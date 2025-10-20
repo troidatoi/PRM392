@@ -18,9 +18,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        System.out.println("MainActivity: onCreate called");
         initViews();
         setupBottomNavigation();
         loadDefaultFragment();
+        System.out.println("MainActivity: Default fragment loaded");
     }
     
     private void initViews() {
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void loadDefaultFragment() {
-        loadFragment(bikeListFragment);
+        loadFragment(homeFragment);
     }
     
     private void loadFragment(Fragment fragment) {
