@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#10FFFFFF" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+
+    <!-- Light reflection on top -->
+    <item android:height="40dp" android:gravity="top">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#50FFFFFF"
+                android:centerColor="#20FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:type="linear" />
+            <corners android:topLeftRadius="20dp" android:topRightRadius="20dp" />
+        </shape>
+    </item>
+
+    <!-- Border glow -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="2dp"
+                android:color="#80FFFFFF" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+</layer-list>
+

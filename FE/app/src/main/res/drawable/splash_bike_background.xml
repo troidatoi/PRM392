@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Placeholder for bike image - you'll need to add the actual image as splash_bike.jpg or splash_bike.png -->
+    <gradient
+        android:angle="135"
+        android:startColor="#1a2332"
+        android:centerColor="#2d4a6e"
+        android:endColor="#4a90a4"
+        android:type="linear" />
+</shape>
+

@@ -2,10 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Internet permission for API calls -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,18 +10,134 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyApplication"
-        android:usesCleartextTraffic="true">
-        
+        android:theme="@style/Theme.Project">
+
+        <!-- Main Activity - Splash Screen (Launcher) -->
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Project">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
+        <!-- Login Activity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Register Activity -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Home Activity - Shop -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Shop Activity -->
+        <activity
+            android:name=".ShopActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Cart Activity -->
+        <activity
+            android:name=".CartActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Account Activity -->
+        <activity
+            android:name=".AccountActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Edit Profile Activity -->
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Checkout Activity -->
+        <activity
+            android:name=".CheckoutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Product Detail Activity -->
+        <activity
+            android:name=".ProductDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Profile Edit Activity -->
+        <activity
+            android:name=".ProfileEditActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Admin Management Activity -->
+        <activity
+            android:name=".AdminManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Product Management Activity -->
+        <activity
+            android:name=".ProductManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Store Management Activity -->
+        <activity
+            android:name=".StoreManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- User Chat Activity -->
+        <activity
+            android:name=".UserChatActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Admin Chat List Activity -->
+        <activity
+            android:name=".AdminChatListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Admin Chat Activity -->
+        <activity
+            android:name=".AdminChatActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Order History Activity -->
+        <activity
+            android:name=".OrderHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Add Product Activity -->
+        <activity
+            android:name=".AddProductActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Search Activity -->
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project"
+            android:windowSoftInputMode="adjustPan" />
+
     </application>
 
 </manifest>

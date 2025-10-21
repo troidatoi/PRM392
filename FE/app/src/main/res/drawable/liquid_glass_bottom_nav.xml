@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Shadow layer for depth -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#1A000000"
+                android:centerColor="#0D000000"
+                android:endColor="#00000000"
+                android:angle="90" />
+            <corners android:radius="35dp" />
+        </shape>
+    </item>
+
+    <!-- Main liquid glass background -->
+    <item
+        android:top="1dp"
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#66FFFFFF"
+                android:centerColor="#52FFFFFF"
+                android:endColor="#40FFFFFF"
+                android:angle="90" />
+            <corners android:radius="34dp" />
+        </shape>
+    </item>
+
+    <!-- Top highlight for glass reflection -->
+    <item
+        android:top="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:bottom="50dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#80FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="90" />
+            <corners 
+                android:topLeftRadius="33dp"
+                android:topRightRadius="33dp" />
+        </shape>
+    </item>
+
+    <!-- Glass border -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="1.5dp"
+                android:color="#99FFFFFF" />
+            <corners android:radius="35dp" />
+        </shape>
+    </item>
+
+    <!-- Inner glow -->
+    <item
+        android:top="1dp"
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp">
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="0.5dp"
+                android:color="#B3FFFFFF" />
+            <corners android:radius="34dp" />
+        </shape>
+    </item>
+</layer-list>

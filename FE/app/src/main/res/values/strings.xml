@@ -1,3 +1,25 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Project</string>
+
+    <!-- Login & Register -->
+    <string name="login_title">Login</string>
+    <string name="register_title">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="login_button">Login</string>
+    <string name="register_button">Register</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="no_account">You dont have account?</string>
+    <string name="have_account">Have an account?</string>
+    <string name="register_now">Register</string>
+    <string name="login_now">Login</string>
+    <string name="welcome_back">Chào mừng bạn trở lại!</string>
+    <string name="create_account">Tạo tài khoản mới</string>
+    <string name="shop_name">Shop Bán Hàng</string>
+
+    <!-- Search -->
+    <string name="search_hint">Tìm kiếm sản phẩm…</string>
+    <string name="search_icon">Search</string>
 </resources>
