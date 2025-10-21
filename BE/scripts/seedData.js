@@ -4,7 +4,7 @@ const Bike = require('../models/Bike');
 const sampleBikes = require('../data/sampleBikes');
 
 // Load env vars
-dotenv.config({ path: './config.env' });
+dotenv.config();
 
 const seedDatabase = async () => {
   try {

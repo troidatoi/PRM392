@@ -5,7 +5,7 @@ const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 
 // Load env vars
-dotenv.config({ path: './config.env' });
+dotenv.config();
 
 // Connect to database
 connectDB();
@@ -26,6 +26,8 @@ app.use(cors({
 
 // Routes
 app.use('/api/bikes', require('./routes/bikeRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

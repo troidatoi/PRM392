@@ -9,9 +9,9 @@ Backend API cho ứng dụng bán xe đạp điện được xây dựng với N
 npm install
 ```
 
-2. Tạo file `.env` từ `config.env`:
+2. Tạo file `.env` từ mẫu:
 ```bash
-cp config.env .env
+cp .env.example .env
 ```
 
 3. Cập nhật các biến môi trường trong file `.env`:
@@ -137,7 +137,7 @@ GET /api/health
 BE/
 ├── config/
 │   ├── database.js          # Cấu hình kết nối MongoDB
-│   └── config.env           # Biến môi trường
+│   └── .env                 # Biến môi trường (không commit)
 ├── middleware/
 │   └── errorHandler.js      # Xử lý lỗi
 ├── models/
