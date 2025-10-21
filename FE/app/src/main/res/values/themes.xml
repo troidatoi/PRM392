@@ -1,20 +1,22 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <!-- Base application theme. -->
-    <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/lime_green</item>
-        <item name="colorPrimaryVariant">@color/lime_green_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/lime_green_light</item>
-        <item name="colorSecondaryVariant">@color/lime_green_dark</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Background colors -->
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="colorSurface">@color/card_background</item>
-        <item name="colorOnSurface">@color/text_primary</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/dark_gray</item>
-        <item name="android:windowLightStatusBar">false</item>
+    <style name="Base.Theme.Project" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+    </style>
+
+    <style name="Theme.Project" parent="Base.Theme.Project" />
+
+    <!-- Liquid Glass TextInputLayout Style -->
+    <style name="LiquidGlassTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxBackgroundColor">@android:color/transparent</item>
+        <item name="hintEnabled">true</item>
+        <item name="hintAnimationEnabled">true</item>
+        <item name="android:textColorHint">#8B9DC3</item>
+        <item name="startIconTint">#5E7CE2</item>
     </style>
 </resources>
+

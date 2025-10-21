@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Lớp nền trong suốt mờ -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#10FFFFFF" /> <!-- nhẹ hơn để nhìn xuyên nền -->
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+
+    <!-- Hiệu ứng phản chiếu sáng phía trên -->
+    <item android:top="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#66FFFFFF"
+                android:centerColor="#10FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="270" />
+            <corners android:topLeftRadius="22dp" android:topRightRadius="22dp" />
+        </shape>
+    </item>
+
+    <!-- Hiệu ứng phản chiếu nghiêng (glass reflection) -->
+    <item android:left="0dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#33FFFFFF"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#00000000"
+                android:angle="45" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+
+    <!-- Viền trắng mờ nhẹ -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="1.2dp"
+                android:color="#88FFFFFF" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+
+    <!-- Bóng đổ nhẹ bên trong tạo chiều sâu -->
+    <item>
+        <shape android:shape="rectangle">
+            <padding android:left="1dp" android:top="1dp" android:right="1dp" android:bottom="1dp"/>
+            <solid android:color="#10000000" />
+            <corners android:radius="22dp" />
+        </shape>
+    </item>
+
+</layer-list>

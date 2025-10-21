@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Lớp nền glass với độ mờ cao hơn -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#40FFFFFF" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+
+    <!-- Lớp inner glow tạo độ sâu -->
+    <item android:top="2dp" android:bottom="2dp" android:left="2dp" android:right="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#30FFFFFF" />
+            <corners android:radius="14dp" />
+        </shape>
+    </item>
+
+    <!-- Hiệu ứng phản chiếu sáng phía trên (glass highlight) -->
+    <item android:height="24dp" android:gravity="top">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#80FFFFFF"
+                android:centerColor="#40FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="270" />
+            <corners android:topLeftRadius="16dp" android:topRightRadius="16dp" />
+        </shape>
+    </item>
+
+    <!-- Hiệu ứng phản chiếu chéo (diagonal reflection) -->
+    <item android:left="0dp" android:top="0dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#50FFFFFF"
+                android:centerColor="#10FFFFFF"
+                android:endColor="#00000000"
+                android:angle="135" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+
+    <!-- Viền trắng sáng để tạo glass border -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke
+                android:width="1.5dp"
+                android:color="#90FFFFFF" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+
+    <!-- Shadow nhẹ bên trong để tạo chiều sâu -->
+    <item android:top="1dp" android:left="1dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#00000000"
+                android:endColor="#10000000"
+                android:angle="135" />
+            <corners android:radius="15dp" />
+        </shape>
+    </item>
+</layer-list>
