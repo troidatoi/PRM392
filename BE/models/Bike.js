@@ -165,3 +165,4 @@ bikeSchema.pre('save', function(next) {
 module.exports = mongoose.model('Bike', bikeSchema);
 
 
+
