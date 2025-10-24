@@ -28,7 +28,10 @@ app.use(cors({
 app.use('/api/bikes', require('./routes/bikeRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/locations', require('./routes/locationRoutes'));
+app.use('/api/stores', require('./routes/storeRoutes')); // Store routes
+app.use('/api/cart', require('./routes/cartRoutes')); // Cart routes
+app.use('/api/orders', require('./routes/orderRoutes')); // Order routes
+app.use('/api/inventory', require('./routes/inventoryRoutes')); // Inventory routes
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

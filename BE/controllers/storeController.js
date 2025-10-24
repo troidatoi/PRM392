@@ -1,4 +1,4 @@
-const StoreLocation = require('../models/StoreLocation');
+const Store = require('../models/Store');
 
 // @desc    Create new store
 // @route   POST /api/locations
@@ -8,7 +8,7 @@ const createStore = async (req, res) => {
     const { name, latitude, longitude, address, city, district } = req.body;
 
     // Check for duplicate store by name and location
-    const existingStore = await StoreLocation.findOne({
+    const existingStore = await Store.findOne({
       $or: [
         { name: name },
         {
@@ -30,7 +30,7 @@ const createStore = async (req, res) => {
       });
     }
 
-    const store = await StoreLocation.create(req.body);
+    const store = await Store.create(req.body);
 
     res.status(201).json({
       success: true,
@@ -49,7 +49,7 @@ const createStore = async (req, res) => {
 // @access  Private/Admin
 const updateStore = async (req, res) => {
   try {
-    const store = await StoreLocation.findByIdAndUpdate(
+    const store = await Store.findByIdAndUpdate(
       req.params.id,
       req.body,
       {
@@ -114,13 +114,13 @@ const getAllStores = async (req, res) => {
       sortObj.createdAt = -1;
     }
 
-    const stores = await StoreLocation.find(filter)
+    const stores = await Store.find(filter)
       .sort(sortObj)
       .skip(skip)
       .limit(limitNum)
       .select('-__v');
 
-    const total = await StoreLocation.countDocuments(filter);
+    const total = await Store.countDocuments(filter);
 
     res.status(200).json({
       success: true,
@@ -143,7 +143,7 @@ const getAllStores = async (req, res) => {
 // @access  Public
 const getStoreById = async (req, res) => {
   try {
-    const store = await StoreLocation.findById(req.params.id);
+    const store = await Store.findById(req.params.id);
 
     if (!store) {
       return res.status(404).json({
@@ -169,7 +169,7 @@ const getStoreById = async (req, res) => {
 // @access  Private/Admin
 const deleteStore = async (req, res) => {
   try {
-    const store = await StoreLocation.findById(req.params.id);
+    const store = await Store.findById(req.params.id);
 
     if (!store) {
       return res.status(404).json({
@@ -220,7 +220,7 @@ const getNearbyStores = async (req, res) => {
     }
 
     // Get all active stores first
-    const allStores = await StoreLocation.find({ isActive: true }).select('-__v');
+    const allStores = await Store.find({ isActive: true }).select('-__v');
 
     // Calculate distance for each store and filter by radius
     const storesWithDistance = allStores

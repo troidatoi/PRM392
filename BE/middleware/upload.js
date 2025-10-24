@@ -1,53 +1,60 @@
-const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
+const path = require('path');
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'demo',
-  api_key: process.env.CLOUDINARY_API_KEY || 'demo',
-  api_secret: process.env.CLOUDINARY_API_SECRET || 'demo'
+// Configure storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
 });
 
-// Configure multer for memory storage
-const storage = multer.memoryStorage();
+// File filter
+const fileFilter = (req, file, cb) => {
+  // Accept images only
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Chỉ chấp nhận file hình ảnh!'), false);
+  }
+};
 
+// Configure multer
 const upload = multer({
   storage: storage,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
-    files: 5 // Maximum 5 files
   },
-  fileFilter: (req, file, cb) => {
-    // Check file type
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Chỉ cho phép upload file ảnh'), false);
-    }
-  }
+  fileFilter: fileFilter
 });
 
-// Middleware for multiple images upload
+// Single file upload
+const uploadSingle = upload.single('image');
+
+// Multiple files upload
 const uploadMultiple = upload.array('images', 5);
 
-// Error handling middleware
+// Error handler
 const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: 'Kích thước file quá lớn. Tối đa 5MB'
+        message: 'File quá lớn. Kích thước tối đa 5MB'
       });
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
       return res.status(400).json({
         success: false,
-        message: 'Số lượng file quá nhiều. Tối đa 5 ảnh'
+        message: 'Quá nhiều file. Tối đa 5 file'
       });
     }
   }
   
-  if (err.message === 'Chỉ cho phép upload file ảnh') {
+  if (err.message === 'Chỉ chấp nhận file hình ảnh!') {
     return res.status(400).json({
       success: false,
       message: err.message
@@ -57,41 +64,8 @@ const handleUploadError = (err, req, res, next) => {
   next(err);
 };
 
-// Upload images to Cloudinary
-const uploadToCloudinary = async (files) => {
-  const uploadPromises = files.map(file => {
-    return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'bike-rental/bikes',
-          transformation: [
-            { width: 800, height: 600, crop: 'limit' },
-            { quality: 'auto' }
-          ]
-        },
-        (error, result) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve({
-              url: result.secure_url,
-              alt: file.originalname || 'Bike image',
-              public_id: result.public_id
-            });
-          }
-        }
-      );
-      
-      uploadStream.end(file.buffer);
-    });
-  });
-  
-  return Promise.all(uploadPromises);
-};
-
 module.exports = {
+  uploadSingle,
   uploadMultiple,
-  handleUploadError,
-  uploadToCloudinary,
-  cloudinary
+  handleUploadError
 };

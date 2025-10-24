@@ -91,11 +91,6 @@ const bikeSchema = new mongoose.Schema({
     enum: ['available', 'out_of_stock', 'discontinued'],
     default: 'available'
   },
-  stock: {
-    type: Number,
-    default: 0,
-    min: [0, 'Số lượng tồn kho không được âm']
-  },
   features: [{
     type: String,
     trim: true

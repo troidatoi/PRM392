@@ -195,7 +195,6 @@ const createBike = async (req, res) => {
       model: req.body.model,
       price: parseFloat(req.body.price),
       description: req.body.description,
-      stock: parseInt(req.body.stock),
       category: req.body.category,
       status: req.body.status,
       specifications: Object.keys(specifications).length > 0 ? specifications : undefined,

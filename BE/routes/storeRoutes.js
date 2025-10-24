@@ -7,7 +7,7 @@ const {
   updateStore,
   deleteStore,
   getNearbyStores
-} = require('../controllers/locationController');
+} = require('../controllers/storeController');
 
 // Public routes
 router.get('/', getAllStores);
