@@ -76,10 +76,11 @@
     </androidx.cardview.widget.CardView>
 
     <!-- Main Content -->
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <!-- Loading Indicator -->
         <ProgressBar
@@ -87,14 +88,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="100dp"
             android:visibility="gone" />
 
         <!-- User Detail Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardViewUserInfo"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="20dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="8dp"
             app:cardBackgroundColor="@android:color/transparent"
@@ -102,8 +105,9 @@
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fillViewport="true">
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:paddingBottom="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -360,6 +364,100 @@
 
         </androidx.cardview.widget.CardView>
 
-    </FrameLayout>
+    </LinearLayout>
+
+    <!-- Action Buttons - Fixed at bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <!-- Update Button -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnUpdateUser"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_update_background"
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_account"
+                    app:tint="#FFFFFF"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Edit" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chỉnh Sửa"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Delete Button -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnDeleteUser"
+            android:layout_width="0dp"
+            android:layout_height="65dp"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_delete_background"
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="#FFFFFF"
+                    android:layout_marginEnd="12dp"
+                    android:contentDescription="Delete" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xóa"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
 
 </LinearLayout>
