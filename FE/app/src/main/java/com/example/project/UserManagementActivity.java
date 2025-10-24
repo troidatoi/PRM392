@@ -66,6 +66,7 @@ public class UserManagementActivity extends AppCompatActivity {
 
         // Setup RecyclerView
         userAdapter = new UserAdapter(userList, this);
+        userAdapter.setOnUserClickListener(this::onUserClick);
         recyclerViewUsers.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewUsers.setAdapter(userAdapter);
     }
@@ -129,6 +130,12 @@ public class UserManagementActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
+    }
+
+    private void onUserClick(User user) {
+        Intent intent = new Intent(this, UserDetailActivity.class);
+        intent.putExtra("userId", user.getId());
+        startActivity(intent);
     }
 
     private void showLoading(boolean show) {

@@ -23,10 +23,19 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private List<User> userList;
     private Context context;
+    private OnUserClickListener onUserClickListener;
+
+    public interface OnUserClickListener {
+        void onUserClick(User user);
+    }
 
     public UserAdapter(List<User> userList, Context context) {
         this.userList = userList;
         this.context = context;
+    }
+
+    public void setOnUserClickListener(OnUserClickListener listener) {
+        this.onUserClickListener = listener;
     }
 
     @NonNull
@@ -107,9 +116,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             imgAvatar.setImageResource(R.drawable.ic_account);
             imgAvatar.setColorFilter(context.getResources().getColor(android.R.color.darker_gray));
 
-            // Click listener for future actions
+            // Click listener for user detail
             cardViewUser.setOnClickListener(v -> {
-                // TODO: Implement user detail/edit functionality
+                if (onUserClickListener != null) {
+                    onUserClickListener.onUserClick(user);
+                }
             });
         }
 

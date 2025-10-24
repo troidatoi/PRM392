@@ -156,15 +156,14 @@
 
         </LinearLayout>
 
-        <!-- Arrow -->
+        <!-- Detail Icon -->
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_search"
-            android:rotation="270"
-            app:tint="#CCCCCC"
+            android:src="@drawable/ic_account"
+            app:tint="#2196F3"
             android:layout_marginStart="12dp"
-            android:contentDescription="Arrow" />
+            android:contentDescription="View Details" />
 
     </LinearLayout>
 
