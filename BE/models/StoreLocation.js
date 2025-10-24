@@ -264,7 +264,8 @@ storeLocationSchema.virtual('fullAddress').get(function() {
 // Virtual for is open now
 storeLocationSchema.virtual('isOpenNow').get(function() {
   const now = new Date();
-  const dayName = now.toLocaleLowerCase().substring(0, 3);
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayName = dayNames[now.getDay()];
   const currentTime = now.toTimeString().substring(0, 5);
   
   const daySchedule = this.operatingHours[dayName];

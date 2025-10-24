@@ -28,6 +28,7 @@ app.use(cors({
 app.use('/api/bikes', require('./routes/bikeRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/locations', require('./routes/locationRoutes'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
