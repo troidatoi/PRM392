@@ -130,8 +130,9 @@ public class ProductManagementActivity extends AppCompatActivity {
     }
 
     private void onBikeClick(Bike bike) {
-        // TODO: Navigate to bike detail page
-        Toast.makeText(this, "Xem chi tiết xe: " + bike.getName(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(ProductManagementActivity.this, BikeDetailActivity.class);
+        intent.putExtra("bike_id", bike.getId());
+        startActivity(intent);
     }
 
     private void showError(String message) {
