@@ -1,6 +1,7 @@
 package com.example.project.network;
 
 import com.example.project.models.ApiResponse;
+import com.example.project.models.Bike;
 import com.example.project.models.LoginRequest;
 import com.example.project.models.RegisterRequest;
 import com.example.project.models.User;
@@ -45,6 +46,36 @@ public interface ApiService {
     
     @retrofit2.http.DELETE("users/{id}")
     Call<ApiResponse<Void>> deleteUser(@Header("Authorization") String token, @retrofit2.http.Path("id") String userId);
+    
+    // Bike endpoints
+    @GET("bikes")
+    Call<ApiResponse<Bike[]>> getBikes(@retrofit2.http.Query("page") int page,
+                                       @retrofit2.http.Query("limit") int limit,
+                                       @retrofit2.http.Query("category") String category,
+                                       @retrofit2.http.Query("status") String status,
+                                       @retrofit2.http.Query("brand") String brand,
+                                       @retrofit2.http.Query("minPrice") Double minPrice,
+                                       @retrofit2.http.Query("maxPrice") Double maxPrice,
+                                       @retrofit2.http.Query("search") String search,
+                                       @retrofit2.http.Query("sortBy") String sortBy);
+    
+    @GET("bikes/{id}")
+    Call<ApiResponse<Bike>> getBikeById(@retrofit2.http.Path("id") String bikeId);
+    
+    @POST("bikes")
+    Call<ApiResponse<Bike>> createBike(@Header("Authorization") String token, @Body Bike bike);
+    
+    @PUT("bikes/{id}")
+    Call<ApiResponse<Bike>> updateBike(@Header("Authorization") String token, @retrofit2.http.Path("id") String bikeId, @Body Bike bike);
+    
+    @retrofit2.http.DELETE("bikes/{id}")
+    Call<ApiResponse<Void>> deleteBike(@Header("Authorization") String token, @retrofit2.http.Path("id") String bikeId);
+    
+    @GET("bikes/featured/list")
+    Call<ApiResponse<Bike[]>> getFeaturedBikes(@retrofit2.http.Query("limit") int limit);
+    
+    @GET("bikes/categories/list")
+    Call<ApiResponse<Object[]>> getCategories();
     
     // Change password request model
     class ChangePasswordRequest {

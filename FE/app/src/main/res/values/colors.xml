@@ -12,4 +12,8 @@
     <color name="button_primary">#FF2196F3</color>
     <color name="button_text">#FFFFFFFF</color>
     <color name="tab_selected_blue">#4A90E2</color>
+    <color name="gray">#FF757575</color>
+    <color name="green">#FF4CAF50</color>
+    <color name="red">#FFF44336</color>
+    <color name="orange">#FFFF9800</color>
 </resources>
