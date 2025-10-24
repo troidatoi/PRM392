@@ -144,6 +144,12 @@
             android:theme="@style/Theme.Project"
             android:windowSoftInputMode="adjustPan" />
 
+        <!-- User Management Activity -->
+        <activity
+            android:name=".UserManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
     </application>
 
 </manifest>

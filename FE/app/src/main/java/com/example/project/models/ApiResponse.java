@@ -15,6 +15,12 @@ public class ApiResponse<T> {
     @SerializedName("user")
     private T user;
     
+    @SerializedName("users")
+    private T users;
+    
+    @SerializedName("count")
+    private int count;
+    
     @SerializedName("errors")
     private Object errors;
 
@@ -50,6 +56,22 @@ public class ApiResponse<T> {
 
     public void setUser(T user) {
         this.user = user;
+    }
+
+    public T getUsers() {
+        return users;
+    }
+
+    public void setUsers(T users) {
+        this.users = users;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public Object getErrors() {
