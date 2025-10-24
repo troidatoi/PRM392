@@ -170,6 +170,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Update Bike Activity -->
+        <activity
+            android:name=".UpdateBikeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
     </application>
 
 </manifest>

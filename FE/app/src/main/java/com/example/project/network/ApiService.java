@@ -79,11 +79,34 @@ public interface ApiService {
         @Part("stock") RequestBody stock,
         @Part("category") RequestBody category,
         @Part("status") RequestBody status,
+        @Part("battery") RequestBody battery,
+        @Part("motor") RequestBody motor,
+        @Part("range") RequestBody range,
+        @Part("maxSpeed") RequestBody maxSpeed,
+        @Part("weight") RequestBody weight,
+        @Part("chargingTime") RequestBody chargingTime,
+        @Part("features") RequestBody features,
+        @Part("warranty") RequestBody warranty,
+        @Part("originalPrice") RequestBody originalPrice,
+        @Part("tags") RequestBody tags,
         @Part List<MultipartBody.Part> images
     );
     
+    @Multipart
     @PUT("bikes/{id}")
-    Call<ApiResponse<Bike>> updateBike(@Header("Authorization") String token, @retrofit2.http.Path("id") String bikeId, @Body Bike bike);
+    Call<ApiResponse<Bike>> updateBike(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("id") String bikeId,
+        @Part("name") RequestBody name,
+        @Part("brand") RequestBody brand,
+        @Part("model") RequestBody model,
+        @Part("price") RequestBody price,
+        @Part("description") RequestBody description,
+        @Part("stock") RequestBody stock,
+        @Part("category") RequestBody category,
+        @Part("status") RequestBody status,
+        @Part List<MultipartBody.Part> images
+    );
     
     @retrofit2.http.DELETE("bikes/{id}")
     Call<ApiResponse<Void>> deleteBike(@Header("Authorization") String token, @retrofit2.http.Path("id") String bikeId);

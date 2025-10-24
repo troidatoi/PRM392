@@ -1,12 +1,14 @@
 package com.example.project;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -20,6 +22,7 @@ import com.example.project.models.ApiResponse;
 import com.example.project.models.Bike;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
+import com.example.project.utils.AuthManager;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -33,7 +36,7 @@ import retrofit2.Response;
 public class BikeDetailActivity extends AppCompatActivity {
 
     // Views
-    private CardView btnBack;
+    private CardView btnBack, btnEdit, btnDelete;
     private ImageView ivMainImage;
     private RecyclerView rvImageGallery;
     private TextView tvBikeName, tvBikeBrand, tvBikeModel, tvBikePrice, tvOriginalPrice;
@@ -48,6 +51,7 @@ public class BikeDetailActivity extends AppCompatActivity {
     private BikeImageAdapter imageAdapter;
     private List<String> imageUrls;
     private ApiService apiService;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,8 @@ public class BikeDetailActivity extends AppCompatActivity {
 
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
+        btnEdit = findViewById(R.id.btnEdit);
+        btnDelete = findViewById(R.id.btnDelete);
         ivMainImage = findViewById(R.id.ivMainImage);
         rvImageGallery = findViewById(R.id.rvImageGallery);
         tvBikeName = findViewById(R.id.tvBikeName);
@@ -93,6 +99,7 @@ public class BikeDetailActivity extends AppCompatActivity {
     private void initData() {
         imageUrls = new ArrayList<>();
         apiService = RetrofitClient.getInstance().getApiService();
+        authManager = AuthManager.getInstance(this);
     }
 
     private void setupRecyclerView() {
@@ -104,6 +111,24 @@ public class BikeDetailActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
+        
+        btnEdit.setOnClickListener(v -> {
+            if (authManager.isStaff()) {
+                Intent intent = new Intent(BikeDetailActivity.this, UpdateBikeActivity.class);
+                intent.putExtra("bike_id", bikeId);
+                startActivityForResult(intent, 1001);
+            } else {
+                Toast.makeText(this, "Bạn không có quyền chỉnh sửa", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnDelete.setOnClickListener(v -> {
+            if (authManager.isStaff()) {
+                showDeleteConfirmationDialog();
+            } else {
+                Toast.makeText(this, "Bạn không có quyền xóa", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void onImageClick(int position) {
@@ -319,5 +344,53 @@ public class BikeDetailActivity extends AppCompatActivity {
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         llErrorState.setVisibility(View.VISIBLE);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        new AlertDialog.Builder(this)
+            .setTitle("Xác nhận xóa xe")
+            .setMessage("Bạn có chắc chắn muốn xóa xe \"" + (bike != null ? bike.getName() : "này") + "\"?\n\nHành động này không thể hoàn tác!")
+            .setPositiveButton("Xóa", (dialog, which) -> deleteBike())
+            .setNegativeButton("Hủy", null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+
+    private void deleteBike() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        String token = "Bearer " + authManager.getToken();
+        Call<ApiResponse<Void>> call = apiService.deleteBike(token, bikeId);
+        
+        call.enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                progressBar.setVisibility(View.GONE);
+                
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Toast.makeText(BikeDetailActivity.this, "Xóa xe thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    String errorMessage = "Lỗi xóa xe: " + (response.body() != null ? response.body().getMessage() : response.message());
+                    Toast.makeText(BikeDetailActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(BikeDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            // Reload bike data when bike is updated successfully
+            loadBikeDetail();
+        }
     }
 }

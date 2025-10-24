@@ -18,6 +18,8 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.project.adapters.SelectedImageAdapter;
 import com.example.project.models.ApiResponse;
 import com.example.project.models.Bike;
@@ -25,7 +27,7 @@ import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
 import com.example.project.utils.AuthManager;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,23 +38,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateBikeActivity extends AppCompatActivity implements SelectedImageAdapter.OnImageClickListener {
+public class UpdateBikeActivity extends AppCompatActivity implements SelectedImageAdapter.OnImageClickListener {
 
     private static final int PICK_IMAGES_REQUEST = 1001;
 
     // Views
     private CardView btnBack;
     private EditText etName, etBrand, etModel, etPrice, etDescription, etStock;
-    private EditText etBattery, etMotor, etRange, etMaxSpeed, etWeight, etChargingTime;
-    private EditText etFeatures, etWarranty, etOriginalPrice, etTags;
     private Spinner spinnerCategory, spinnerStatus;
-    private Button btnSelectImages, btnCreateBike;
+    private Button btnSelectImages, btnUpdateBike;
     private TextView tvImageCount;
     private RecyclerView rvSelectedImages;
     private ProgressBar progressBar;
 
     // Data
+    private String bikeId;
+    private Bike originalBike;
     private List<Uri> selectedImages;
+    private List<String> existingImageUrls;
     private SelectedImageAdapter imageAdapter;
     private ApiService apiService;
     private AuthManager authManager;
@@ -60,13 +63,22 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_bike);
+        setContentView(R.layout.activity_update_bike);
+
+        // Get bike ID from intent
+        bikeId = getIntent().getStringExtra("bike_id");
+        if (bikeId == null) {
+            Toast.makeText(this, "Không tìm thấy ID xe", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         initViews();
         initData();
         setupSpinners();
         setupRecyclerView();
         setupClickListeners();
+        loadBikeData();
     }
 
     private void initViews() {
@@ -77,20 +89,10 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         etPrice = findViewById(R.id.etPrice);
         etDescription = findViewById(R.id.etDescription);
         etStock = findViewById(R.id.etStock);
-        etBattery = findViewById(R.id.etBattery);
-        etMotor = findViewById(R.id.etMotor);
-        etRange = findViewById(R.id.etRange);
-        etMaxSpeed = findViewById(R.id.etMaxSpeed);
-        etWeight = findViewById(R.id.etWeight);
-        etChargingTime = findViewById(R.id.etChargingTime);
-        etFeatures = findViewById(R.id.etFeatures);
-        etWarranty = findViewById(R.id.etWarranty);
-        etOriginalPrice = findViewById(R.id.etOriginalPrice);
-        etTags = findViewById(R.id.etTags);
         spinnerCategory = findViewById(R.id.spinnerCategory);
         spinnerStatus = findViewById(R.id.spinnerStatus);
         btnSelectImages = findViewById(R.id.btnSelectImages);
-        btnCreateBike = findViewById(R.id.btnCreateBike);
+        btnUpdateBike = findViewById(R.id.btnUpdateBike);
         tvImageCount = findViewById(R.id.tvImageCount);
         rvSelectedImages = findViewById(R.id.rvSelectedImages);
         progressBar = findViewById(R.id.progressBar);
@@ -98,6 +100,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
 
     private void initData() {
         selectedImages = new ArrayList<>();
+        existingImageUrls = new ArrayList<>();
         apiService = RetrofitClient.getInstance().getApiService();
         authManager = AuthManager.getInstance(this);
     }
@@ -128,7 +131,75 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
 
         btnSelectImages.setOnClickListener(v -> selectImages());
 
-        btnCreateBike.setOnClickListener(v -> createBike());
+        btnUpdateBike.setOnClickListener(v -> updateBike());
+    }
+
+    private void loadBikeData() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        Call<ApiResponse<Bike>> call = apiService.getBikeById(bikeId);
+        call.enqueue(new Callback<ApiResponse<Bike>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Bike>> call, Response<ApiResponse<Bike>> response) {
+                progressBar.setVisibility(View.GONE);
+                
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    originalBike = response.body().getData();
+                    if (originalBike != null) {
+                        populateForm();
+                    } else {
+                        showToast("Không tìm thấy thông tin xe");
+                        finish();
+                    }
+                } else {
+                    showToast("Lỗi tải thông tin xe: " + response.code());
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Bike>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                showToast("Lỗi kết nối: " + t.getMessage());
+                finish();
+            }
+        });
+    }
+
+    private void populateForm() {
+        // Fill form with existing data
+        etName.setText(originalBike.getName());
+        etBrand.setText(originalBike.getBrand());
+        etModel.setText(originalBike.getModel());
+        etPrice.setText(String.valueOf(originalBike.getPrice()));
+        etDescription.setText(originalBike.getDescription());
+        etStock.setText(String.valueOf(originalBike.getStock()));
+
+        // Set spinner selections
+        String[] categories = {"city", "mountain", "folding", "cargo", "sport", "other"};
+        for (int i = 0; i < categories.length; i++) {
+            if (categories[i].equals(originalBike.getCategory())) {
+                spinnerCategory.setSelection(i);
+                break;
+            }
+        }
+
+        String[] statuses = {"available", "out_of_stock", "discontinued"};
+        for (int i = 0; i < statuses.length; i++) {
+            if (statuses[i].equals(originalBike.getStatus())) {
+                spinnerStatus.setSelection(i);
+                break;
+            }
+        }
+
+        // Load existing images
+        if (originalBike.getImages() != null && !originalBike.getImages().isEmpty()) {
+            existingImageUrls.clear();
+            for (Bike.BikeImage image : originalBike.getImages()) {
+                existingImageUrls.add(image.getUrl());
+            }
+            updateImageDisplay();
+        }
     }
 
     private void selectImages() {
@@ -165,15 +236,16 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
     }
 
     private void updateImageDisplay() {
-        tvImageCount.setText("Đã chọn: " + selectedImages.size() + "/5 ảnh");
+        int totalImages = existingImageUrls.size() + selectedImages.size();
+        tvImageCount.setText("Đã chọn: " + totalImages + "/5 ảnh");
         imageAdapter.notifyDataSetChanged();
         
-        if (selectedImages.size() >= 5) {
+        if (totalImages >= 5) {
             btnSelectImages.setEnabled(false);
             btnSelectImages.setText("Đã chọn tối đa 5 ảnh");
         } else {
             btnSelectImages.setEnabled(true);
-            btnSelectImages.setText("Chọn ảnh (" + selectedImages.size() + "/5)");
+            btnSelectImages.setText("Chọn ảnh (" + totalImages + "/5)");
         }
     }
 
@@ -185,11 +257,19 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
 
     @Override
     public void onRemoveImage(int position) {
-        selectedImages.remove(position);
+        if (position < selectedImages.size()) {
+            selectedImages.remove(position);
+        } else {
+            // Remove from existing images
+            int existingIndex = position - selectedImages.size();
+            if (existingIndex < existingImageUrls.size()) {
+                existingImageUrls.remove(existingIndex);
+            }
+        }
         updateImageDisplay();
     }
 
-    private void createBike() {
+    private void updateBike() {
         // Validation
         if (etName.getText().toString().trim().isEmpty()) {
             showToast("Vui lòng nhập tên xe");
@@ -213,10 +293,6 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         }
         if (etStock.getText().toString().trim().isEmpty()) {
             showToast("Vui lòng nhập số lượng tồn kho");
-            return;
-        }
-        if (selectedImages.isEmpty()) {
-            showToast("Vui lòng chọn ít nhất 1 ảnh");
             return;
         }
 
@@ -244,7 +320,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         }
 
         progressBar.setVisibility(View.VISIBLE);
-        btnCreateBike.setEnabled(false);
+        btnUpdateBike.setEnabled(false);
 
         // Prepare form data
         String name = etName.getText().toString().trim();
@@ -255,66 +331,13 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         int stock = Integer.parseInt(etStock.getText().toString());
         String category = spinnerCategory.getSelectedItem().toString();
         String status = spinnerStatus.getSelectedItem().toString();
-        
-        // Specifications
-        String battery = etBattery.getText().toString().trim();
-        String motor = etMotor.getText().toString().trim();
-        String range = etRange.getText().toString().trim();
-        String maxSpeed = etMaxSpeed.getText().toString().trim();
-        String weight = etWeight.getText().toString().trim();
-        String chargingTime = etChargingTime.getText().toString().trim();
-        
-        // Features (split by newline)
-        String featuresText = etFeatures.getText().toString().trim();
-        List<String> features = new ArrayList<>();
-        if (!featuresText.isEmpty()) {
-            String[] featureArray = featuresText.split("\n");
-            for (String feature : featureArray) {
-                if (!feature.trim().isEmpty()) {
-                    features.add(feature.trim());
-                }
-            }
-        }
-        
-        // Warranty
-        String warranty = etWarranty.getText().toString().trim();
-        if (warranty.isEmpty()) {
-            warranty = "12 tháng";
-        }
-        
-        // Original price
-        double originalPrice = 0;
-        String originalPriceText = etOriginalPrice.getText().toString().trim();
-        if (!originalPriceText.isEmpty()) {
-            try {
-                originalPrice = Double.parseDouble(originalPriceText);
-            } catch (NumberFormatException e) {
-                showToast("Giá gốc không hợp lệ");
-                progressBar.setVisibility(View.GONE);
-                btnCreateBike.setEnabled(true);
-                return;
-            }
-        }
-        
-        // Tags (split by comma)
-        String tagsText = etTags.getText().toString().trim();
-        List<String> tags = new ArrayList<>();
-        if (!tagsText.isEmpty()) {
-            String[] tagArray = tagsText.split(",");
-            for (String tag : tagArray) {
-                if (!tag.trim().isEmpty()) {
-                    tags.add(tag.trim());
-                }
-            }
-        }
 
-        // Convert images to MultipartBody.Part
+        // Convert new images to MultipartBody.Part
         List<MultipartBody.Part> imageParts = new ArrayList<>();
-        for (int i = 0; i < selectedImages.size(); i++) {
-            Uri uri = selectedImages.get(i);
+        for (Uri uri : selectedImages) {
             try {
                 // Get file name
-                String fileName = "image_" + (i + 1) + ".jpg";
+                String fileName = "image_" + System.currentTimeMillis() + ".jpg";
                 
                 // Get content type
                 String contentType = getContentResolver().getType(uri);
@@ -323,7 +346,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
                 }
                 
                 // Create RequestBody from InputStream
-                java.io.InputStream inputStream = getContentResolver().openInputStream(uri);
+                InputStream inputStream = getContentResolver().openInputStream(uri);
                 if (inputStream == null) {
                     throw new Exception("Không thể đọc file ảnh");
                 }
@@ -338,9 +361,9 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
                 
             } catch (Exception e) {
                 e.printStackTrace();
-                showToast("Lỗi xử lý ảnh " + (i + 1) + ": " + e.getMessage());
+                showToast("Lỗi xử lý ảnh: " + e.getMessage());
                 progressBar.setVisibility(View.GONE);
-                btnCreateBike.setEnabled(true);
+                btnUpdateBike.setEnabled(true);
                 return;
             }
         }
@@ -354,50 +377,26 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         RequestBody stockPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(stock));
         RequestBody categoryPart = RequestBody.create(MediaType.parse("text/plain"), category);
         RequestBody statusPart = RequestBody.create(MediaType.parse("text/plain"), status);
-        
-        // Specifications
-        RequestBody batteryPart = RequestBody.create(MediaType.parse("text/plain"), battery);
-        RequestBody motorPart = RequestBody.create(MediaType.parse("text/plain"), motor);
-        RequestBody rangePart = RequestBody.create(MediaType.parse("text/plain"), range);
-        RequestBody maxSpeedPart = RequestBody.create(MediaType.parse("text/plain"), maxSpeed);
-        RequestBody weightPart = RequestBody.create(MediaType.parse("text/plain"), weight);
-        RequestBody chargingTimePart = RequestBody.create(MediaType.parse("text/plain"), chargingTime);
-        
-        // Features (join with newline)
-        String featuresString = String.join("\n", features);
-        RequestBody featuresPart = RequestBody.create(MediaType.parse("text/plain"), featuresString);
-        
-        // Warranty
-        RequestBody warrantyPart = RequestBody.create(MediaType.parse("text/plain"), warranty);
-        
-        // Original price
-        RequestBody originalPricePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(originalPrice));
-        
-        // Tags (join with comma)
-        String tagsString = String.join(",", tags);
-        RequestBody tagsPart = RequestBody.create(MediaType.parse("text/plain"), tagsString);
 
         // Make API call
         String token = "Bearer " + authManager.getToken();
-        Call<ApiResponse<Bike>> call = apiService.createBike(
-            token, namePart, brandPart, modelPart, pricePart, 
-            descriptionPart, stockPart, categoryPart, statusPart,
-            batteryPart, motorPart, rangePart, maxSpeedPart, weightPart, chargingTimePart,
-            featuresPart, warrantyPart, originalPricePart, tagsPart, imageParts
+        Call<ApiResponse<Bike>> call = apiService.updateBike(
+            token, bikeId, namePart, brandPart, modelPart, pricePart, 
+            descriptionPart, stockPart, categoryPart, statusPart, imageParts
         );
 
         call.enqueue(new Callback<ApiResponse<Bike>>() {
             @Override
             public void onResponse(Call<ApiResponse<Bike>> call, Response<ApiResponse<Bike>> response) {
                 progressBar.setVisibility(View.GONE);
-                btnCreateBike.setEnabled(true);
+                btnUpdateBike.setEnabled(true);
                 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    showToast("Tạo xe thành công!");
+                    showToast("Cập nhật xe thành công!");
                     setResult(RESULT_OK);
                     finish();
                 } else {
-                    String errorMessage = "Lỗi tạo xe: " + (response.body() != null ? response.body().getMessage() : response.message());
+                    String errorMessage = "Lỗi cập nhật xe: " + (response.body() != null ? response.body().getMessage() : response.message());
                     showToast(errorMessage);
                 }
             }
@@ -405,40 +404,10 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
             @Override
             public void onFailure(Call<ApiResponse<Bike>> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                btnCreateBike.setEnabled(true);
+                btnUpdateBike.setEnabled(true);
                 showToast("Lỗi kết nối: " + t.getMessage());
             }
         });
-    }
-
-    private File getFileFromUri(Uri uri) throws Exception {
-        // Get the file path from URI
-        String filePath = null;
-        
-        if (uri.getScheme().equals("content")) {
-            // For content URIs, we need to get the actual file path
-            String[] projection = { android.provider.MediaStore.Images.Media.DATA };
-            android.database.Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-            if (cursor != null) {
-                int column_index = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                filePath = cursor.getString(column_index);
-                cursor.close();
-            }
-        } else if (uri.getScheme().equals("file")) {
-            filePath = uri.getPath();
-        }
-        
-        if (filePath == null) {
-            throw new Exception("Không thể lấy đường dẫn file từ URI");
-        }
-        
-        File file = new File(filePath);
-        if (!file.exists()) {
-            throw new Exception("File không tồn tại: " + filePath);
-        }
-        
-        return file;
     }
 
     private void showToast(String message) {

@@ -26,14 +26,14 @@
                 android:layout_marginEnd="16dp"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="4dp"
-                android:background="@drawable/liquid_glass_small">
+                android:background="@drawable/white_rounded_background">
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_arrow_back"
-                    android:tint="@color/white" />
+                    android:tint="@color/black" />
 
             </androidx.cardview.widget.CardView>
 
@@ -41,7 +41,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tạo xe mới"
+                android:text="Cập nhật xe"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -202,6 +202,22 @@
 
         <Spinner
             android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/white_rounded_background" />
+
+        <!-- Status Spinner -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trạng thái"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerStatus"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
@@ -421,7 +437,6 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textColorHint="@color/gray"
-                android:text="12 tháng"
                 android:background="@android:color/transparent" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -495,23 +510,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Status Spinner -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Trạng thái"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
-
-        <Spinner
-            android:id="@+id/spinnerStatus"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginBottom="24dp"
-            android:background="@drawable/white_rounded_background" />
-
         <!-- Image Selection -->
         <TextView
             android:layout_width="match_parent"
@@ -526,7 +524,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="12dp"
-            android:text="Chọn ảnh (0/5)"
+            android:text="Chọn ảnh mới (0/5)"
             android:textColor="@color/black"
             android:background="@drawable/white_rounded_background" />
 
@@ -546,12 +544,12 @@
             android:layout_height="120dp"
             android:layout_marginBottom="24dp" />
 
-        <!-- Create Button -->
+        <!-- Update Button -->
         <Button
-            android:id="@+id/btnCreateBike"
+            android:id="@+id/btnUpdateBike"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Tạo xe"
+            android:text="Cập nhật xe"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"

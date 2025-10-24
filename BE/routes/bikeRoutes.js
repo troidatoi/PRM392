@@ -11,6 +11,7 @@ const {
 } = require('../controllers/bikeController');
 const { validateBike, validateBikeQuery, validateFeaturedQuery } = require('../middleware/validation');
 const { uploadMultiple, handleUploadError } = require('../middleware/upload');
+const { protect, authorize } = require('../middleware/auth');
 
 // @route   GET /api/bikes
 // @desc    Get all bikes with filtering and pagination
@@ -24,18 +25,18 @@ router.get('/:id', getBikeById);
 
 // @route   POST /api/bikes
 // @desc    Create new bike
-// @access  Private (Admin only - sẽ implement sau)
-router.post('/', uploadMultiple, handleUploadError, validateBike, createBike);
+// @access  Private (Admin/Staff only)
+router.post('/', protect, authorize('admin', 'staff'), uploadMultiple, handleUploadError, validateBike, createBike);
 
 // @route   PUT /api/bikes/:id
 // @desc    Update bike
-// @access  Private (Admin only - sẽ implement sau)
-router.put('/:id', validateBike, updateBike);
+// @access  Private (Admin/Staff only)
+router.put('/:id', protect, authorize('admin', 'staff'), uploadMultiple, handleUploadError, validateBike, updateBike);
 
 // @route   DELETE /api/bikes/:id
 // @desc    Delete bike
-// @access  Private (Admin only - sẽ implement sau)
-router.delete('/:id', deleteBike);
+// @access  Private (Admin/Staff only)
+router.delete('/:id', protect, authorize('admin', 'staff'), deleteBike);
 
 // @route   GET /api/bikes/featured/list
 // @desc    Get featured bikes

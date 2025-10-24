@@ -161,9 +161,48 @@ const createBike = async (req, res) => {
       }
     }
 
-    // Create bike data with images
+    // Process specifications
+    const specifications = {};
+    if (req.body.battery) specifications.battery = req.body.battery;
+    if (req.body.motor) specifications.motor = req.body.motor;
+    if (req.body.range) specifications.range = req.body.range;
+    if (req.body.maxSpeed) specifications.maxSpeed = req.body.maxSpeed;
+    if (req.body.weight) specifications.weight = req.body.weight;
+    if (req.body.chargingTime) specifications.chargingTime = req.body.chargingTime;
+
+    // Process features (split by newline)
+    let features = [];
+    if (req.body.features) {
+      features = req.body.features.split('\n').filter(feature => feature.trim() !== '');
+    }
+
+    // Process tags (split by comma)
+    let tags = [];
+    if (req.body.tags) {
+      tags = req.body.tags.split(',').filter(tag => tag.trim() !== '');
+    }
+
+    // Process original price
+    let originalPrice = 0;
+    if (req.body.originalPrice && req.body.originalPrice !== '0') {
+      originalPrice = parseFloat(req.body.originalPrice);
+    }
+
+    // Create bike data with all fields
     const bikeData = {
-      ...req.body,
+      name: req.body.name,
+      brand: req.body.brand,
+      model: req.body.model,
+      price: parseFloat(req.body.price),
+      description: req.body.description,
+      stock: parseInt(req.body.stock),
+      category: req.body.category,
+      status: req.body.status,
+      specifications: Object.keys(specifications).length > 0 ? specifications : undefined,
+      features: features.length > 0 ? features : undefined,
+      warranty: req.body.warranty || '12 tháng',
+      originalPrice: originalPrice > 0 ? originalPrice : undefined,
+      tags: tags.length > 0 ? tags : undefined,
       images: images
     };
 
@@ -209,18 +248,46 @@ const updateBike = async (req, res) => {
       });
     }
 
-    const bike = await Bike.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).select('-__v');
-
-    if (!bike) {
+    // Find existing bike
+    const existingBike = await Bike.findById(req.params.id);
+    if (!existingBike) {
       return res.status(404).json({
         success: false,
         message: 'Không tìm thấy xe đạp điện'
       });
     }
+
+    // Process new uploaded images if any
+    let newImages = [];
+    if (req.files && req.files.length > 0) {
+      try {
+        newImages = await uploadToCloudinary(req.files);
+      } catch (uploadError) {
+        console.error('Error uploading new images:', uploadError);
+        return res.status(500).json({
+          success: false,
+          message: 'Lỗi khi upload ảnh mới lên Cloudinary'
+        });
+      }
+    }
+
+    // Combine existing images with new images
+    let allImages = [...existingBike.images];
+    if (newImages.length > 0) {
+      allImages = [...allImages, ...newImages];
+    }
+
+    // Create update data
+    const updateData = {
+      ...req.body,
+      images: allImages
+    };
+
+    const bike = await Bike.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-__v');
 
     res.json({
       success: true,

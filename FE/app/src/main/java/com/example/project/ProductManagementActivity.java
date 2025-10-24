@@ -132,7 +132,7 @@ public class ProductManagementActivity extends AppCompatActivity {
     private void onBikeClick(Bike bike) {
         Intent intent = new Intent(ProductManagementActivity.this, BikeDetailActivity.class);
         intent.putExtra("bike_id", bike.getId());
-        startActivity(intent);
+        startActivityForResult(intent, 1002);
     }
 
     private void showError(String message) {
@@ -155,6 +155,9 @@ public class ProductManagementActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1001 && resultCode == RESULT_OK) {
             // Reload bikes when bike is created successfully
+            loadBikes();
+        } else if (requestCode == 1002 && resultCode == RESULT_OK) {
+            // Reload bikes when bike is updated or deleted
             loadBikes();
         }
     }
