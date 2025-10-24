@@ -27,8 +27,8 @@
     <color name="green_tertiary">#FFA5D6A7</color>
     
     <!-- Modern color palette inspired by reference image -->
-    <color name="gradient_start">#FF667eea</color>
-    <color name="gradient_end">#FF764ba2</color>
+    <color name="gradient_start">#FF87CEEB</color>
+    <color name="gradient_end">#FF98FB98</color>
     <color name="card_white">#FFFFFFFF</color>
     <color name="text_dark">#FF2D3748</color>
     <color name="text_secondary">#FF718096</color>
