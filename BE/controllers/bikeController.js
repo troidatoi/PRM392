@@ -1,5 +1,6 @@
 const Bike = require('../models/Bike');
 const { validationResult } = require('express-validator');
+const { uploadToCloudinary } = require('../middleware/upload');
 
 // @desc    Get all bikes with filtering and pagination
 // @route   GET /api/bikes
@@ -146,7 +147,27 @@ const createBike = async (req, res) => {
       });
     }
 
-    const bike = new Bike(req.body);
+    // Process uploaded images
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      try {
+        images = await uploadToCloudinary(req.files);
+      } catch (uploadError) {
+        console.error('Error uploading images:', uploadError);
+        return res.status(500).json({
+          success: false,
+          message: 'Lỗi khi upload ảnh lên Cloudinary'
+        });
+      }
+    }
+
+    // Create bike data with images
+    const bikeData = {
+      ...req.body,
+      images: images
+    };
+
+    const bike = new Bike(bikeData);
     await bike.save();
 
     res.status(201).json({
@@ -156,6 +177,7 @@ const createBike = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating bike:', error);
+    
     if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,

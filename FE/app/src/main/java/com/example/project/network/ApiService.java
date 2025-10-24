@@ -6,12 +6,17 @@ import com.example.project.models.LoginRequest;
 import com.example.project.models.RegisterRequest;
 import com.example.project.models.User;
 
+import java.util.List;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 
 public interface ApiService {
     
@@ -62,8 +67,20 @@ public interface ApiService {
     @GET("bikes/{id}")
     Call<ApiResponse<Bike>> getBikeById(@retrofit2.http.Path("id") String bikeId);
     
+    @Multipart
     @POST("bikes")
-    Call<ApiResponse<Bike>> createBike(@Header("Authorization") String token, @Body Bike bike);
+    Call<ApiResponse<Bike>> createBike(
+        @Header("Authorization") String token,
+        @Part("name") RequestBody name,
+        @Part("brand") RequestBody brand,
+        @Part("model") RequestBody model,
+        @Part("price") RequestBody price,
+        @Part("description") RequestBody description,
+        @Part("stock") RequestBody stock,
+        @Part("category") RequestBody category,
+        @Part("status") RequestBody status,
+        @Part List<MultipartBody.Part> images
+    );
     
     @PUT("bikes/{id}")
     Call<ApiResponse<Bike>> updateBike(@Header("Authorization") String token, @retrofit2.http.Path("id") String bikeId, @Body Bike bike);

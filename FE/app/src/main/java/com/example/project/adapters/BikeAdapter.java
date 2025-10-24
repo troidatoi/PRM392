@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.project.R;
 import com.example.project.models.Bike;
 
@@ -75,6 +77,21 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
         }
 
         public void bind(Bike bike) {
+            // Load bike image
+            if (bike.getImages() != null && !bike.getImages().isEmpty()) {
+                String imageUrl = bike.getImages().get(0).getUrl();
+                Glide.with(itemView.getContext())
+                    .load(imageUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.ic_bike_placeholder)
+                    .error(R.drawable.ic_bike_placeholder)
+                    .centerCrop()
+                    .into(ivBikeImage);
+            } else {
+                // Set placeholder if no image
+                ivBikeImage.setImageResource(R.drawable.ic_bike_placeholder);
+            }
+
             // Set bike name
             tvBikeName.setText(bike.getName());
 

@@ -10,6 +10,7 @@ const {
   getCategories
 } = require('../controllers/bikeController');
 const { validateBike, validateBikeQuery, validateFeaturedQuery } = require('../middleware/validation');
+const { uploadMultiple, handleUploadError } = require('../middleware/upload');
 
 // @route   GET /api/bikes
 // @desc    Get all bikes with filtering and pagination
@@ -24,7 +25,7 @@ router.get('/:id', getBikeById);
 // @route   POST /api/bikes
 // @desc    Create new bike
 // @access  Private (Admin only - sẽ implement sau)
-router.post('/', validateBike, createBike);
+router.post('/', uploadMultiple, handleUploadError, validateBike, createBike);
 
 // @route   PUT /api/bikes/:id
 // @desc    Update bike

@@ -144,9 +144,18 @@ public class ProductManagementActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         btnAddProduct.setOnClickListener(v -> {
-            Intent intent = new Intent(ProductManagementActivity.this, AddProductActivity.class);
-            startActivity(intent);
+            Intent intent = new Intent(ProductManagementActivity.this, CreateBikeActivity.class);
+            startActivityForResult(intent, 1001);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            // Reload bikes when bike is created successfully
+            loadBikes();
+        }
     }
 
     @Override
