@@ -1,138 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="@drawable/modern_gradient_background"
+    android:fillViewport="true">
 
-    <!-- Header -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/headerCard"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="90"
-                        app:tint="#2196F3"
-                        android:contentDescription="Back" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Quản Lý Admin"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="center" />
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnNotifications"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_home"
-                        app:tint="#FF9800"
-                        android:contentDescription="Notifications" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <!-- Main Content -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/headerCard"
-        android:layout_marginTop="16dp"
-        android:fillViewport="true"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp">
-
+        <!-- Modern Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="24dp"
+            android:paddingTop="48dp">
 
-            <!-- Statistics Cards -->
+            <!-- Top Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Admin Dashboard"
+                    android:textColor="@color/text_muted"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_notifications"
+                    android:tint="@color/card_white" />
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="16dp"
+                    android:src="@drawable/ic_account_circle"
+                    android:tint="@color/card_white" />
+
+            </LinearLayout>
+
+            <!-- Welcome Message -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thống Kê Tổng Quan"
-                android:textSize="18sp"
+                android:text="Hi Admin,"
+                android:textColor="@color/card_white"
+                android:textSize="28sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="8dp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome to your dashboard"
+                android:textColor="@color/card_white"
+                android:textSize="16sp"
+                android:alpha="0.9" />
+
+        </LinearLayout>
+
+        <!-- Statistics Cards -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Overview Statistics"
+                android:textColor="@color/text_dark"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="20dp" />
+
+            <!-- First Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="16dp">
 
-                <!-- Total Products Card -->
+                <!-- Products Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="140dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="20dp"
@@ -142,43 +107,44 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
+                        android:background="@drawable/modern_card_with_shadow"
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_cart"
-                            app:tint="#2196F3"
-                            android:layout_marginBottom="8dp"
-                            android:contentDescription="Products" />
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_modern_products"
+                            android:background="@drawable/modern_button_background"
+                            android:padding="8dp"
+                            android:layout_marginBottom="12dp" />
 
                         <TextView
                             android:id="@+id/tvTotalProducts"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="245"
-                            android:textSize="24sp"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#2196F3" />
+                            android:textColor="@color/accent_blue"
+                            android:layout_marginBottom="4dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sản phẩm"
-                            android:textSize="12sp"
-                            android:textColor="#666666" />
+                            android:text="Products"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Total Orders Card -->
+                <!-- Orders Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="140dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="20dp"
@@ -188,34 +154,35 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
+                        android:background="@drawable/modern_card_with_shadow"
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_home"
-                            app:tint="#4CAF50"
-                            android:layout_marginBottom="8dp"
-                            android:contentDescription="Orders" />
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_modern_orders"
+                            android:background="@drawable/modern_button_background"
+                            android:padding="8dp"
+                            android:layout_marginBottom="12dp" />
 
                         <TextView
                             android:id="@+id/tvTotalOrders"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="1,234"
-                            android:textSize="24sp"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#4CAF50" />
+                            android:textColor="@color/accent_green"
+                            android:layout_marginBottom="4dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Đơn hàng"
-                            android:textSize="12sp"
-                            android:textColor="#666666" />
+                            android:text="Orders"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
@@ -223,16 +190,17 @@
 
             </LinearLayout>
 
+            <!-- Second Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="32dp">
 
-                <!-- Total Revenue Card -->
+                <!-- Revenue Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="140dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="20dp"
@@ -242,43 +210,44 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
+                        android:background="@drawable/modern_card_with_shadow"
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_account"
-                            app:tint="#FF9800"
-                            android:layout_marginBottom="8dp"
-                            android:contentDescription="Revenue" />
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_modern_dashboard"
+                            android:background="@drawable/modern_button_background"
+                            android:padding="8dp"
+                            android:layout_marginBottom="12dp" />
 
                         <TextView
                             android:id="@+id/tvTotalRevenue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="15.5M"
-                            android:textSize="24sp"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#FF9800" />
+                            android:textColor="@color/accent_orange"
+                            android:layout_marginBottom="4dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Doanh thu"
-                            android:textSize="12sp"
-                            android:textColor="#666666" />
+                            android:text="Revenue"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Total Users Card -->
+                <!-- Users Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
-                    android:layout_height="120dp"
+                    android:layout_height="140dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="20dp"
@@ -288,34 +257,35 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
+                        android:background="@drawable/modern_card_with_shadow"
                         android:orientation="vertical"
-                        android:padding="16dp"
+                        android:padding="20dp"
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:src="@drawable/ic_phone"
-                            app:tint="#9C27B0"
-                            android:layout_marginBottom="8dp"
-                            android:contentDescription="Users" />
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_modern_users"
+                            android:background="@drawable/modern_button_background"
+                            android:padding="8dp"
+                            android:layout_marginBottom="12dp" />
 
                         <TextView
                             android:id="@+id/tvTotalUsers"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="856"
-                            android:textSize="24sp"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:textColor="#9C27B0" />
+                            android:textColor="@color/accent_purple"
+                            android:layout_marginBottom="4dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Người dùng"
-                            android:textSize="12sp"
-                            android:textColor="#666666" />
+                            android:text="Users"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
 
                     </LinearLayout>
 
@@ -323,24 +293,33 @@
 
             </LinearLayout>
 
-            <!-- Management Options -->
+        </LinearLayout>
+
+        <!-- Management Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingTop="0dp">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quản Lý"
-                android:textSize="18sp"
+                android:text="Management"
+                android:textColor="@color/text_dark"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="20dp" />
 
             <!-- Product Management -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnManageProducts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@android:color/transparent"
                 android:clickable="true"
                 android:focusable="true"
@@ -349,56 +328,39 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="@drawable/modern_card_with_shadow"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:gravity="center_vertical">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/ic_cart"
-                                app:tint="#2196F3"
-                                android:contentDescription="Products" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_modern_products"
+                        android:background="@drawable/modern_button_background"
+                        android:padding="12dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="20dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quản lý sản phẩm"
-                            android:textSize="16sp"
+                            android:text="Product Management"
+                            android:textSize="18sp"
                             android:textStyle="bold"
-                            android:textColor="#000000" />
+                            android:textColor="@color/text_dark" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thêm, sửa, xóa sản phẩm"
-                            android:textSize="12sp"
-                            android:textColor="#666666"
+                            android:text="Add, edit, delete products"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
                             android:layout_marginTop="4dp" />
 
                     </LinearLayout>
@@ -406,10 +368,8 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="270"
-                        app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:src="@drawable/ic_arrow_forward"
+                        android:tint="@color/text_muted" />
 
                 </LinearLayout>
 
@@ -420,9 +380,9 @@
                 android:id="@+id/btnManageStores"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@android:color/transparent"
                 android:clickable="true"
                 android:focusable="true"
@@ -431,56 +391,39 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="@drawable/modern_card_with_shadow"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:gravity="center_vertical">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/ic_home"
-                                app:tint="#4CAF50"
-                                android:contentDescription="Stores" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_modern_branches"
+                        android:background="@drawable/modern_button_background"
+                        android:padding="12dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="20dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quản lý chi nhánh"
-                            android:textSize="16sp"
+                            android:text="Branch Management"
+                            android:textSize="18sp"
                             android:textStyle="bold"
-                            android:textColor="#000000" />
+                            android:textColor="@color/text_dark" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quản lý cửa hàng và kho"
-                            android:textSize="12sp"
-                            android:textColor="#666666"
+                            android:text="Manage stores and warehouses"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
                             android:layout_marginTop="4dp" />
 
                     </LinearLayout>
@@ -488,10 +431,8 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="270"
-                        app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:src="@drawable/ic_arrow_forward"
+                        android:tint="@color/text_muted" />
 
                 </LinearLayout>
 
@@ -502,9 +443,9 @@
                 android:id="@+id/btnManageOrders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@android:color/transparent"
                 android:clickable="true"
                 android:focusable="true"
@@ -513,56 +454,39 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="@drawable/modern_card_with_shadow"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:gravity="center_vertical">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/ic_account"
-                                app:tint="#FF9800"
-                                android:contentDescription="Orders" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_modern_orders"
+                        android:background="@drawable/modern_button_background"
+                        android:padding="12dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="20dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quản lý đơn hàng"
-                            android:textSize="16sp"
+                            android:text="Order Management"
+                            android:textSize="18sp"
                             android:textStyle="bold"
-                            android:textColor="#000000" />
+                            android:textColor="@color/text_dark" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Xem và xử lý đơn hàng"
-                            android:textSize="12sp"
-                            android:textColor="#666666"
+                            android:text="View and process orders"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
                             android:layout_marginTop="4dp" />
 
                     </LinearLayout>
@@ -570,10 +494,8 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="270"
-                        app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:src="@drawable/ic_arrow_forward"
+                        android:tint="@color/text_muted" />
 
                 </LinearLayout>
 
@@ -584,9 +506,9 @@
                 android:id="@+id/btnManageUsers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@android:color/transparent"
                 android:clickable="true"
                 android:focusable="true"
@@ -595,56 +517,39 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="@drawable/modern_card_with_shadow"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:gravity="center_vertical">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/ic_phone"
-                                app:tint="#9C27B0"
-                                android:contentDescription="Users" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_modern_users"
+                        android:background="@drawable/modern_button_background"
+                        android:padding="12dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="20dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quản lý người dùng"
-                            android:textSize="16sp"
+                            android:text="User Management"
+                            android:textSize="18sp"
                             android:textStyle="bold"
-                            android:textColor="#000000" />
+                            android:textColor="@color/text_dark" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quản lý tài khoản khách hàng"
-                            android:textSize="12sp"
-                            android:textColor="#666666"
+                            android:text="Manage customer accounts"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
                             android:layout_marginTop="4dp" />
 
                     </LinearLayout>
@@ -652,10 +557,8 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="270"
-                        app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:src="@drawable/ic_arrow_forward"
+                        android:tint="@color/text_muted" />
 
                 </LinearLayout>
 
@@ -666,9 +569,9 @@
                 android:id="@+id/btnManageChat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="32dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                app:cardElevation="8dp"
                 app:cardBackgroundColor="@android:color/transparent"
                 android:clickable="true"
                 android:focusable="true"
@@ -677,56 +580,39 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="@drawable/modern_card_with_shadow"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:gravity="center_vertical">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
-                            android:gravity="center">
-
-                            <ImageView
-                                android:layout_width="28dp"
-                                android:layout_height="28dp"
-                                android:src="@drawable/ic_message"
-                                app:tint="#E91E63"
-                                android:contentDescription="Chat" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_modern_dashboard"
+                        android:background="@drawable/modern_button_background"
+                        android:padding="12dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="20dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quản lý chat"
-                            android:textSize="16sp"
+                            android:text="Chat Management"
+                            android:textSize="18sp"
                             android:textStyle="bold"
-                            android:textColor="#000000" />
+                            android:textColor="@color/text_dark" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Trả lời tin nhắn khách hàng"
-                            android:textSize="12sp"
-                            android:textColor="#666666"
+                            android:text="Respond to customer messages"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary"
                             android:layout_marginTop="4dp" />
 
                     </LinearLayout>
@@ -734,10 +620,8 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="270"
-                        app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:src="@drawable/ic_arrow_forward"
+                        android:tint="@color/text_muted" />
 
                 </LinearLayout>
 
@@ -745,6 +629,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </LinearLayout>
 
-</RelativeLayout>
+</ScrollView>
