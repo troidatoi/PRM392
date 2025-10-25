@@ -4,7 +4,7 @@ const Bike = require('../models/Bike');
 const Store = require('../models/Store');
 const Inventory = require('../models/Inventory');
 
-// Create new cart
+// Create new cart or get existing cart
 const createCart = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -26,9 +26,7 @@ const createCart = async (req, res) => {
     // Create new cart
     const cart = new Cart({
       user: userId,
-      status: 'active',
-      totalPrice: 0,
-      isMultiStore: false
+      status: 'active'
     });
     
     await cart.save();
@@ -50,23 +48,29 @@ const createCart = async (req, res) => {
 // Add item to cart
 const addItemToCart = async (req, res) => {
   try {
-    const { cartId, productId, storeId, quantity } = req.body;
+    const { userId, productId, storeId, quantity } = req.body;
     
     // Validate required fields
-    if (!cartId || !productId || !storeId || !quantity) {
+    if (!userId || !productId || !storeId || !quantity) {
       return res.status(400).json({
         success: false,
         message: 'Thiếu thông tin bắt buộc'
       });
     }
     
-    // Check if cart exists
-    const cart = await Cart.findById(cartId);
+    // Find or create cart for user
+    let cart = await Cart.findOne({ 
+      user: userId, 
+      status: 'active' 
+    });
+    
     if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: 'Giỏ hàng không tồn tại'
+      // Create new cart if user doesn't have one
+      cart = new Cart({
+        user: userId,
+        status: 'active'
       });
+      await cart.save();
     }
     
     // Check if product exists
@@ -89,7 +93,7 @@ const addItemToCart = async (req, res) => {
     
     // Check if item already exists in cart
     const existingItem = await CartItem.findOne({
-      cart: cartId,
+      cart: cart._id,
       product: productId,
       store: storeId
     });
@@ -101,7 +105,7 @@ const addItemToCart = async (req, res) => {
     } else {
       // Create new cart item
       const cartItem = new CartItem({
-        cart: cartId,
+        cart: cart._id,
         product: productId,
         store: storeId,
         quantity
@@ -114,7 +118,7 @@ const addItemToCart = async (req, res) => {
     }
     
     // Check if multi-store
-    const cartItems = await CartItem.find({ cart: cartId });
+    const cartItems = await CartItem.find({ cart: cart._id });
     const uniqueStores = [...new Set(cartItems.map(item => item.store.toString()))];
     cart.isMultiStore = uniqueStores.length > 1;
     
@@ -228,9 +232,9 @@ const clearCart = async (req, res) => {
     
     const cart = await Cart.findOne({ user: userId, status: 'active' });
     if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: 'Giỏ hàng không tồn tại'
+      return res.json({
+        success: true,
+        message: 'Giỏ hàng đã trống'
       });
     }
     
@@ -260,7 +264,7 @@ const getCart = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    const cart = await Cart.findOne({ 
+    let cart = await Cart.findOne({ 
       user: userId, 
       status: 'active' 
     })
@@ -279,9 +283,30 @@ const getCart = async (req, res) => {
     });
     
     if (!cart) {
+      // Create new cart if user doesn't have one
+      cart = new Cart({
+        user: userId,
+        status: 'active'
+      });
+      await cart.save();
+      
       return res.json({
         success: true,
-        data: null,
+        data: {
+          cart: {
+            _id: cart._id,
+            isMultiStore: false,
+            itemCount: 0,
+            storeCount: 0,
+            grandTotal: 0
+          },
+          itemsByStore: [],
+          summary: {
+            totalStores: 0,
+            totalItems: 0,
+            grandTotal: 0
+          }
+        },
         message: 'Giỏ hàng trống'
       });
     }
@@ -429,106 +454,7 @@ const updateItemPrice = async (req, res) => {
   }
 };
 
-// Check price changes before checkout
-const checkPriceChanges = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    const cart = await Cart.findOne({ 
-      user: userId, 
-      status: 'active' 
-    }).populate('items');
-    
-    if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: 'Giỏ hàng không tồn tại'
-      });
-    }
-    
-    const priceChanges = [];
-    let totalSavings = 0;
-    let totalIncrease = 0;
-    
-    for (const item of cart.items) {
-      await item.updateCurrentPrice();
-      
-      if (item.hasPriceChanged) {
-        const change = item.priceDifference * item.quantity;
-        
-        priceChanges.push({
-          productId: item.product,
-          productName: item.product.name,
-          oldPrice: item.price,
-          newPrice: item.currentPrice,
-          quantity: item.quantity,
-          changeAmount: change,
-          changePercentage: item.priceChangePercentage
-        });
-        
-        if (change > 0) {
-          totalIncrease += change;
-        } else {
-          totalSavings += Math.abs(change);
-        }
-      }
-    }
-    
-    res.json({
-      success: true,
-      data: {
-        hasChanges: priceChanges.length > 0,
-        priceChanges,
-        summary: {
-          totalSavings,
-          totalIncrease,
-          netChange: totalSavings - totalIncrease
-        }
-      }
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi server',
-      error: error.message
-    });
-  }
-};
 
-// Lock all prices in cart
-const lockAllPrices = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    const cart = await Cart.findOne({ 
-      user: userId, 
-      status: 'active' 
-    }).populate('items');
-    
-    if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: 'Giỏ hàng không tồn tại'
-      });
-    }
-    
-    for (const item of cart.items) {
-      await item.lockPrice();
-    }
-    
-    res.json({
-      success: true,
-      message: 'Đã khóa tất cả giá trong giỏ hàng',
-      data: cart
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi server',
-      error: error.message
-    });
-  }
-};
 
 // Get price change history for an item
 const getPriceHistory = async (req, res) => {
@@ -572,7 +498,5 @@ module.exports = {
   clearCart,
   getCart,
   updateItemPrice,
-  checkPriceChanges,
-  lockAllPrices,
   getPriceHistory
 };

@@ -8,25 +8,28 @@ const Bike = require('../models/Bike');
 // Create separate orders for each store
 const createOrders = async (req, res) => {
   try {
-    const { userId, cartId, shippingAddress, paymentMethod, notes } = req.body;
+    const { userId, shippingAddress, paymentMethod, notes } = req.body;
     
-    // Get cart with items
-    const cart = await Cart.findById(cartId)
-      .populate({
-        path: 'items',
-        populate: [
-          {
-            path: 'product',
-            select: 'name brand price originalPrice'
-          },
-          {
-            path: 'store',
-            select: 'name address city'
-          }
-        ]
-      });
+    // Get cart with items for user
+    const cart = await Cart.findOne({ 
+      user: userId, 
+      status: 'active' 
+    })
+    .populate({
+      path: 'items',
+      populate: [
+        {
+          path: 'product',
+          select: 'name brand price originalPrice'
+        },
+        {
+          path: 'store',
+          select: 'name address city'
+        }
+      ]
+    });
     
-    if (!cart || cart.user.toString() !== userId) {
+    if (!cart) {
       return res.status(404).json({
         success: false,
         message: 'Giỏ hàng không tồn tại'
@@ -133,8 +136,12 @@ const createOrders = async (req, res) => {
       });
     }
     
-    // Mark cart as converted
-    cart.status = 'converted';
+    // Clear cart items after creating orders
+    await CartItem.deleteMany({ cart: cart._id });
+    
+    // Reset cart to empty state
+    cart.items = [];
+    cart.isMultiStore = false;
     await cart.save();
     
     res.json({

@@ -139,13 +139,14 @@ GET /api/bikes?page=1&limit=20&category=city&brand=yamaha
 GET /api/bikes/:productId
 ```
 
-### Bước 4: Tạo giỏ hàng
+### Bước 4: Tạo/Lấy giỏ hàng (Tự động)
 ```
 POST /api/cart/create
 {
   "userId": "user123"
 }
 ```
+**Lưu ý:** Mỗi user chỉ có 1 cart active. Nếu đã có cart thì trả về cart hiện tại, nếu chưa có thì tạo mới.
 
 ### Bước 5: Kiểm tra tồn kho tại cửa hàng
 ```
@@ -161,7 +162,7 @@ POST /api/inventory/check-availability
 ```
 POST /api/cart/add-item
 {
-  "cartId": "cart123",
+  "userId": "user123",
   "productId": "bike001",
   "storeId": "store_hanoi",
   "quantity": 1
@@ -169,6 +170,7 @@ POST /api/cart/add-item
 ```
 
 **Xử lý:**
+- Tự động tìm cart active của user (nếu chưa có thì tạo mới)
 - Tạo CartItem với store cụ thể
 - Kiểm tra inventory tại cửa hàng đó
 - KHÔNG lưu giá - sẽ lấy từ product khi tạo order
@@ -255,7 +257,6 @@ GET /api/cart/user/:userId
 POST /api/orders/create
 {
   "userId": "user123",
-  "cartId": "cart123",
   "shippingAddress": {
     "fullName": "Nguyễn Văn A",
     "phone": "0123456789",
@@ -268,12 +269,14 @@ POST /api/orders/create
 ```
 
 **Xử lý:**
-1. Lấy giỏ hàng và nhóm sản phẩm theo cửa hàng
-2. Tạo **1 Order riêng** cho **mỗi cửa hàng**
-3. Lấy giá hiện tại từ product cho mỗi sản phẩm
-4. Tạo OrderDetail với giá tại thời điểm tạo order
-5. Giảm stock trong Inventory của từng cửa hàng
-6. Đánh dấu Cart là "converted"
+1. Tự động tìm cart active của user
+2. Nhóm sản phẩm theo cửa hàng
+3. Tạo **1 Order riêng** cho **mỗi cửa hàng**
+4. Lấy giá hiện tại từ product cho mỗi sản phẩm
+5. Tạo OrderDetail với giá tại thời điểm tạo order
+6. Giảm stock trong Inventory của từng cửa hàng
+7. **XÓA TẤT CẢ CartItem** trong cart
+8. **Reset cart về trạng thái trống** (items = [], isMultiStore = false)
 
 **Response:**
 ```json
@@ -369,7 +372,7 @@ POST /api/orders/:orderId/cancel
   "cart": {
     "_id": "cart123",
     "user": "user123",
-    "status": "active",  // ← Trạng thái ban đầu
+    "status": "active",
     "items": ["item1", "item2"],
     "isMultiStore": true
   }
@@ -382,9 +385,9 @@ POST /api/orders/:orderId/cancel
   "cart": {
     "_id": "cart123",
     "user": "user123", 
-    "status": "converted",  // ← Đã chuyển thành đơn hàng
-    "items": ["item1", "item2"],
-    "isMultiStore": true
+    "status": "active",  // ← Vẫn giữ status active
+    "items": [],         // ← Đã xóa tất cả items
+    "isMultiStore": false // ← Reset về false
   }
 }
 ```
@@ -393,21 +396,39 @@ POST /api/orders/:orderId/cancel
 ```json
 {
   "success": true,
-  "data": null,
+  "data": {
+    "cart": {
+      "_id": "cart123",
+      "isMultiStore": false,
+      "itemCount": 0,
+      "storeCount": 0,
+      "grandTotal": 0
+    },
+    "itemsByStore": [],
+    "summary": {
+      "totalStores": 0,
+      "totalItems": 0,
+      "grandTotal": 0
+    }
+  },
   "message": "Giỏ hàng trống"
 }
 ```
 
-**Lý do:** Hệ thống chỉ tìm cart có status = "active". Cart đã "converted" sẽ không hiển thị.
+**Lý do:** Cart vẫn tồn tại nhưng đã được reset về trạng thái trống. User có thể thêm sản phẩm mới ngay lập tức.
 
 ### Nếu user muốn mua tiếp:
+**KHÔNG CẦN** tạo cart mới. Chỉ cần thêm sản phẩm:
 ```
-POST /api/cart/create
+POST /api/cart/add-item
 {
-  "userId": "user123"
+  "userId": "user123",
+  "productId": "bike003",
+  "storeId": "store_hanoi",
+  "quantity": 1
 }
 ```
-**Sẽ tạo cart mới với status = "active"**
+**Sẽ tự động sử dụng cart hiện tại (đã trống)**
 
 ## Quản lý kho hàng
 
@@ -481,15 +502,15 @@ pending → confirmed → shipped → delivered
 - `GET /api/bikes/:id` - Chi tiết sản phẩm
 
 ### Cart
-- `POST /api/cart/create` - Tạo giỏ hàng
-- `GET /api/cart/user/:userId` - Xem giỏ hàng
-- `POST /api/cart/add-item` - Thêm sản phẩm
+- `POST /api/cart/create` - Tạo/lấy giỏ hàng (mỗi user 1 cart)
+- `GET /api/cart/user/:userId` - Xem giỏ hàng (tự động tạo nếu chưa có)
+- `POST /api/cart/add-item` - Thêm sản phẩm (tự động tìm/tạo cart)
 - `PUT /api/cart/update-quantity/:itemId` - Cập nhật số lượng
 - `DELETE /api/cart/remove-item/:itemId` - Xóa sản phẩm
 - `DELETE /api/cart/clear/:userId` - Xóa tất cả sản phẩm
 
 ### Orders
-- `POST /api/orders/create` - Tạo đơn hàng
+- `POST /api/orders/create` - Tạo đơn hàng (tự động tìm cart của user)
 - `GET /api/orders/user/:userId` - Đơn hàng của user
 - `GET /api/orders/:orderId` - Chi tiết đơn hàng
 - `PUT /api/orders/:orderId/status` - Cập nhật trạng thái
@@ -533,20 +554,23 @@ Store (1) ←→ (N) Inventory
 4. **Giảm kho ngay** khi tạo Order thành công
 5. **Hoàn lại kho** khi hủy đơn hàng
 6. **Validate địa chỉ** trước khi tạo Order
-7. **Cart status = "converted"** sau khi tạo order thành công
-8. **User cần tạo cart mới** để mua tiếp
-9. **Xử lý lỗi** một cách graceful
-10. **Log các hoạt động** quan trọng
+7. **XÓA CartItem** sau khi tạo order thành công
+8. **Reset cart về trạng thái trống** (items = [], isMultiStore = false)
+9. **Mỗi user chỉ có 1 cart active** - tự động tìm/tạo khi cần
+10. **Xử lý lỗi** một cách graceful
+11. **Log các hoạt động** quan trọng
 
 ## Testing Scenarios
 
 ### Test Case 1: Mua hàng từ 1 cửa hàng
 1. User thêm 2 sản phẩm từ cùng 1 cửa hàng
 2. Thanh toán → Tạo 1 Order duy nhất
+3. Cart được reset về trạng thái trống
 
 ### Test Case 2: Mua hàng từ nhiều cửa hàng
 1. User thêm sản phẩm từ 2 cửa hàng khác nhau
 2. Thanh toán → Tạo 2 Order riêng biệt
+3. Cart được reset về trạng thái trống
 
 ### Test Case 3: Hết hàng
 1. User thêm sản phẩm đã hết hàng
@@ -556,6 +580,11 @@ Store (1) ←→ (N) Inventory
 1. User tạo Order thành công
 2. User hủy Order
 3. System hoàn lại kho hàng
+
+### Test Case 5: Mua tiếp sau khi tạo đơn
+1. User tạo Order thành công (cart đã trống)
+2. User thêm sản phẩm mới → Tự động sử dụng cart hiện tại
+3. Không cần tạo cart mới
 
 ---
 
