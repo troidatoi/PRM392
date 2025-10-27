@@ -131,18 +131,18 @@ public interface ApiService {
     );
     
     @GET("stores/{id}")
-    Call<StoreResponse> getStoreById(@retrofit2.http.Path("id") String storeId);
+    Call<ApiResponse<Store>> getStoreById(@retrofit2.http.Path("id") String storeId);
     
     @POST("stores")
-    Call<StoreResponse> createStore(@Header("Authorization") String token, @Body Store store);
+    Call<ApiResponse<Store>> createStore(@Header("Authorization") String token, @Body Store store);
     
     @PUT("stores/{id}")
-    Call<StoreResponse> updateStore(@Header("Authorization") String token, 
+    Call<ApiResponse<Store>> updateStore(@Header("Authorization") String token, 
                                        @retrofit2.http.Path("id") String storeId, 
                                        @Body Store store);
     
     @retrofit2.http.DELETE("stores/{id}")
-    Call<StoreResponse> deleteStore(@Header("Authorization") String token, 
+    Call<ApiResponse<Void>> deleteStore(@Header("Authorization") String token, 
                                       @retrofit2.http.Path("id") String storeId);
     
     @POST("stores/nearby")
@@ -180,6 +180,7 @@ public interface ApiService {
     // Store response model for pagination
     class StoreResponse {
         private boolean success;
+        private String message;
         private int count;
         private int total;
         private int page;
@@ -195,6 +196,14 @@ public interface ApiService {
         
         public void setSuccess(boolean success) {
             this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
         }
         
         public int getCount() {

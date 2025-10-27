@@ -228,11 +228,17 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     }
 
     private void showAddStoreDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Thêm Cửa Hàng Mới");
-        builder.setMessage("Chức năng thêm cửa hàng sẽ được cập nhật trong phiên bản tiếp theo.");
-        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
-        builder.show();
+        AddStoreDialog dialog = new AddStoreDialog(this, new AddStoreDialog.OnStoreAddedListener() {
+            @Override
+            public void onStoreAdded(Store store) {
+                // Refresh the store list
+                refreshStores();
+                
+                // Update statistics
+                updateStatistics();
+            }
+        });
+        dialog.show();
     }
 
     @Override

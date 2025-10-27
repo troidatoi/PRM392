@@ -20,6 +20,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.example.project.models.ApiResponse;
+
 public class StoreDetailActivity extends AppCompatActivity {
 
     // Views
@@ -119,25 +121,16 @@ public class StoreDetailActivity extends AppCompatActivity {
             return;
         }
 
-        Call<ApiService.StoreResponse> call = apiService.getStoreById(storeId);
+        Call<ApiResponse<Store>> call = apiService.getStoreById(storeId);
         
-        call.enqueue(new Callback<ApiService.StoreResponse>() {
+        call.enqueue(new Callback<ApiResponse<Store>>() {
             @Override
-            public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+            public void onResponse(Call<ApiResponse<Store>> call, Response<ApiResponse<Store>> response) {
                 showLoading(false);
                 swipeRefreshLayout.setRefreshing(false);
 
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiService.StoreResponse storeResponse = response.body();
-                    Store store = null;
-                    
-                    // Check if it's a single store or a list
-                    if (storeResponse.getSingleData() != null) {
-                        store = storeResponse.getSingleData();
-                    } else if (storeResponse.getData() != null && !storeResponse.getData().isEmpty()) {
-                        store = storeResponse.getData().get(0);
-                    }
-                    
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Store store = response.body().getData();
                     if (store != null) {
                         currentStore = store;
                         displayStoreDetails(currentStore);
@@ -152,7 +145,7 @@ public class StoreDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<Store>> call, Throwable t) {
                 showLoading(false);
                 swipeRefreshLayout.setRefreshing(false);
                 Toast.makeText(StoreDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -237,11 +230,11 @@ public class StoreDetailActivity extends AppCompatActivity {
             return;
         }
 
-        Call<ApiService.StoreResponse> call = apiService.deleteStore(authHeader, storeId);
+        Call<ApiResponse<Void>> call = apiService.deleteStore(authHeader, storeId);
         
-        call.enqueue(new Callback<ApiService.StoreResponse>() {
+        call.enqueue(new Callback<ApiResponse<Void>>() {
             @Override
-            public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
                 showLoading(false);
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -254,7 +247,7 @@ public class StoreDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 showLoading(false);
                 Toast.makeText(StoreDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
