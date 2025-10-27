@@ -201,11 +201,19 @@ public class StoreDetailActivity extends AppCompatActivity {
     }
 
     private void showEditStoreDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Chỉnh Sửa Cửa Hàng");
-        builder.setMessage("Chức năng chỉnh sửa cửa hàng sẽ được cập nhật trong phiên bản tiếp theo.");
-        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
-        builder.show();
+        if (currentStore == null) {
+            Toast.makeText(this, "Không có dữ liệu cửa hàng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        EditStoreDialog dialog = new EditStoreDialog(this, currentStore, new EditStoreDialog.OnStoreUpdatedListener() {
+            @Override
+            public void onStoreUpdated(Store store) {
+                // Refresh the store details
+                loadStoreDetails();
+            }
+        });
+        dialog.show();
     }
 
     private void confirmDeleteStore() {

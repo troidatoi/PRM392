@@ -244,15 +244,14 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     @Override
     public void onEditStore(Store store) {
         // Handle edit store
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Chỉnh Sửa Cửa Hàng");
-        builder.setMessage("Bạn muốn chỉnh sửa: " + store.getName() + "?");
-        builder.setPositiveButton("Đồng ý", (dialog, which) -> {
-            Toast.makeText(this, "Chức năng chỉnh sửa - Coming soon", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
+        EditStoreDialog dialog = new EditStoreDialog(this, store, new EditStoreDialog.OnStoreUpdatedListener() {
+            @Override
+            public void onStoreUpdated(Store updatedStore) {
+                // Refresh the store list
+                refreshStores();
+            }
         });
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
-        builder.show();
+        dialog.show();
     }
 
     @Override
