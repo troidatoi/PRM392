@@ -5,6 +5,7 @@ import com.example.project.models.Bike;
 import com.example.project.models.LoginRequest;
 import com.example.project.models.RegisterRequest;
 import com.example.project.models.User;
+import com.example.project.Store;
 
 import java.util.List;
 import okhttp3.MultipartBody;
@@ -117,6 +118,36 @@ public interface ApiService {
     @GET("bikes/categories/list")
     Call<ApiResponse<Object[]>> getCategories();
     
+    // Store endpoints
+    @GET("stores")
+    Call<StoreResponse> getStores(
+        @retrofit2.http.Query("city") String city,
+        @retrofit2.http.Query("district") String district,
+        @retrofit2.http.Query("storeType") String storeType,
+        @retrofit2.http.Query("isActive") Boolean isActive,
+        @retrofit2.http.Query("page") int page,
+        @retrofit2.http.Query("limit") int limit,
+        @retrofit2.http.Query("sort") String sort
+    );
+    
+    @GET("stores/{id}")
+    Call<ApiResponse<Store>> getStoreById(@retrofit2.http.Path("id") String storeId);
+    
+    @POST("stores")
+    Call<ApiResponse<Store>> createStore(@Header("Authorization") String token, @Body Store store);
+    
+    @PUT("stores/{id}")
+    Call<ApiResponse<Store>> updateStore(@Header("Authorization") String token, 
+                                       @retrofit2.http.Path("id") String storeId, 
+                                       @Body Store store);
+    
+    @retrofit2.http.DELETE("stores/{id}")
+    Call<ApiResponse<Void>> deleteStore(@Header("Authorization") String token, 
+                                      @retrofit2.http.Path("id") String storeId);
+    
+    @POST("stores/nearby")
+    Call<ApiResponse<Store[]>> getNearbyStores(@Body NearbyStoreRequest request);
+    
     // Change password request model
     class ChangePasswordRequest {
         private String currentPassword;
@@ -145,5 +176,113 @@ public interface ApiService {
             this.newPassword = newPassword;
         }
     }
+    
+    // Store response model for pagination
+    class StoreResponse {
+        private boolean success;
+        private int count;
+        private int total;
+        private int page;
+        private int pages;
+        private List<Store> data;
+        
+        public StoreResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public int getCount() {
+            return count;
+        }
+        
+        public void setCount(int count) {
+            this.count = count;
+        }
+        
+        public int getTotal() {
+            return total;
+        }
+        
+        public void setTotal(int total) {
+            this.total = total;
+        }
+        
+        public int getPage() {
+            return page;
+        }
+        
+        public void setPage(int page) {
+            this.page = page;
+        }
+        
+        public int getPages() {
+            return pages;
+        }
+        
+        public void setPages(int pages) {
+            this.pages = pages;
+        }
+        
+        public List<Store> getData() {
+            return data;
+        }
+        
+        public void setData(List<Store> data) {
+            this.data = data;
+        }
+    }
+    
+    // Nearby store request model
+    class NearbyStoreRequest {
+        private double lat;
+        private double lng;
+        private double radius;
+        private int limit;
+        
+        public NearbyStoreRequest() {}
+        
+        public NearbyStoreRequest(double lat, double lng, double radius, int limit) {
+            this.lat = lat;
+            this.lng = lng;
+            this.radius = radius;
+            this.limit = limit;
+        }
+        
+        public double getLat() {
+            return lat;
+        }
+        
+        public void setLat(double lat) {
+            this.lat = lat;
+        }
+        
+        public double getLng() {
+            return lng;
+        }
+        
+        public void setLng(double lng) {
+            this.lng = lng;
+        }
+        
+        public double getRadius() {
+            return radius;
+        }
+        
+        public void setRadius(double radius) {
+            this.radius = radius;
+        }
+        
+        public int getLimit() {
+            return limit;
+        }
+        
+        public void setLimit(int limit) {
+            this.limit = limit;
+        }
+    }
 }
-

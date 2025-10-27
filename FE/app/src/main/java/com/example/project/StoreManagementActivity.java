@@ -7,14 +7,24 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.example.project.network.ApiService;
+import com.example.project.network.RetrofitClient;
+import com.example.project.utils.AuthManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class StoreManagementActivity extends AppCompatActivity implements StoreAdapter.OnStoreActionListener {
 
@@ -22,19 +32,47 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     private RecyclerView rvStores;
     private TextView tvTotalStores, tvActiveStores;
     private LinearLayout emptyState;
+    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private StoreAdapter storeAdapter;
     private List<Store> storeList;
+    
+    // API related
+    private ApiService apiService;
+    private AuthManager authManager;
+    
+    // Pagination
+    private int currentPage = 1;
+    private int totalPages = 1;
+    private boolean isLoading = false;
+    private boolean hasMoreData = true;
+    
+    // Filters
+    private String currentCity = null;
+    private Boolean currentIsActive = null;
+    private String currentSort = "createdAt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store_management);
 
+        // Initialize API and Auth
+        apiService = RetrofitClient.getInstance().getApiService();
+        authManager = AuthManager.getInstance(this);
+        
+        // Check authentication
+        if (!authManager.isLoggedIn() || !authManager.isStaff()) {
+            Toast.makeText(this, "Bạn không có quyền truy cập", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         initViews();
         setupRecyclerView();
+        setupSwipeRefresh();
         loadStores();
-        updateStatistics();
     }
 
     private void initViews() {
@@ -45,6 +83,8 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         tvTotalStores = findViewById(R.id.tvTotalStores);
         tvActiveStores = findViewById(R.id.tvActiveStores);
         emptyState = findViewById(R.id.emptyState);
+        progressBar = findViewById(R.id.progressBar);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         // Back button
         btnBack.setOnClickListener(v -> finish());
@@ -68,37 +108,101 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         rvStores.setAdapter(storeAdapter);
     }
 
+    private void setupSwipeRefresh() {
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            refreshStores();
+        });
+        swipeRefreshLayout.setColorSchemeResources(
+            android.R.color.holo_blue_bright,
+            android.R.color.holo_green_light,
+            android.R.color.holo_orange_light,
+            android.R.color.holo_red_light
+        );
+    }
+
     private void loadStores() {
-        // Load sample stores - replace with actual data from database
-        storeList.clear();
-
-        storeList.add(new Store("1", "Cửa Hàng Xe Đạp Sài Gòn",
-            "123 Nguyễn Huệ, Quận 1, TP.HCM", "0901234567", "Hoạt động", 45));
-
-        storeList.add(new Store("2", "Xe Đạp Thể Thao ABC",
-            "456 Lê Lợi, Quận 3, TP.HCM", "0912345678", "Hoạt động", 32));
-
-        storeList.add(new Store("3", "Cửa Hàng Xe Điện XYZ",
-            "789 Trần Hưng Đạo, Quận 5, TP.HCM", "0923456789", "Đóng cửa", 15));
-
-        storeList.add(new Store("4", "Xe Đạp Địa Hình Pro",
-            "321 Võ Văn Tần, Quận 3, TP.HCM", "0934567890", "Hoạt động", 28));
-
-        storeList.add(new Store("5", "Giant Bike Store",
-            "654 Điện Biên Phủ, Quận Bình Thạnh, TP.HCM", "0945678901", "Hoạt động", 52));
-
-        storeList.add(new Store("6", "Cửa Hàng Xe Gấp Mini",
-            "987 Cách Mạng Tháng 8, Quận 10, TP.HCM", "0956789012", "Hoạt động", 18));
-
-        storeList.add(new Store("7", "Xe Đạp Trẻ Em Happy",
-            "147 Lý Thường Kiệt, Quận 11, TP.HCM", "0967890123", "Đóng cửa", 22));
-
-        storeList.add(new Store("8", "VinFast E-Bike Center",
-            "258 Nguyễn Văn Cừ, Quận 5, TP.HCM", "0978901234", "Hoạt động", 38));
-
+        if (isLoading) return;
+        
+        isLoading = true;
+        showLoading(true);
+        
+        String authHeader = authManager.getAuthHeader();
+        if (authHeader == null) {
+            Toast.makeText(this, "Phiên đăng nhập đã hết hạn", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        
+        Call<ApiService.StoreResponse> call = apiService.getStores(
+            currentCity,
+            null, // district
+            null, // storeType
+            currentIsActive,
+            currentPage,
+            10, // limit
+            currentSort
+        );
+        
+        call.enqueue(new Callback<ApiService.StoreResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+                isLoading = false;
+                showLoading(false);
+                swipeRefreshLayout.setRefreshing(false);
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.StoreResponse storeResponse = response.body();
+                    if (storeResponse.isSuccess()) {
+                        handleStoreResponse(storeResponse);
+                    } else {
+                        Toast.makeText(StoreManagementActivity.this, "Lỗi: " + response.message(), Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(StoreManagementActivity.this, "Lỗi tải dữ liệu: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+                isLoading = false;
+                showLoading(false);
+                swipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(StoreManagementActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    
+    private void handleStoreResponse(ApiService.StoreResponse response) {
+        if (currentPage == 1) {
+            storeList.clear();
+        }
+        
+        if (response.getData() != null) {
+            storeList.addAll(response.getData());
+        }
+        
+        currentPage = response.getPage();
+        totalPages = response.getPages();
+        hasMoreData = currentPage < totalPages;
+        
         storeAdapter.notifyDataSetChanged();
-
-        // Show/hide empty state
+        updateStatistics();
+        updateEmptyState();
+    }
+    
+    private void refreshStores() {
+        currentPage = 1;
+        hasMoreData = true;
+        loadStores();
+    }
+    
+    private void showLoading(boolean show) {
+        if (progressBar != null) {
+            progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+    
+    private void updateEmptyState() {
         if (storeList.isEmpty()) {
             emptyState.setVisibility(View.VISIBLE);
             rvStores.setVisibility(View.GONE);

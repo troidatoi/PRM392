@@ -40,9 +40,9 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         Store store = storeList.get(position);
 
         holder.tvStoreName.setText(store.getName());
-        holder.tvStoreAddress.setText(store.getAddress());
+        holder.tvStoreAddress.setText(store.getFullAddress());
         holder.tvProductCount.setText("• " + store.getProductCount() + " sản phẩm");
-        holder.tvStoreStatus.setText(store.getStatus());
+        holder.tvStoreStatus.setText(store.getDisplayStatus());
 
         // Set status badge color
         if (store.isActive()) {

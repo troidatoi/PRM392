@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.viewpager2)
+    implementation(libs.swiperefreshlayout)
     
     // Network dependencies
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
