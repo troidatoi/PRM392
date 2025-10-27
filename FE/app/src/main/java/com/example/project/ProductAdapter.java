@@ -46,58 +46,40 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
 
-        holder.tvProductName.setText(product.getName());
-        holder.tvProductDescription.setText(product.getDescription());
-        holder.tvProductPrice.setText(product.getPrice());
-        
-        // Handle original price if exists
-        if (product.getOriginalPrice() != null && !product.getOriginalPrice().isEmpty()) {
-            holder.tvOriginalPrice.setText(product.getOriginalPrice());
-            holder.tvOriginalPrice.setVisibility(View.VISIBLE);
-        } else {
-            holder.tvOriginalPrice.setVisibility(View.GONE);
+        // Safe text setting with null checks
+        if (holder.tvProductName != null) {
+            holder.tvProductName.setText(product.getName() != null ? product.getName() : "Tên không xác định");
         }
         
-        // Handle status tags
-        if (product.isBestSeller()) {
-            holder.bestSellerTag.setVisibility(View.VISIBLE);
-            holder.statusTagContainer.setVisibility(View.VISIBLE);
-        } else {
-            holder.bestSellerTag.setVisibility(View.GONE);
+        if (holder.tvProductDescription != null) {
+            holder.tvProductDescription.setText(product.getDescription() != null ? product.getDescription() : "Mô tả không có");
         }
         
-        if (product.isSoldOut()) {
-            holder.soldOutTag.setVisibility(View.VISIBLE);
-            holder.statusTagContainer.setVisibility(View.VISIBLE);
-        } else {
-            holder.soldOutTag.setVisibility(View.GONE);
-        }
-        
-        // Hide status container if no tags are visible
-        if (holder.bestSellerTag.getVisibility() == View.GONE && 
-            holder.soldOutTag.getVisibility() == View.GONE) {
-            holder.statusTagContainer.setVisibility(View.GONE);
+        if (holder.tvProductPrice != null) {
+            holder.tvProductPrice.setText(product.getPrice() != null ? product.getPrice() : "0 ₫");
         }
         
         // Load image from URL if available, otherwise use default resource
-        if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                .load(product.getImageUrl())
-                .apply(new RequestOptions()
-                    .placeholder(product.getImageResId()) // Default image while loading
-                    .error(product.getImageResId()) // Default image if error
-                    .transform(new RoundedCorners(16)))
-                .into(holder.ivProductImage);
-        } else {
-            holder.ivProductImage.setImageResource(product.getImageResId());
+        if (holder.ivProductImage != null) {
+            if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+                Glide.with(holder.itemView.getContext())
+                    .load(product.getImageUrl())
+                    .apply(new RequestOptions()
+                        .placeholder(product.getImageResId()) // Default image while loading
+                        .error(product.getImageResId()) // Default image if error
+                        .transform(new RoundedCorners(16)))
+                    .into(holder.ivProductImage);
+            } else {
+                holder.ivProductImage.setImageResource(product.getImageResId());
+            }
         }
 
         // Click on product card to view details
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), ProductDetailActivity.class);
-            intent.putExtra("productName", product.getName());
-            intent.putExtra("productDescription", product.getDescription());
-            intent.putExtra("productPrice", product.getPrice());
+            intent.putExtra("productName", product.getName() != null ? product.getName() : "Tên không xác định");
+            intent.putExtra("productDescription", product.getDescription() != null ? product.getDescription() : "Mô tả không có");
+            intent.putExtra("productPrice", product.getPrice() != null ? product.getPrice() : "0 ₫");
             intent.putExtra("productImage", product.getImageResId());
             if (product.getImageUrl() != null) {
                 intent.putExtra("productImageUrl", product.getImageUrl());
@@ -105,9 +87,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             v.getContext().startActivity(intent);
         });
 
-        holder.btnAddToCart.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Đã thêm " + product.getName() + " vào giỏ hàng", Toast.LENGTH_SHORT).show();
-        });
+        if (holder.btnAddToCart != null) {
+            holder.btnAddToCart.setOnClickListener(v -> {
+                Toast.makeText(v.getContext(), "Đã thêm " + (product.getName() != null ? product.getName() : "sản phẩm") + " vào giỏ hàng", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     @Override
@@ -120,13 +104,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         TextView tvProductName;
         TextView tvProductDescription;
         TextView tvProductPrice;
-        TextView tvOriginalPrice;
         CardView btnAddToCart;
-        
-        // Status tags
-        LinearLayout statusTagContainer;
-        LinearLayout bestSellerTag;
-        LinearLayout soldOutTag;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -134,13 +112,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvProductName = itemView.findViewById(R.id.tvProductName);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
             tvProductPrice = itemView.findViewById(R.id.tvProductPrice);
-            tvOriginalPrice = itemView.findViewById(R.id.tvOriginalPrice);
             btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
-            
-            // Status tags
-            statusTagContainer = itemView.findViewById(R.id.statusTagContainer);
-            bestSellerTag = itemView.findViewById(R.id.bestSellerTag);
-            soldOutTag = itemView.findViewById(R.id.soldOutTag);
         }
     }
 }
