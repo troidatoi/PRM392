@@ -6,73 +6,47 @@
     android:background="#FFFFFF">
 
     <!-- Header with Back Button -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:id="@+id/headerCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
+            android:rotation="90"
+            app:tint="#2196F3"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:text="Xác Nhận Thanh Toán"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:gravity="center" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+        <View
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:visibility="invisible" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
+    </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="90"
-                        app:tint="#2196F3"
-                        android:contentDescription="Back" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Xác Nhận Thanh Toán"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="center" />
-
-            <View
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:visibility="invisible" />
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
 
     <!-- Main Content -->
     <ScrollView
@@ -105,23 +79,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Họ và tên người nhận"
                         android:textSize="12sp"
-                        android:textColor="#999999"
+                        android:textColor="#757575"
                         android:layout_marginBottom="8dp" />
 
                     <EditText
@@ -130,8 +105,8 @@
                         android:layout_height="wrap_content"
                         android:hint="Nhập họ và tên"
                         android:textSize="16sp"
-                        android:textColor="#000000"
-                        android:textColorHint="#CCCCCC"
+                        android:textColor="#212121"
+                        android:textColorHint="#BDBDBD"
                         android:background="@android:color/transparent"
                         android:inputType="textPersonName"
                         android:importantForAutofill="no" />
@@ -144,17 +119,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:gravity="center_vertical">
+                    android:padding="16dp"
+                android:gravity="center_vertical">
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -167,7 +143,7 @@
                             android:layout_height="wrap_content"
                             android:text="Số điện thoại"
                             android:textSize="12sp"
-                            android:textColor="#999999"
+                            android:textColor="#757575"
                             android:layout_marginBottom="8dp" />
 
                         <EditText
@@ -176,8 +152,8 @@
                             android:layout_height="wrap_content"
                             android:hint="Nhập số điện thoại"
                             android:textSize="16sp"
-                            android:textColor="#000000"
-                            android:textColorHint="#CCCCCC"
+                            android:textColor="#212121"
+                            android:textColorHint="#BDBDBD"
                             android:background="@android:color/transparent"
                             android:inputType="phone"
                             android:importantForAutofill="no" />
@@ -190,7 +166,7 @@
                         android:src="@drawable/ic_phone"
                         app:tint="#4CAF50"
                         android:layout_marginStart="12dp"
-                        android:contentDescription="Phone" />
+                        android:contentDescription="@string/app_name" />
 
                 </LinearLayout>
 
@@ -200,16 +176,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="16dp"
                     android:gravity="top">
 
                     <LinearLayout
@@ -223,7 +200,7 @@
                             android:layout_height="wrap_content"
                             android:text="Địa chỉ giao hàng"
                             android:textSize="12sp"
-                            android:textColor="#999999"
+                            android:textColor="#757575"
                             android:layout_marginBottom="8dp" />
 
                         <EditText
@@ -232,8 +209,8 @@
                             android:layout_height="wrap_content"
                             android:hint="Nhập địa chỉ chi tiết"
                             android:textSize="16sp"
-                            android:textColor="#000000"
-                            android:textColorHint="#CCCCCC"
+                            android:textColor="#212121"
+                            android:textColorHint="#BDBDBD"
                             android:background="@android:color/transparent"
                             android:inputType="textMultiLine"
                             android:minLines="3"
@@ -249,7 +226,7 @@
                         app:tint="#FF9800"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="28dp"
-                        android:contentDescription="Address" />
+                        android:contentDescription="@string/app_name" />
 
                 </LinearLayout>
 
@@ -270,16 +247,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <!-- RecyclerView for cart items -->
                     <androidx.recyclerview.widget.RecyclerView
@@ -306,16 +284,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <RadioGroup
                         android:id="@+id/rgPaymentMethod"
@@ -328,7 +307,7 @@
                             android:layout_height="wrap_content"
                             android:text="Thanh toán khi nhận hàng (COD)"
                             android:textSize="16sp"
-                            android:textColor="#000000"
+                            android:textColor="#212121"
                             android:checked="true"
                             android:paddingVertical="8dp" />
 
@@ -338,7 +317,7 @@
                             android:layout_height="wrap_content"
                             android:text="Chuyển khoản ngân hàng"
                             android:textSize="16sp"
-                            android:textColor="#000000"
+                            android:textColor="#212121"
                             android:paddingVertical="8dp" />
 
                         <RadioButton
@@ -347,7 +326,7 @@
                             android:layout_height="wrap_content"
                             android:text="Ví điện tử (Momo, ZaloPay)"
                             android:textSize="16sp"
-                            android:textColor="#000000"
+                            android:textColor="#212121"
                             android:paddingVertical="8dp" />
 
                     </RadioGroup>
@@ -370,16 +349,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="16dp">
 
                     <!-- Subtotal -->
                     <LinearLayout
@@ -394,7 +374,7 @@
                             android:layout_weight="1"
                             android:text="Tạm tính"
                             android:textSize="16sp"
-                            android:textColor="#666666" />
+                            android:textColor="#757575" />
 
                         <TextView
                             android:id="@+id/tvSubtotal"
@@ -402,7 +382,7 @@
                             android:layout_height="wrap_content"
                             android:text="59.980.000 VNĐ"
                             android:textSize="16sp"
-                            android:textColor="#000000"
+                            android:textColor="#212121"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -420,7 +400,7 @@
                             android:layout_weight="1"
                             android:text="Phí vận chuyển"
                             android:textSize="16sp"
-                            android:textColor="#666666" />
+                            android:textColor="#757575" />
 
                         <TextView
                             android:id="@+id/tvShippingFee"
@@ -452,7 +432,7 @@
                             android:layout_weight="1"
                             android:text="Tổng cộng"
                             android:textSize="18sp"
-                            android:textColor="#000000"
+                            android:textColor="#212121"
                             android:textStyle="bold" />
 
                         <TextView
@@ -483,9 +463,9 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#2196F3"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -493,7 +473,6 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_button"
             android:gravity="center">
 
             <TextView

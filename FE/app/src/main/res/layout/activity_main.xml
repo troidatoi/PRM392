@@ -2,46 +2,43 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!-- Background Image - Will be overlaid with gradient -->
-    <ImageView
-        android:id="@+id/backgroundImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/splash_bike_background"
-        android:contentDescription="@string/app_name" />
-
-    <!-- Dark overlay for better text visibility -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/google_ai_studio" />
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
     <!-- Content Container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="bottom|center_horizontal"
+        android:gravity="center"
         android:padding="32dp">
 
-        <!-- Liquid Glass Start Button -->
+        <!-- Logo or Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_marginBottom="60dp" />
+
+        <!-- Start Button -->
         <androidx.cardview.widget.CardView
             android:id="@+id/startButtonCard"
             android:layout_width="280dp"
             android:layout_height="70dp"
-            android:layout_marginBottom="60dp"
             app:cardCornerRadius="35dp"
-            app:cardElevation="12dp"
-            android:backgroundTint="#00000000">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#2196F3"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <RelativeLayout
                 android:id="@+id/startButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/liquid_glass_start_button"
                 android:clickable="true"
                 android:focusable="true">
 
@@ -53,11 +50,7 @@
                     android:textSize="24sp"
                     android:textStyle="bold"
                     android:textColor="#FFFFFF"
-                    android:letterSpacing="0.15"
-                    android:shadowColor="#000000"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="4" />
+                    android:letterSpacing="0.15" />
 
             </RelativeLayout>
 

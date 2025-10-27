@@ -3,433 +3,190 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="#FFFFFF">
 
-    <!-- Header với Search Box -->
-    <androidx.cardview.widget.CardView
+    <!-- Header with Search -->
+    <LinearLayout
         android:id="@+id/headerCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
             android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-            <!-- Back Button -->
-            <androidx.cardview.widget.CardView
+            <ImageView
                 android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_back"
+                app:tint="#2196F3"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+                android:contentDescription="@string/app_name" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_back"
-                        app:tint="#2196F3"
-                        android:contentDescription="Back" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Search Box -->
-            <androidx.cardview.widget.CardView
+            <TextView
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                android:text="Tìm Kiếm"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:gravity="center" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_search"
-                    android:padding="8dp">
-
-                    <ImageView
-                        android:id="@+id/iconSearch"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="12dp"
-                        android:src="@drawable/ic_search"
-                        app:tint="#5E7CE2"
-                        android:contentDescription="Search" />
-
-                    <EditText
-                        android:id="@+id/etSearch"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_toEndOf="@id/iconSearch"
-                        android:layout_toStartOf="@id/btnClearSearch"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@android:color/transparent"
-                        android:hint="Tìm kiếm sản phẩm..."
-                        android:textColorHint="#8B9DC3"
-                        android:textColor="#3D5A80"
-                        android:textSize="15sp"
-                        android:inputType="text"
-                        android:imeOptions="actionSearch"
-                        android:importantForAutofill="no" />
-
-                    <ImageView
-                        android:id="@+id/btnClearSearch"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="12dp"
-                        android:src="@drawable/ic_close"
-                        app:tint="#999999"
-                        android:visibility="gone"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="Clear search" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
+            <ImageView
+                android:id="@+id/btnFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_filter"
+                app:tint="#2196F3"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/app_name" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+        <!-- Search Box -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#F5F5F5">
 
-    <!-- Main Content -->
-    <ScrollView
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp">
+
+                <ImageView
+                    android:id="@+id/iconSearch"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="#2196F3"
+                    android:contentDescription="@string/app_name" />
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toEndOf="@id/iconSearch"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@android:color/transparent"
+                    android:hint="Tìm kiếm sản phẩm..."
+                    android:textColorHint="#999999"
+                    android:textColor="#000000"
+                    android:textSize="15sp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:importantForAutofill="no" />
+
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <!-- Search Results -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSearchResults"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerCard"
-        android:layout_marginTop="16dp"
-        android:fillViewport="true"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:padding="8dp"
+        android:background="#F5F5F5" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/emptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_search"
+            app:tint="#CCCCCC"
+            android:alpha="0.5"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:text="Không tìm thấy kết quả"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#999999"
+            android:layout_marginTop="16dp" />
 
-            <!-- Tìm Kiếm Gợi Ý Section -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/suggestionsCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thử từ khóa khác"
+            android:textSize="14sp"
+            android:textColor="#BBBBBB"
+            android:layout_marginTop="8dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tìm Kiếm Gợi Ý"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:layout_marginBottom="16dp" />
+    <!-- Search Suggestions (Initially visible) -->
+    <LinearLayout
+        android:id="@+id/searchSuggestions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center">
 
-                    <!-- Suggestion Item 1 -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/suggestion1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_search"
+            app:tint="#CCCCCC"
+            android:alpha="0.5"
+            android:contentDescription="@string/app_name" />
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
-                            android:padding="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tìm kiếm sản phẩm"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#999999"
+            android:layout_marginTop="16dp" />
 
-                            <ImageView
-                                android:id="@+id/iconSuggestion1"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
-                                android:contentDescription="Search suggestion" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nhập từ khóa để tìm kiếm"
+            android:textSize="14sp"
+            android:textColor="#BBBBBB"
+            android:layout_marginTop="8dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toEndOf="@id/iconSuggestion1"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="12dp"
-                                android:text="Xe đạp điện"
-                                android:textSize="15sp"
-                                android:textColor="#3D5A80" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Suggestion Item 2 -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/suggestion2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:id="@+id/iconSuggestion2"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
-                                android:contentDescription="Search suggestion" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toEndOf="@id/iconSuggestion2"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="12dp"
-                                android:text="Xe thể thao"
-                                android:textSize="15sp"
-                                android:textColor="#3D5A80" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Suggestion Item 3 -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/suggestion3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:id="@+id/iconSuggestion3"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
-                                android:contentDescription="Search suggestion" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toEndOf="@id/iconSuggestion3"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="12dp"
-                                android:text="Xe đạp địa hình"
-                                android:textSize="15sp"
-                                android:textColor="#3D5A80" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Suggestion Item 4 -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/suggestion4"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:id="@+id/iconSuggestion4"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
-                                android:contentDescription="Search suggestion" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toEndOf="@id/iconSuggestion4"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="12dp"
-                                android:text="Xe đạp trẻ em"
-                                android:textSize="15sp"
-                                android:textColor="#3D5A80" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Suggestion Item 5 -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/suggestion5"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
-                            android:padding="16dp">
-
-                            <ImageView
-                                android:id="@+id/iconSuggestion5"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_alignParentStart="true"
-                                android:layout_centerVertical="true"
-                                android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
-                                android:contentDescription="Search suggestion" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_toEndOf="@id/iconSuggestion5"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="12dp"
-                                android:text="Xe đạp gấp"
-                                android:textSize="15sp"
-                                android:textColor="#3D5A80" />
-
-                        </RelativeLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Search Results (Initially Hidden) -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/resultsCard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Kết Quả Tìm Kiếm"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000"
-                        android:layout_marginBottom="16dp" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvSearchResults"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false" />
-
-                    <TextView
-                        android:id="@+id/tvNoResults"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="Không tìm thấy kết quả"
-                        android:textSize="15sp"
-                        android:textColor="#666666"
-                        android:visibility="gone"
-                        android:padding="24dp" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-    </ScrollView>
+    </LinearLayout>
 
 </RelativeLayout>
 

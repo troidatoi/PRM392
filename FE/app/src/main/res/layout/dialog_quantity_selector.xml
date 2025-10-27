@@ -9,16 +9,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="20dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_background"
             android:orientation="vertical"
-            android:padding="28dp">
+            android:padding="24dp">
 
             <!-- Title -->
             <TextView
@@ -36,14 +35,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
                     android:padding="16dp"
                     android:gravity="center_vertical">
@@ -105,14 +103,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
                     android:padding="16dp"
                     android:gravity="center_vertical">
@@ -122,8 +119,8 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -131,7 +128,6 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <TextView
@@ -162,8 +158,8 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardElevation="2dp"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -171,7 +167,6 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <TextView
@@ -205,8 +200,8 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="26dp"
-                    app:cardElevation="6dp"
-                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#F5F5F5"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -214,7 +209,6 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_input"
                         android:gravity="center">
 
                         <TextView
@@ -237,8 +231,8 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="26dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="#2196F3"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -246,7 +240,6 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_button"
                         android:gravity="center">
 
                         <TextView

@@ -8,40 +8,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.project.models.ApiResponse;
-import com.example.project.models.LoginRequest;
-import com.example.project.models.User;
-import com.example.project.network.ApiService;
-import com.example.project.network.RetrofitClient;
-import com.example.project.utils.AuthManager;
-import com.example.project.utils.NetworkTest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputLayout tilEmail, tilPassword;
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnLogin;
-    private AuthManager authManager;
-    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        // Initialize managers
-        authManager = AuthManager.getInstance(this);
-        apiService = RetrofitClient.getInstance().getApiService();
-        
-        // Test network connection
-        NetworkTest.testConnection("http://10.0.2.2:5000/api/health");
 
         // Initialize views
         tilEmail = findViewById(R.id.tilEmail);
@@ -70,31 +50,24 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs() {
-        String usernameOrEmail = etEmail.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
         // Reset errors
         tilEmail.setError(null);
         tilPassword.setError(null);
 
-        // Validate username or email
-        if (TextUtils.isEmpty(usernameOrEmail)) {
-            tilEmail.setError("Vui lòng nhập tên đăng nhập hoặc email");
+        // Validate email
+        if (TextUtils.isEmpty(email)) {
+            tilEmail.setError("Vui lòng nhập email");
             etEmail.requestFocus();
             return false;
         }
 
-        // Check if it's an email format, if not, treat as username
-        boolean isEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(usernameOrEmail).matches();
-        if (isEmail) {
-            // Valid email format
-        } else {
-            // Username - check minimum length
-            if (usernameOrEmail.length() < 3) {
-                tilEmail.setError("Tên đăng nhập phải có ít nhất 3 ký tự");
-                etEmail.requestFocus();
-                return false;
-            }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Email không hợp lệ");
+            etEmail.requestFocus();
+            return false;
         }
 
         // Validate password
@@ -114,57 +87,41 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void performLogin() {
-        String usernameOrEmail = etEmail.getText().toString().trim();
+        String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // Show loading
-        btnLogin.setEnabled(false);
-        btnLogin.setText("Đang đăng nhập...");
+        // Check if logging in as admin
+        if (isAdminAccount(email, password)) {
+            Toast.makeText(this, "Đăng nhập với quyền Admin thành công!", Toast.LENGTH_SHORT).show();
 
-        // Create login request
-        LoginRequest loginRequest = new LoginRequest(usernameOrEmail, password);
+            Intent intent = new Intent(LoginActivity.this, AdminManagementActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
-        // Make API call
-        apiService.login(loginRequest).enqueue(new Callback<ApiResponse<User>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {
-                btnLogin.setEnabled(true);
-                btnLogin.setText("Đăng nhập");
+        // TODO: Implement actual login logic here (e.g., Firebase, API call)
+        // For now, just show a success message and navigate to HomeActivity
 
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<User> apiResponse = response.body();
-                    if (apiResponse.isSuccess()) {
-                        // Save auth data
-                        authManager.saveAuthData(apiResponse.getToken(), apiResponse.getUser());
-                        
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                        
-                        // Navigate based on user role
-                        Intent intent;
-                        if (authManager.isAdmin()) {
-                            intent = new Intent(LoginActivity.this, AdminManagementActivity.class);
-                        } else {
-                            intent = new Intent(LoginActivity.this, HomeActivity.class);
-                        }
-                        
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(LoginActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thất bại. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
-                }
-            }
+        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
-            @Override
-            public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
-                btnLogin.setEnabled(true);
-                btnLogin.setText("Đăng nhập");
-                Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
+    /**
+     * Check if the credentials belong to an admin account
+     *
+     * @param email    User email
+     * @param password User password
+     * @return true if admin account, false otherwise
+     */
+    private boolean isAdminAccount(String email, String password) {
+        // Default admin credentials
+        // TODO: In production, use proper authentication with database
+        return email.equals("admin@example.com") && password.equals("admin123");
+    }
 }

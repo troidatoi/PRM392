@@ -3,115 +3,72 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="#FFFFFF">
 
     <!-- Header -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:id="@+id/headerCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
+            android:rotation="90"
+            app:tint="#2196F3"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:text="Quản Lý Admin"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:gravity="center" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+        <ImageView
+            android:id="@+id/btnNotifications"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_home"
+            app:tint="#FF9800"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/app_name" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="90"
-                        app:tint="#2196F3"
-                        android:contentDescription="Back" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Quản Lý Admin"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="center" />
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnNotifications"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_home"
-                        app:tint="#FF9800"
-                        android:contentDescription="Notifications" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
     <!-- Main Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerCard"
-        android:layout_marginTop="16dp"
         android:fillViewport="true"
         android:clipToPadding="false"
-        android:paddingBottom="16dp">
+        android:paddingBottom="16dp"
+        android:background="#F5F5F5">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <!-- Statistics Cards -->
             <TextView
@@ -127,22 +84,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="12dp">
 
                 <!-- Total Products Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:strokeColor="#616161"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
@@ -153,7 +111,7 @@
                             android:src="@drawable/ic_cart"
                             app:tint="#2196F3"
                             android:layout_marginBottom="8dp"
-                            android:contentDescription="Products" />
+                            android:contentDescription="@string/app_name" />
 
                         <TextView
                             android:id="@+id/tvTotalProducts"
@@ -180,15 +138,16 @@
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:strokeColor="#616161"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
@@ -199,7 +158,7 @@
                             android:src="@drawable/ic_home"
                             app:tint="#4CAF50"
                             android:layout_marginBottom="8dp"
-                            android:contentDescription="Orders" />
+                            android:contentDescription="@string/app_name" />
 
                         <TextView
                             android:id="@+id/tvTotalOrders"
@@ -234,15 +193,16 @@
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    android:layout_marginEnd="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:strokeColor="#616161"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
@@ -253,7 +213,7 @@
                             android:src="@drawable/ic_account"
                             app:tint="#FF9800"
                             android:layout_marginBottom="8dp"
-                            android:contentDescription="Revenue" />
+                            android:contentDescription="@string/app_name" />
 
                         <TextView
                             android:id="@+id/tvTotalRevenue"
@@ -280,15 +240,16 @@
                     android:layout_width="0dp"
                     android:layout_height="120dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    android:layout_marginStart="6dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:strokeColor="#616161"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
                         android:orientation="vertical"
                         android:padding="16dp"
                         android:gravity="center">
@@ -299,7 +260,7 @@
                             android:src="@drawable/ic_phone"
                             app:tint="#9C27B0"
                             android:layout_marginBottom="8dp"
-                            android:contentDescription="Users" />
+                            android:contentDescription="@string/app_name" />
 
                         <TextView
                             android:id="@+id/tvTotalUsers"
@@ -339,9 +300,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -349,22 +312,20 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="16dp"
                     android:gravity="center_vertical">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#E3F2FD">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -372,7 +333,7 @@
                                 android:layout_height="28dp"
                                 android:src="@drawable/ic_cart"
                                 app:tint="#2196F3"
-                                android:contentDescription="Products" />
+                                android:contentDescription="@string/app_name" />
 
                         </RelativeLayout>
 
@@ -409,7 +370,7 @@
                         android:src="@drawable/ic_search"
                         android:rotation="270"
                         app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:contentDescription="@string/app_name" />
 
                 </LinearLayout>
 
@@ -421,9 +382,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -431,22 +394,20 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="16dp"
                     android:gravity="center_vertical">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#E8F5E9">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -454,7 +415,7 @@
                                 android:layout_height="28dp"
                                 android:src="@drawable/ic_home"
                                 app:tint="#4CAF50"
-                                android:contentDescription="Stores" />
+                                android:contentDescription="@string/app_name" />
 
                         </RelativeLayout>
 
@@ -491,7 +452,7 @@
                         android:src="@drawable/ic_search"
                         android:rotation="270"
                         app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:contentDescription="@string/app_name" />
 
                 </LinearLayout>
 
@@ -503,9 +464,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -513,22 +476,20 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="16dp"
                     android:gravity="center_vertical">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#FFF3E0">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -536,7 +497,7 @@
                                 android:layout_height="28dp"
                                 android:src="@drawable/ic_account"
                                 app:tint="#FF9800"
-                                android:contentDescription="Orders" />
+                                android:contentDescription="@string/app_name" />
 
                         </RelativeLayout>
 
@@ -573,7 +534,7 @@
                         android:src="@drawable/ic_search"
                         android:rotation="270"
                         app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:contentDescription="@string/app_name" />
 
                 </LinearLayout>
 
@@ -585,9 +546,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -595,22 +558,20 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="16dp"
                     android:gravity="center_vertical">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#F3E5F5">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -618,7 +579,7 @@
                                 android:layout_height="28dp"
                                 android:src="@drawable/ic_phone"
                                 app:tint="#9C27B0"
-                                android:contentDescription="Users" />
+                                android:contentDescription="@string/app_name" />
 
                         </RelativeLayout>
 
@@ -655,7 +616,7 @@
                         android:src="@drawable/ic_search"
                         android:rotation="270"
                         app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:contentDescription="@string/app_name" />
 
                 </LinearLayout>
 
@@ -667,9 +628,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -677,22 +640,20 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="20dp"
+                    android:padding="16dp"
                     android:gravity="center_vertical">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#FCE4EC">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -700,7 +661,7 @@
                                 android:layout_height="28dp"
                                 android:src="@drawable/ic_message"
                                 app:tint="#E91E63"
-                                android:contentDescription="Chat" />
+                                android:contentDescription="@string/app_name" />
 
                         </RelativeLayout>
 
@@ -737,7 +698,7 @@
                         android:src="@drawable/ic_search"
                         android:rotation="270"
                         app:tint="#CCCCCC"
-                        android:contentDescription="Arrow" />
+                        android:contentDescription="@string/app_name" />
 
                 </LinearLayout>
 
@@ -748,3 +709,4 @@
     </ScrollView>
 
 </RelativeLayout>
+

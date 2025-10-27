@@ -20,13 +20,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:cardCornerRadius="18dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="@android:color/transparent">
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#F5F5F5">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/liquid_glass_input"
                 android:padding="12dp">
 
                 <TextView

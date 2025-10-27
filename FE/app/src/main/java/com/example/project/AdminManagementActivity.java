@@ -76,8 +76,7 @@ public class AdminManagementActivity extends AppCompatActivity {
 
         // Manage Users
         btnManageUsers.setOnClickListener(v -> {
-            Intent intent = new Intent(AdminManagementActivity.this, UserManagementActivity.class);
-            startActivity(intent);
+            Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
         });
 
         // Manage Chat - NEW

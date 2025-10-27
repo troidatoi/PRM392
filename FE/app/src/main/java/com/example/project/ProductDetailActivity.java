@@ -1,5 +1,6 @@
 package com.example.project;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,9 +25,9 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private ViewPager2 viewPagerImages;
     private LinearLayout indicatorLayout;
-    private ImageView ivFavorite;
+    private ImageView btnBack, btnFavorite;
     private TextView tvProductName, tvProductPrice, tvProductDescription;
-    private CardView btnBack, btnFavorite, btnAddToCart, btnBuyNow;
+    private CardView btnAddToCart, btnBuyNow;
     private RecyclerView rvStoreStock;
 
     private boolean isFavorite = false;
@@ -57,7 +57,6 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void initViews() {
         viewPagerImages = findViewById(R.id.viewPagerImages);
         indicatorLayout = findViewById(R.id.indicatorLayout);
-        ivFavorite = findViewById(R.id.ivFavorite);
 
         tvProductName = findViewById(R.id.tvProductName);
         tvProductPrice = findViewById(R.id.tvProductPrice);
@@ -179,12 +178,15 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void showQuantityDialog(boolean isBuyNow) {
         // Create dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_quantity_selector, null);
-        builder.setView(dialogView);
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
         AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
 
         // Initialize dialog views
         ImageView ivDialogProductImage = dialogView.findViewById(R.id.ivDialogProductImage);
