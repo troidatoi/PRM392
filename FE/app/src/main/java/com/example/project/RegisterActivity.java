@@ -23,8 +23,8 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private TextInputLayout tilEmail, tilPhone, tilPassword, tilConfirmPassword;
-    private TextInputEditText etEmail, etPhone, etPassword, etConfirmPassword;
+    private TextInputLayout tilUsername, tilEmail, tilPhone, tilAddress, tilFirstName, tilLastName, tilPassword, tilConfirmPassword;
+    private TextInputEditText etUsername, etEmail, etPhone, etAddress, etFirstName, etLastName, etPassword, etConfirmPassword;
     private MaterialButton btnRegister;
     private AuthManager authManager;
     private ApiService apiService;
@@ -39,13 +39,21 @@ public class RegisterActivity extends AppCompatActivity {
         apiService = RetrofitClient.getInstance().getApiService();
 
         // Initialize views
+        tilUsername = findViewById(R.id.tilUsername);
         tilEmail = findViewById(R.id.tilEmail);
         tilPhone = findViewById(R.id.tilPhone);
+        tilAddress = findViewById(R.id.tilAddress);
+        tilFirstName = findViewById(R.id.tilFirstName);
+        tilLastName = findViewById(R.id.tilLastName);
         tilPassword = findViewById(R.id.tilPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
 
+        etUsername = findViewById(R.id.etUsername);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
+        etAddress = findViewById(R.id.etAddress);
+        etFirstName = findViewById(R.id.etFirstName);
+        etLastName = findViewById(R.id.etLastName);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
@@ -65,16 +73,37 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs() {
+        String username = etUsername.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+        String firstName = etFirstName.getText().toString().trim();
+        String lastName = etLastName.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         // Reset errors
+        tilUsername.setError(null);
         tilEmail.setError(null);
         tilPhone.setError(null);
+        tilAddress.setError(null);
+        tilFirstName.setError(null);
+        tilLastName.setError(null);
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
+
+        // Validate username
+        if (TextUtils.isEmpty(username)) {
+            tilUsername.setError("Vui lòng nhập tên đăng nhập");
+            etUsername.requestFocus();
+            return false;
+        }
+
+        if (username.length() < 3) {
+            tilUsername.setError("Tên đăng nhập phải có ít nhất 3 ký tự");
+            etUsername.requestFocus();
+            return false;
+        }
 
         // Validate email
         if (TextUtils.isEmpty(email)) {
@@ -89,14 +118,8 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         }
 
-        // Validate phone
-        if (TextUtils.isEmpty(phone)) {
-            tilPhone.setError("Vui lòng nhập số điện thoại");
-            etPhone.requestFocus();
-            return false;
-        }
-
-        if (!android.util.Patterns.PHONE.matcher(phone).matches() || phone.length() < 10) {
+        // Validate phone (optional but validate format if provided)
+        if (!TextUtils.isEmpty(phone) && (phone.length() < 10 || !android.util.Patterns.PHONE.matcher(phone).matches())) {
             tilPhone.setError("Số điện thoại không hợp lệ");
             etPhone.requestFocus();
             return false;
@@ -132,8 +155,12 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void performRegister() {
+        String username = etUsername.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
+        String address = etAddress.getText().toString().trim();
+        String firstName = etFirstName.getText().toString().trim();
+        String lastName = etLastName.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
         // Show loading
@@ -142,13 +169,13 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Create register request
         RegisterRequest registerRequest = new RegisterRequest(
-            email.split("@")[0], // Use email prefix as username
+            username,
             email,
             password,
-            phone,
-            "", // address - empty for now
-            "User", // firstName - default
-            "" // lastName - empty
+            phone.isEmpty() ? null : phone,
+            address.isEmpty() ? null : address,
+            firstName.isEmpty() ? null : firstName,
+            lastName.isEmpty() ? null : lastName
         );
 
         // Make API call

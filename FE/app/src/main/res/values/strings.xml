@@ -2,19 +2,23 @@
     <string name="app_name">Project</string>
 
     <!-- Login & Register -->
-    <string name="login_title">Login</string>
-    <string name="register_title">Register</string>
-    <string name="email">Tên đăng nhập hoặc Email</string>
-    <string name="password">Password</string>
-    <string name="confirm_password">Confirm Password</string>
-    <string name="phone_number">Phone Number</string>
-    <string name="login_button">Login</string>
-    <string name="register_button">Register</string>
-    <string name="forgot_password">Forgot Password?</string>
-    <string name="no_account">You dont have account?</string>
-    <string name="have_account">Have an account?</string>
-    <string name="register_now">Register</string>
-    <string name="login_now">Login</string>
+    <string name="login_title">Đăng Nhập</string>
+    <string name="register_title">Đăng Ký</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="username">Tên đăng nhập</string>
+    <string name="address">Địa chỉ</string>
+    <string name="first_name">Tên</string>
+    <string name="last_name">Họ</string>
+    <string name="login_button">Đăng Nhập</string>
+    <string name="register_button">Đăng Ký</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="have_account">Đã có tài khoản?</string>
+    <string name="register_now">Đăng ký</string>
+    <string name="login_now">Đăng nhập</string>
     <string name="welcome_back">Chào mừng bạn trở lại!</string>
     <string name="create_account">Tạo tài khoản mới</string>
     <string name="shop_name">Shop Bán Hàng</string>
