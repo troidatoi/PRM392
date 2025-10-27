@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardViewBike"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Bike Image -->
+        <ImageView
+            android:id="@+id/ivBikeImage"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/liquid_glass_small"
+            android:contentDescription="Bike Image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/splash_bike_background" />
+
+        <!-- Bike Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Bike Name -->
+            <TextView
+                android:id="@+id/tvBikeName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Xe đạp điện VinFast Klara S"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Brand and Model -->
+            <TextView
+                android:id="@+id/tvBikeBrand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="VinFast"
+                android:textColor="@color/gray"
+                android:textSize="14sp" />
+
+            <!-- Price -->
+            <TextView
+                android:id="@+id/tvBikePrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="29.990.000 ₫"
+                android:textColor="@color/primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Stock and Status Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Stock -->
+                <TextView
+                    android:id="@+id/tvBikeStock"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Kho: 10"
+                    android:textColor="@color/gray"
+                    android:textSize="12sp" />
+
+                <!-- Status -->
+                <TextView
+                    android:id="@+id/tvBikeStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/liquid_glass_small"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="Available"
+                    android:textColor="@color/green"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Detail Icon -->
+        <ImageView
+            android:id="@+id/ivDetailIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/liquid_glass_small"
+            android:clickable="true"
+            android:contentDescription="View Details"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="6dp"
+            android:src="@drawable/ic_visibility"
+            android:tint="@color/primary" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

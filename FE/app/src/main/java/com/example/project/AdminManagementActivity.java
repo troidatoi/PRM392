@@ -10,7 +10,6 @@ import androidx.cardview.widget.CardView;
 
 public class AdminManagementActivity extends AppCompatActivity {
 
-    private CardView btnBack, btnNotifications;
     private CardView btnManageProducts, btnManageStores, btnManageOrders, btnManageUsers, btnManageChat;
     private TextView tvTotalProducts, tvTotalOrders, tvTotalRevenue, tvTotalUsers;
 
@@ -25,9 +24,6 @@ public class AdminManagementActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnBack = findViewById(R.id.btnBack);
-        btnNotifications = findViewById(R.id.btnNotifications);
-
         btnManageProducts = findViewById(R.id.btnManageProducts);
         btnManageStores = findViewById(R.id.btnManageStores);
         btnManageOrders = findViewById(R.id.btnManageOrders);
@@ -49,14 +45,6 @@ public class AdminManagementActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        // Back button
-        btnBack.setOnClickListener(v -> finish());
-
-        // Notifications button
-        btnNotifications.setOnClickListener(v -> {
-            Toast.makeText(this, "Thông báo", Toast.LENGTH_SHORT).show();
-        });
-
         // Manage Products
         btnManageProducts.setOnClickListener(v -> {
             Intent intent = new Intent(AdminManagementActivity.this, ProductManagementActivity.class);
@@ -76,10 +64,11 @@ public class AdminManagementActivity extends AppCompatActivity {
 
         // Manage Users
         btnManageUsers.setOnClickListener(v -> {
-            Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(AdminManagementActivity.this, UserManagementActivity.class);
+            startActivity(intent);
         });
 
-        // Manage Chat - NEW
+        // Manage Chat
         btnManageChat.setOnClickListener(v -> {
             Intent intent = new Intent(AdminManagementActivity.this, AdminChatListActivity.class);
             startActivity(intent);

@@ -5,46 +5,74 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- Header -->
-    <LinearLayout
+    <!-- Header with Back Button -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/headerCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical"
-        android:background="#FFFFFF"
-        android:elevation="4dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@android:color/transparent">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_back"
-            app:tint="#2196F3"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            android:contentDescription="@string/app_name" />
-
-        <TextView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Chỉnh Sửa Hồ Sơ"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:gravity="center" />
+            android:background="@drawable/liquid_glass_header"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
 
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:visibility="invisible" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnBack"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                app:cardCornerRadius="22.5dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
-    </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/liquid_glass_small"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_search"
+                        android:rotation="90"
+                        app:tint="#2196F3"
+                        android:contentDescription="Back" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Chỉnh Sửa Hồ Sơ"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:gravity="center" />
+
+            <View
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <!-- Main Content -->
     <ScrollView
@@ -52,9 +80,10 @@
         android:layout_height="match_parent"
         android:layout_below="@id/headerCard"
         android:layout_above="@id/btnSave"
+        android:layout_marginTop="16dp"
         android:fillViewport="true"
         android:clipToPadding="false"
-        android:background="#F5F5F5">
+        android:paddingBottom="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,16 +95,14 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:strokeColor="#616161"
-                app:strokeWidth="2dp">
+                app:cardCornerRadius="25dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
                     android:padding="24dp"
                     android:gravity="center">
@@ -84,21 +111,22 @@
                         android:layout_width="120dp"
                         android:layout_height="120dp"
                         app:cardCornerRadius="60dp"
-                        app:cardElevation="0dp"
-                        app:cardBackgroundColor="#E3F2FD">
+                        app:cardElevation="8dp"
+                        app:cardBackgroundColor="@android:color/transparent">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
                                 android:id="@+id/ivAvatar"
-                                android:layout_width="70dp"
-                                android:layout_height="70dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:src="@drawable/ic_person"
                                 app:tint="#2196F3"
-                                android:contentDescription="@string/app_name" />
+                                android:contentDescription="Avatar" />
 
                         </RelativeLayout>
 
@@ -107,11 +135,11 @@
                     <androidx.cardview.widget.CardView
                         android:id="@+id/btnChangeAvatar"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="36dp"
                         android:layout_marginTop="16dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="2dp"
-                        app:cardBackgroundColor="#2196F3"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@android:color/transparent"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -119,8 +147,9 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:paddingStart="24dp"
-                            android:paddingEnd="24dp"
+                            android:background="@drawable/liquid_glass_button"
+                            android:paddingStart="20dp"
+                            android:paddingEnd="20dp"
                             android:gravity="center">
 
                             <TextView
@@ -128,7 +157,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Thay đổi ảnh đại diện"
                                 android:textColor="#FFFFFF"
-                                android:textSize="14sp"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
 
                         </RelativeLayout>
@@ -143,9 +172,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thông Tin Cá Nhân"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp" />
 
             <!-- Name Input -->
@@ -153,17 +183,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:strokeColor="#616161"
-                app:strokeWidth="2dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/liquid_glass_input"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -194,17 +223,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:strokeColor="#616161"
-                app:strokeWidth="2dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="16dp"
+                    android:padding="20dp"
                     android:gravity="center_vertical">
 
                     <LinearLayout
@@ -241,7 +269,7 @@
                         android:src="@drawable/ic_email"
                         app:tint="#2196F3"
                         android:layout_marginStart="12dp"
-                        android:contentDescription="@string/app_name" />
+                        android:contentDescription="Email" />
 
                 </LinearLayout>
 
@@ -252,17 +280,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:strokeColor="#616161"
-                app:strokeWidth="2dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="16dp"
+                    android:padding="20dp"
                     android:gravity="center_vertical">
 
                     <LinearLayout
@@ -299,7 +326,7 @@
                         android:src="@drawable/ic_phone"
                         app:tint="#4CAF50"
                         android:layout_marginStart="12dp"
-                        android:contentDescription="@string/app_name" />
+                        android:contentDescription="Phone" />
 
                 </LinearLayout>
 
@@ -310,17 +337,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:strokeColor="#616161"
-                app:strokeWidth="2dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@android:color/transparent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/liquid_glass_input"
                     android:orientation="horizontal"
-                    android:padding="16dp"
+                    android:padding="20dp"
                     android:gravity="top">
 
                     <LinearLayout
@@ -360,7 +386,7 @@
                         app:tint="#FF9800"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="28dp"
-                        android:contentDescription="@string/app_name" />
+                        android:contentDescription="Address" />
 
                 </LinearLayout>
 
@@ -380,8 +406,8 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         app:cardCornerRadius="28dp"
-        app:cardElevation="4dp"
-        app:cardBackgroundColor="#2196F3"
+        app:cardElevation="12dp"
+        app:cardBackgroundColor="@android:color/transparent"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -389,6 +415,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/liquid_glass_button"
             android:gravity="center">
 
             <TextView
