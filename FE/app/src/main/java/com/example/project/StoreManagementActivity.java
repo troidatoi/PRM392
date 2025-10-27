@@ -26,6 +26,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.example.project.models.ApiResponse;
+
 public class StoreManagementActivity extends AppCompatActivity implements StoreAdapter.OnStoreActionListener, StoreAdapter.OnStoreClickListener {
 
     private CardView btnBack, btnAddStore, btnSearch;
@@ -256,26 +258,67 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
 
     @Override
     public void onDeleteStore(Store store) {
-        // Handle delete store
+        // Handle delete store with confirmation
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Xóa Cửa Hàng");
         builder.setMessage("Bạn có chắc chắn muốn xóa cửa hàng: " + store.getName() + "?");
         builder.setPositiveButton("Xóa", (dialog, which) -> {
-            storeList.remove(store);
-            storeAdapter.notifyDataSetChanged();
-            updateStatistics();
-
-            // Show/hide empty state
-            if (storeList.isEmpty()) {
-                emptyState.setVisibility(View.VISIBLE);
-                rvStores.setVisibility(View.GONE);
-            }
-
-            Toast.makeText(this, "Đã xóa cửa hàng: " + store.getName(), Toast.LENGTH_SHORT).show();
+            deleteStoreFromAPI(store);
             dialog.dismiss();
         });
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
         builder.show();
+    }
+    
+    private void deleteStoreFromAPI(Store store) {
+        // Get auth header
+        String authHeader = authManager.getAuthHeader();
+        if (authHeader == null) {
+            Toast.makeText(this, "Phiên đăng nhập đã hết hạn", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Show loading
+        showLoading(true);
+        
+        // Call API to delete store
+        Call<ApiResponse<Void>> call = apiService.deleteStore(authHeader, store.getId());
+        
+        call.enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                showLoading(false);
+                
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    // Remove from local list
+                    storeList.remove(store);
+                    storeAdapter.notifyDataSetChanged();
+                    updateStatistics();
+                    
+                    // Show/hide empty state
+                    if (storeList.isEmpty()) {
+                        emptyState.setVisibility(View.VISIBLE);
+                        rvStores.setVisibility(View.GONE);
+                    }
+                    
+                    Toast.makeText(StoreManagementActivity.this, "Đã xóa cửa hàng: " + store.getName(), Toast.LENGTH_SHORT).show();
+                } else {
+                    String errorMsg = "Lỗi không xác định";
+                    if (response.body() != null) {
+                        errorMsg = response.body().getMessage() != null ? response.body().getMessage() : "Lỗi xóa cửa hàng";
+                    } else {
+                        errorMsg = response.message();
+                    }
+                    Toast.makeText(StoreManagementActivity.this, "Lỗi: " + errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                showLoading(false);
+                Toast.makeText(StoreManagementActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
