@@ -131,18 +131,18 @@ public interface ApiService {
     );
     
     @GET("stores/{id}")
-    Call<ApiResponse<Store>> getStoreById(@retrofit2.http.Path("id") String storeId);
+    Call<StoreResponse> getStoreById(@retrofit2.http.Path("id") String storeId);
     
     @POST("stores")
-    Call<ApiResponse<Store>> createStore(@Header("Authorization") String token, @Body Store store);
+    Call<StoreResponse> createStore(@Header("Authorization") String token, @Body Store store);
     
     @PUT("stores/{id}")
-    Call<ApiResponse<Store>> updateStore(@Header("Authorization") String token, 
+    Call<StoreResponse> updateStore(@Header("Authorization") String token, 
                                        @retrofit2.http.Path("id") String storeId, 
                                        @Body Store store);
     
     @retrofit2.http.DELETE("stores/{id}")
-    Call<ApiResponse<Void>> deleteStore(@Header("Authorization") String token, 
+    Call<StoreResponse> deleteStore(@Header("Authorization") String token, 
                                       @retrofit2.http.Path("id") String storeId);
     
     @POST("stores/nearby")
@@ -185,6 +185,7 @@ public interface ApiService {
         private int page;
         private int pages;
         private List<Store> data;
+        private Store singleData; // For single store response
         
         public StoreResponse() {}
         
@@ -234,6 +235,14 @@ public interface ApiService {
         
         public void setData(List<Store> data) {
             this.data = data;
+        }
+        
+        public Store getSingleData() {
+            return singleData;
+        }
+        
+        public void setSingleData(Store singleData) {
+            this.singleData = singleData;
         }
     }
     

@@ -176,6 +176,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Store Detail Activity -->
+        <activity
+            android:name=".StoreDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
     </application>
 
 </manifest>

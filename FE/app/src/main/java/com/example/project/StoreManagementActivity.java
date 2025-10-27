@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StoreManagementActivity extends AppCompatActivity implements StoreAdapter.OnStoreActionListener {
+public class StoreManagementActivity extends AppCompatActivity implements StoreAdapter.OnStoreActionListener, StoreAdapter.OnStoreClickListener {
 
     private CardView btnBack, btnAddStore, btnSearch;
     private RecyclerView rvStores;
@@ -104,6 +104,7 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     private void setupRecyclerView() {
         storeList = new ArrayList<>();
         storeAdapter = new StoreAdapter(storeList, this);
+        storeAdapter.setOnStoreClickListener(this);
         rvStores.setLayoutManager(new LinearLayoutManager(this));
         rvStores.setAdapter(storeAdapter);
     }
@@ -270,5 +271,13 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         });
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
         builder.show();
+    }
+
+    @Override
+    public void onStoreClick(Store store) {
+        // Open store detail activity
+        Intent intent = new Intent(this, StoreDetailActivity.class);
+        intent.putExtra("storeId", store.getId());
+        startActivity(intent);
     }
 }

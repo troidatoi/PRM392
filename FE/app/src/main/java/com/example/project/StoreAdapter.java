@@ -16,15 +16,24 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     private List<Store> storeList;
     private OnStoreActionListener listener;
+    private OnStoreClickListener clickListener;
 
     public interface OnStoreActionListener {
         void onEditStore(Store store);
         void onDeleteStore(Store store);
     }
 
+    public interface OnStoreClickListener {
+        void onStoreClick(Store store);
+    }
+
     public StoreAdapter(List<Store> storeList, OnStoreActionListener listener) {
         this.storeList = storeList;
         this.listener = listener;
+    }
+
+    public void setOnStoreClickListener(OnStoreClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -62,6 +71,13 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         holder.btnDeleteStore.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteStore(store);
+            }
+        });
+
+        // Store item click
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onStoreClick(store);
             }
         });
     }
