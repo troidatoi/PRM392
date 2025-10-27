@@ -54,4 +54,10 @@
     <color name="deep_orange">#FFFF5722</color>
     <color name="brown">#FF795548</color>
     <color name="blue_grey">#FF607D8B</color>
+    
+    <!-- Shop colors -->
+    <color name="category_inactive">#8B7355</color>
+    <color name="category_active">#1A1A1A</color>
+    <color name="category_inactive_new">#E0E0E0</color>
+    <color name="category_text_inactive">#666666</color>
 </resources>

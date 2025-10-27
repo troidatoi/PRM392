@@ -3,14 +3,17 @@ package com.example.project;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -32,15 +35,23 @@ public class ShopActivity extends AppCompatActivity {
     private List<Product> productList;
     private ApiService apiService;
 
+    // Top Bar
+    private EditText etSearch;
+    private ImageView iconFilter;
+
+    // Categories
+    private LinearLayout categoryAll, categoryMountain, categoryFolding, categoryEGravel, btnFilter;
+    private LinearLayout lastSelectedCategory;
+
+    // View Toggle
+    private LinearLayout viewGrid, viewList;
+    private boolean isGridMode = true;
+
     // Bottom Navigation
     private View navHome, navProducts, navCart, navAccount;
     private View blurHome, blurProducts, blurCart, blurAccount;
     private ImageView iconHome, iconProducts, iconCart, iconAccount;
-    private TextView tvHome, tvProducts, tvCart, tvAccount;
-
-    // Search Box
-    private EditText etSearch;
-    private CardView searchCard;
+    private TextView tvHome, tvProducts, tvCart, tvAccount, tvResultsCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +59,9 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
 
         initViews();
-        setupSearchBox();
+        setupTopBar();
+        setupCategories();
+        setupViewToggle();
         setupRecyclerView();
         setupBottomNavigation();
         
@@ -61,10 +74,22 @@ public class ShopActivity extends AppCompatActivity {
 
     private void initViews() {
         rvProducts = findViewById(R.id.rvProducts);
+        tvResultsCount = findViewById(R.id.tvResultsCount);
 
-        // Search Box
+        // Top Bar
         etSearch = findViewById(R.id.etSearch);
-        searchCard = findViewById(R.id.searchCard);
+        iconFilter = findViewById(R.id.iconFilter);
+
+        // Categories
+        categoryAll = findViewById(R.id.categoryAll);
+        categoryMountain = findViewById(R.id.categoryMountain);
+        categoryFolding = findViewById(R.id.categoryFolding);
+        categoryEGravel = findViewById(R.id.categoryEGravel);
+        btnFilter = findViewById(R.id.btnFilter);
+
+        // View Toggle
+        viewGrid = findViewById(R.id.viewGrid);
+        viewList = findViewById(R.id.viewList);
 
         // Bottom Navigation
         navHome = findViewById(R.id.navHome);
@@ -88,27 +113,167 @@ public class ShopActivity extends AppCompatActivity {
         tvAccount = findViewById(R.id.tvAccount);
     }
 
+    private void setupTopBar() {
+        // Setup search functionality
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Search with delay to avoid too many API calls
+                String searchQuery = s.toString().trim();
+                if (searchQuery.length() >= 2 || searchQuery.isEmpty()) {
+                    loadBikes(null, searchQuery);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        iconFilter.setOnClickListener(v -> {
+            // Open advanced filter dialog
+            // TODO: Implement advanced filter dialog
+        });
+    }
+
+    private void setupCategories() {
+        // Load categories from API
+        loadCategories();
+        
+        // Set "All" as selected by default
+        lastSelectedCategory = categoryAll;
+
+        categoryAll.setOnClickListener(v -> {
+            selectCategory(categoryAll);
+            filterByCategory("All");
+        });
+
+        categoryMountain.setOnClickListener(v -> {
+            selectCategory(categoryMountain);
+            filterByCategory("Mountain");
+        });
+
+        categoryFolding.setOnClickListener(v -> {
+            selectCategory(categoryFolding);
+            filterByCategory("Folding");
+        });
+
+        categoryEGravel.setOnClickListener(v -> {
+            selectCategory(categoryEGravel);
+            filterByCategory("E-gravel");
+        });
+
+        btnFilter.setOnClickListener(v -> {
+            // Open filter dialog
+        });
+    }
+
+    private void selectCategory(LinearLayout category) {
+        // Reset last selected
+        if (lastSelectedCategory != null) {
+            lastSelectedCategory.setBackgroundResource(R.drawable.category_button_inactive);
+            TextView text = (TextView) lastSelectedCategory.getChildAt(0);
+            if (text != null) {
+                text.setTextColor(getResources().getColor(R.color.category_text_inactive, null));
+            }
+        }
+
+        // Set new selected
+        category.setBackgroundResource(R.drawable.category_button_active);
+        TextView text = (TextView) category.getChildAt(0);
+        if (text != null) {
+            text.setTextColor(getResources().getColor(R.color.white, null));
+        }
+        lastSelectedCategory = category;
+    }
+
+    private void setupViewToggle() {
+        viewGrid.setOnClickListener(v -> {
+            if (!isGridMode) {
+                isGridMode = true;
+                updateViewToggle();
+                switchToGridLayout();
+            }
+        });
+
+        viewList.setOnClickListener(v -> {
+            if (isGridMode) {
+                isGridMode = false;
+                updateViewToggle();
+                switchToListLayout();
+            }
+        });
+    }
+
+    private void updateViewToggle() {
+        if (isGridMode) {
+            viewGrid.setBackgroundResource(R.drawable.view_toggle_active);
+            viewList.setBackgroundResource(android.R.color.transparent);
+            ((ImageView) viewGrid.getChildAt(0)).setColorFilter(getResources().getColor(R.color.white, null));
+            ((ImageView) viewList.getChildAt(0)).setColorFilter(getResources().getColor(R.color.category_text_inactive, null));
+        } else {
+            viewList.setBackgroundResource(R.drawable.view_toggle_active);
+            viewGrid.setBackgroundResource(android.R.color.transparent);
+            ((ImageView) viewList.getChildAt(0)).setColorFilter(getResources().getColor(R.color.white, null));
+            ((ImageView) viewGrid.getChildAt(0)).setColorFilter(getResources().getColor(R.color.category_text_inactive, null));
+        }
+    }
+
+    private void switchToGridLayout() {
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        rvProducts.setLayoutManager(layoutManager);
+        productAdapter = new ProductAdapter(productList, true);
+        rvProducts.setAdapter(productAdapter);
+    }
+
+    private void switchToListLayout() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        rvProducts.setLayoutManager(layoutManager);
+        productAdapter = new ProductAdapter(productList, false);
+        rvProducts.setAdapter(productAdapter);
+    }
+
+    private void filterByCategory(String category) {
+        // Call API with category filter
+        String categoryFilter = null;
+        if (!"All".equals(category)) {
+            // Map display names to API category IDs
+            switch (category) {
+                case "Mountain":
+                    categoryFilter = "mountain";
+                    break;
+                case "Folding":
+                    categoryFilter = "folding";
+                    break;
+                case "Cargo":
+                    categoryFilter = "cargo";
+                    break;
+                case "Sport":
+                    categoryFilter = "sport";
+                    break;
+                case "City":
+                    categoryFilter = "city";
+                    break;
+                case "Other":
+                    categoryFilter = "other";
+                    break;
+            }
+        }
+        
+        // Get current search query
+        String searchQuery = etSearch.getText().toString().trim();
+        loadBikes(categoryFilter, searchQuery);
+    }
+
     private void setupSearchBox() {
-        // Khi bấm vào ô tìm kiếm, mở SearchActivity
-        etSearch.setOnClickListener(v -> {
-            Intent intent = new Intent(ShopActivity.this, SearchActivity.class);
-            startActivity(intent);
-        });
-
-        // Khi bấm vào searchCard cũng mở SearchActivity
-        searchCard.setOnClickListener(v -> {
-            Intent intent = new Intent(ShopActivity.this, SearchActivity.class);
-            startActivity(intent);
-        });
-
-        // Disable input trực tiếp ở ShopActivity
-        etSearch.setFocusable(false);
-        etSearch.setClickable(true);
+        // Not needed in new layout
     }
 
     private void setupRecyclerView() {
         productList = new ArrayList<>();
-        productAdapter = new ProductAdapter(productList);
+        productAdapter = new ProductAdapter(productList, true);
 
         // Set GridLayoutManager with 2 columns for shop view
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
@@ -117,7 +282,7 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        // Set Products as selected by default (we're on shop page)
+        // Set Products as selected by default
         selectNavItem(blurProducts, iconProducts, tvProducts);
 
         navHome.setOnClickListener(v -> {
@@ -132,13 +297,11 @@ public class ShopActivity extends AppCompatActivity {
         });
 
         navCart.setOnClickListener(v -> {
-            // Open Cart Activity
             Intent intent = new Intent(ShopActivity.this, CartActivity.class);
             startActivity(intent);
         });
 
         navAccount.setOnClickListener(v -> {
-            // Open Account Activity
             Intent intent = new Intent(ShopActivity.this, AccountActivity.class);
             startActivity(intent);
         });
@@ -146,19 +309,28 @@ public class ShopActivity extends AppCompatActivity {
 
     private void selectNavItem(View blur, ImageView icon, TextView text) {
         blur.setVisibility(View.VISIBLE);
-        icon.setColorFilter(Color.parseColor("#2196F3"));
-        text.setTextColor(Color.parseColor("#2196F3"));
+        icon.setColorFilter(android.graphics.Color.parseColor("#1A1A1A"));
+        text.setTextColor(android.graphics.Color.parseColor("#1A1A1A"));
+        text.setTypeface(null, android.graphics.Typeface.BOLD);
     }
 
     private void deselectNavItem(View blur, ImageView icon, TextView text) {
         blur.setVisibility(View.GONE);
-        icon.setColorFilter(Color.parseColor("#666666"));
-        text.setTextColor(Color.parseColor("#666666"));
+        icon.setColorFilter(android.graphics.Color.parseColor("#1A1A1A"));
+        text.setTextColor(android.graphics.Color.parseColor("#1A1A1A"));
     }
 
     private void loadBikes() {
-        // Call API to get all bikes
-        apiService.getBikes(1, 100, null, null, null, null, null, null, null)
+        loadBikes(null, null);
+    }
+    
+    private void loadBikes(String category) {
+        loadBikes(category, null);
+    }
+    
+    private void loadBikes(String category, String search) {
+        // Call API to get bikes with optional category filter and search
+        apiService.getBikes(1, 100, category, null, null, null, null, search, null)
             .enqueue(new Callback<ApiResponse<Bike[]>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Bike[]>> call, Response<ApiResponse<Bike[]>> response) {
@@ -169,273 +341,122 @@ public class ShopActivity extends AppCompatActivity {
                             
                             // Convert bikes to products
                             for (Bike bike : bikes) {
-                                String priceText = String.format("%.0f ₫", bike.getPrice());
+                                String priceText = formatPrice(bike.getPrice());
+                                String originalPriceText = null;
+                                
+                                // Check if there's an original price (discount)
+                                if (bike.getOriginalPrice() > 0 && bike.getOriginalPrice() > bike.getPrice()) {
+                                    originalPriceText = formatPrice(bike.getOriginalPrice());
+                                }
+                                
+                                // Get first image URL if available
+                                String imageUrl = null;
+                                if (bike.getImages() != null && !bike.getImages().isEmpty()) {
+                                    imageUrl = bike.getImages().get(0).getUrl();
+                                }
+                                
+                                // Determine status tags
+                                boolean isBestSeller = bike.isFeatured();
+                                boolean isSoldOut = "out_of_stock".equals(bike.getStatus());
+                                
                                 productList.add(new Product(
                                     bike.getName(),
-                                    bike.getDescription(),
+                                    bike.getDescription() != null ? bike.getDescription() : "",
                                     priceText,
-                                    R.drawable.splash_bike_background
+                                    originalPriceText,
+                                    R.drawable.splash_bike_background, // Default image
+                                    imageUrl, // Image URL from API
+                                    isBestSeller,
+                                    isSoldOut
                                 ));
                             }
                             
+                            // Update results count
+                            updateResultsCount(productList.size());
+                            
                             productAdapter.notifyDataSetChanged();
-                        } else {
-                            // If no bikes, use sample data
-                            loadSampleProducts();
                         }
-                    } else {
-                        // Fallback to sample data if API fails
-                        loadSampleProducts();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ApiResponse<Bike[]>> call, Throwable t) {
-                    // Fallback to sample data if API fails
-                    loadSampleProducts();
+                    // Handle error silently or show an empty state
+                    updateResultsCount(0);
                 }
             });
     }
     
-    private void loadSampleProducts() {
-        // === XE ĐẠP ĐIỆN (8 sản phẩm) ===
-        productList.add(new Product(
-            "VinFast Klara S",
-            "Pin Lithium 60V, tốc độ 50km/h",
-            "29.990.000 ₫",
-            R.drawable.splash_bike_background
-        ));
+    private void updateResultsCount(int count) {
+        if (tvResultsCount != null) {
+            tvResultsCount.setText(String.format("%,d Results", count));
+        }
+    }
+    
+    private String formatPrice(double price) {
+        // Format price with dot as thousands separator
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
+        return formatter.format(price).replace(",", ".") + " ₫";
+    }
+    
+    private void loadCategories() {
+        apiService.getCategories()
+            .enqueue(new Callback<ApiResponse<Object[]>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Object[]>> call, Response<ApiResponse<Object[]>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        Object[] categories = response.body().getData();
+                        if (categories != null && categories.length > 0) {
+                            updateCategoryButtons(categories);
+                        }
+                    }
+                }
 
-        productList.add(new Product(
-            "Yadea E3",
-            "Động cơ 1200W, quãng đường 80km",
-            "25.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Dibao Type R",
-            "Phanh ABS, màn hình LCD",
-            "32.000.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Pega Aska",
-            "Vận hành êm, bảo hành 3 năm",
-            "27.800.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Giant M133S",
-            "Chất lượng cao, pin 72V",
-            "35.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "HKbike Cap A+",
-            "Tốc độ cao, phanh đĩa",
-            "28.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Bluera 133E",
-            "Cao cấp, sang trọng",
-            "31.200.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Anbico Smart",
-            "Thông minh, GPS tích hợp",
-            "26.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        // === XE ĐẠP THỂ THAO (4 sản phẩm) ===
-        productList.add(new Product(
-            "Road Bike Pro",
-            "Khung carbon, siêu nhẹ",
-            "15.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Giant TCR",
-            "Khí động học, Shimano 105",
-            "18.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Specialized Allez",
-            "Xe đua tốc độ cao",
-            "22.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Trek Emonda",
-            "Siêu nhẹ, leo dốc tốt",
-            "19.800.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        // === XE ĐẠP ĐỊA HÌNH (5 sản phẩm) ===
-        productList.add(new Product(
-            "MTB Pro 27.5",
-            "Leo núi, phuộc 120mm",
-            "8.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Trek Marlin 7",
-            "Nhôm cao cấp, phanh thủy lực",
-            "12.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Specialized Rock",
-            "Địa hình phức tạp, 21 tốc độ",
-            "11.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Giant Talon 29",
-            "Bánh 29 inch, khung nhôm",
-            "10.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Cannondale Trail",
-            "Ổn định, bền bỉ",
-            "13.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        // === XE ĐẠP GẤP (5 sản phẩm) ===
-        productList.add(new Product(
-            "Dahon K3",
-            "Siêu gọn, chỉ 7kg",
-            "5.800.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Java Fit 16",
-            "Gấp trong 10 giây",
-            "6.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Fornix BF-300",
-            "Phù hợp đi làm, học",
-            "4.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Hachiko HA-02",
-            "Gọn nhẹ, màu đẹp",
-            "5.200.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Sava Z0 Carbon",
-            "Xe gấp carbon cao cấp",
-            "15.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        // === XE ĐẠP TRẺ EM (5 sản phẩm) ===
-        productList.add(new Product(
-            "Disney Princess",
-            "Cho bé gái 5-8 tuổi",
-            "1.800.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Giant XTC Jr",
-            "Thể thao, bánh 20 inch",
-            "3.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "BMX Freestyle",
-            "Biểu diễn từ 10 tuổi",
-            "2.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Spider Man",
-            "Cho bé trai 6-9 tuổi",
-            "2.200.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Royal Baby",
-            "An toàn, dễ sử dụng",
-            "2.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        // === XE ĐẠP TOURING (3 sản phẩm) ===
-        productList.add(new Product(
-            "Giant Escape 3",
-            "Đi phố, 21 tốc độ",
-            "9.800.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Trek FX 2",
-            "Đa năng, hàng ngày",
-            "10.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Momentum Street",
-            "Thoải mái, phong cách",
-            "8.900.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        // === FIXED GEAR (3 sản phẩm) ===
-        productList.add(new Product(
-            "Fixed Gear Pista",
-            "Thời trang, tối giản",
-            "4.500.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Single Speed",
-            "1 tốc độ, cổ điển",
-            "3.800.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productList.add(new Product(
-            "Fixie Retro",
-            "Phong cách Vintage",
-            "4.200.000 ₫",
-            R.drawable.splash_bike_background
-        ));
-
-        productAdapter.notifyDataSetChanged();
+                @Override
+                public void onFailure(Call<ApiResponse<Object[]>> call, Throwable t) {
+                    // Handle error silently - keep default categories
+                }
+            });
+    }
+    
+    private void updateCategoryButtons(Object[] categories) {
+        // Map category IDs to display names
+        java.util.Map<String, String> categoryNames = new java.util.HashMap<>();
+        categoryNames.put("city", "City");
+        categoryNames.put("mountain", "Mountain");
+        categoryNames.put("folding", "Folding");
+        categoryNames.put("cargo", "Cargo");
+        categoryNames.put("sport", "Sport");
+        categoryNames.put("other", "Other");
+        
+        // Update category buttons with real data
+        for (Object categoryObj : categories) {
+            if (categoryObj instanceof java.util.Map) {
+                java.util.Map<String, Object> category = (java.util.Map<String, Object>) categoryObj;
+                String categoryId = (String) category.get("id");
+                String displayName = categoryNames.get(categoryId);
+                
+                if (displayName != null) {
+                    switch (categoryId) {
+                        case "mountain":
+                            updateCategoryButton(categoryMountain, displayName);
+                            break;
+                        case "folding":
+                            updateCategoryButton(categoryFolding, displayName);
+                            break;
+                        case "cargo":
+                            updateCategoryButton(categoryEGravel, displayName);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+    
+    private void updateCategoryButton(LinearLayout categoryButton, String displayName) {
+        TextView textView = (TextView) categoryButton.getChildAt(0);
+        if (textView != null) {
+            textView.setText(displayName);
+        }
     }
 }

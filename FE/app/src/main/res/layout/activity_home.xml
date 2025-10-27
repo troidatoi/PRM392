@@ -249,7 +249,8 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_home" />
+                        android:src="@drawable/ic_home"
+                        app:tint="#1A1A1A" />
 
                 </FrameLayout>
 
@@ -259,8 +260,7 @@
                     android:layout_height="wrap_content"
                     android:text="Trang chủ"
                     android:textSize="11sp"
-                    android:textColor="#1A1A1A"
-                    android:layout_marginTop="4dp" />
+                    android:textColor="#1A1A1A" />
 
             </LinearLayout>
 
@@ -293,7 +293,8 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_products" />
+                        android:src="@drawable/ic_products"
+                        app:tint="#1A1A1A" />
 
                 </FrameLayout>
 
@@ -303,8 +304,7 @@
                     android:layout_height="wrap_content"
                     android:text="Sản phẩm"
                     android:textSize="11sp"
-                    android:textColor="#333333"
-                    android:layout_marginTop="4dp" />
+                    android:textColor="#1A1A1A" />
 
             </LinearLayout>
 
@@ -337,7 +337,8 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_cart" />
+                        android:src="@drawable/ic_cart"
+                        app:tint="#1A1A1A" />
 
                 </FrameLayout>
 
@@ -347,8 +348,7 @@
                     android:layout_height="wrap_content"
                     android:text="Giỏ hàng"
                     android:textSize="11sp"
-                    android:textColor="#333333"
-                    android:layout_marginTop="4dp" />
+                    android:textColor="#1A1A1A" />
 
             </LinearLayout>
 
@@ -381,7 +381,8 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_account" />
+                        android:src="@drawable/ic_account"
+                        app:tint="#1A1A1A" />
 
                 </FrameLayout>
 
@@ -391,8 +392,7 @@
                     android:layout_height="wrap_content"
                     android:text="Tài khoản"
                     android:textSize="11sp"
-                    android:textColor="#333333"
-                    android:layout_marginTop="4dp" />
+                    android:textColor="#1A1A1A" />
 
             </LinearLayout>
 
