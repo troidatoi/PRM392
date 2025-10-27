@@ -3,100 +3,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="#FFFFFF">
 
     <!-- Header with Back Button -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:id="@+id/headerCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
+            android:rotation="90"
+            app:tint="#2196F3"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:text="Chi Tiết Sản Phẩm"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:gravity="center" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+        <ImageView
+            android:id="@+id/btnFavorite"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_cart"
+            app:tint="#FF5722"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/app_name" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="90"
-                        app:tint="#2196F3"
-                        android:contentDescription="Back" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Chi Tiết Sản Phẩm"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="center" />
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnFavorite"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:id="@+id/ivFavorite"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_cart"
-                        app:tint="#FF5722"
-                        android:contentDescription="Favorite" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
     <!-- Main Content -->
     <ScrollView
@@ -104,7 +60,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/headerCard"
         android:layout_above="@id/bottomActionBar"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:fillViewport="true"
         android:clipToPadding="false"
         android:paddingBottom="16dp">
@@ -113,22 +69,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <!-- Product Image Carousel -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_marginBottom="20dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_background"
-                    android:padding="20dp">
+                    android:padding="8dp">
 
                     <!-- ViewPager2 for image carousel -->
                     <androidx.viewpager2.widget.ViewPager2
@@ -157,16 +114,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="16dp">
 
                     <!-- Product Name -->
                     <TextView
@@ -174,7 +132,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Xe đạp điện VinFast Klara S"
-                        android:textSize="24sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#000000"
                         android:layout_marginBottom="12dp" />
@@ -185,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:id="@+id/tvProductPrice"
@@ -193,36 +151,22 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="29.990.000 VNĐ"
-                            android:textSize="28sp"
+                            android:textSize="24sp"
                             android:textStyle="bold"
                             android:textColor="#2196F3" />
 
-                        <androidx.cardview.widget.CardView
+                        <TextView
                             android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
-                            app:cardBackgroundColor="@android:color/transparent">
-
-                            <RelativeLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/liquid_glass_button"
-                                android:paddingStart="16dp"
-                                android:paddingEnd="16dp"
-                                android:gravity="center">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Còn hàng"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold" />
-
-                            </RelativeLayout>
-
-                        </androidx.cardview.widget.CardView>
+                            android:layout_height="wrap_content"
+                            android:text="Còn hàng"
+                            android:textColor="#4CAF50"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"
+                            android:background="@android:color/transparent" />
 
                     </LinearLayout>
 
@@ -237,7 +181,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="⭐ 4.5"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="#FFC107" />
 
@@ -245,7 +189,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="(128 đánh giá)"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textColor="#666666"
                             android:layout_marginStart="8dp" />
 
@@ -258,7 +202,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Đã bán: 245"
-                            android:textSize="14sp"
+                            android:textSize="13sp"
                             android:textColor="#666666" />
 
                     </LinearLayout>
@@ -281,23 +225,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <TextView
                         android:id="@+id/tvProductDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Xe đạp điện thông minh với công nghệ tiên tiến, thiết kế hiện đại và tiết kiệm năng lượng. Pin lithium-ion dung lượng cao, quãng đường di chuyển lên đến 80km với một lần sạc."
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         android:textColor="#555555"
                         android:lineSpacingExtra="4dp" />
 
@@ -319,16 +264,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <!-- Spec Item 1 -->
                     <LinearLayout
@@ -342,7 +288,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Dung lượng pin"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#666666" />
 
                         <TextView
@@ -350,7 +296,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="48V 20Ah"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#000000"
                             android:textStyle="bold"
                             android:gravity="end" />
@@ -369,7 +315,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Quãng đường"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#666666" />
 
                         <TextView
@@ -377,7 +323,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="80 km"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#000000"
                             android:textStyle="bold"
                             android:gravity="end" />
@@ -396,7 +342,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Tốc độ tối đa"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#666666" />
 
                         <TextView
@@ -404,7 +350,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="45 km/h"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#000000"
                             android:textStyle="bold"
                             android:gravity="end" />
@@ -423,7 +369,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Thời gian sạc"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#666666" />
 
                         <TextView
@@ -431,7 +377,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="4-5 giờ"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#000000"
                             android:textStyle="bold"
                             android:gravity="end" />
@@ -449,7 +395,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Trọng lượng"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#666666" />
 
                         <TextView
@@ -457,7 +403,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="75 kg"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="#000000"
                             android:textStyle="bold"
                             android:gravity="end" />
@@ -482,16 +428,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeColor="#616161"
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
                     <!-- RecyclerView for store stock -->
                     <androidx.recyclerview.widget.RecyclerView
@@ -509,103 +456,93 @@
     </ScrollView>
 
     <!-- Bottom Action Bar -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:id="@+id/bottomActionBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="8dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_background"
-            android:orientation="horizontal"
-            android:padding="12dp">
+        <!-- Add to Cart Button -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnAddToCart"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:strokeColor="#2196F3"
+            app:strokeWidth="2dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
-            <!-- Add to Cart Button -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnAddToCart"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_input"
-                    android:gravity="center">
+                <ImageView
+                    android:id="@+id/iconCart"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ic_cart"
+                    app:tint="#2196F3"
+                    android:contentDescription="@string/app_name" />
 
-                    <ImageView
-                        android:id="@+id/iconCart"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="20dp"
-                        android:src="@drawable/ic_cart"
-                        app:tint="#2196F3"
-                        android:contentDescription="Cart" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Thêm vào giỏ"
+                    android:textColor="#2196F3"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:text="Thêm vào giỏ"
-                        android:textColor="#2196F3"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+            </RelativeLayout>
 
-                </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-            </androidx.cardview.widget.CardView>
+        <!-- Buy Now Button -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnBuyNow"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#2196F3"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
-            <!-- Buy Now Button -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBuyNow"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_button"
-                    android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mua Ngay"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Mua Ngay"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+            </RelativeLayout>
 
-                </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
 </RelativeLayout>
+

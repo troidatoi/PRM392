@@ -4,9 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="12dp"
-    app:cardCornerRadius="0dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="@android:color/transparent">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeColor="#616161"
+    app:strokeWidth="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,8 +26,8 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
 
                 <ImageView
                     android:id="@+id/ivProductImage"
@@ -84,15 +86,15 @@
 
         </LinearLayout>
 
-        <!-- Add to Cart Button with Liquid Glass Effect -->
+        <!-- Add to Cart Button -->
         <androidx.cardview.widget.CardView
             android:id="@+id/btnAddToCart"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="16dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="@android:color/transparent"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="#2196F3"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
@@ -100,7 +102,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/liquid_glass_small"
                 android:gravity="center">
 
                 <ImageView
@@ -131,3 +132,4 @@
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
+

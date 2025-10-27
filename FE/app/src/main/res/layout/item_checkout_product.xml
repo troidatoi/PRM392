@@ -4,71 +4,86 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="15dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@android:color/transparent">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeColor="#616161"
+    app:strokeWidth="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/liquid_glass_input"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
         <!-- Product Image -->
         <androidx.cardview.widget.CardView
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
 
             <ImageView
                 android:id="@+id/ivProductImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/splash_bike_background"
-                android:contentDescription="Product" />
+                android:contentDescription="@string/app_name" />
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Product Details -->
+        <!-- Product Info -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="12dp"
-            android:layout_gravity="center_vertical">
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvProductName"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Xe đạp điện VinFast Klara S"
+                android:text="Tên sản phẩm"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
                 android:maxLines="2"
                 android:ellipsize="end" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SL: "
+                    android:textSize="13sp"
+                    android:textColor="#666666" />
+
+                <TextView
+                    android:id="@+id/tvQuantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000" />
+
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tvProductPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="29.990.000 VNĐ"
-                android:textSize="14sp"
-                android:textColor="#2196F3"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginTop="4dp" />
-
-            <TextView
-                android:id="@+id/tvProductQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Số lượng: 1"
-                android:textSize="13sp"
-                android:textColor="#666666"
+                android:textColor="#2196F3"
                 android:layout_marginTop="4dp" />
 
         </LinearLayout>

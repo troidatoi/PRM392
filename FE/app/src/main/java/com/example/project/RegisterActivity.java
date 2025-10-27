@@ -7,36 +7,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.project.models.ApiResponse;
-import com.example.project.models.RegisterRequest;
-import com.example.project.models.User;
-import com.example.project.network.ApiService;
-import com.example.project.network.RetrofitClient;
-import com.example.project.utils.AuthManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class RegisterActivity extends AppCompatActivity {
 
-    private TextInputLayout tilEmail, tilPhone, tilPassword, tilConfirmPassword;
-    private TextInputEditText etEmail, etPhone, etPassword, etConfirmPassword;
+    private TextInputLayout tilFullName, tilEmail, tilPhone, tilPassword, tilConfirmPassword;
+    private TextInputEditText etFullName, etEmail, etPhone, etPassword, etConfirmPassword;
     private MaterialButton btnRegister;
-    private AuthManager authManager;
-    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
-        // Initialize managers
-        authManager = AuthManager.getInstance(this);
-        apiService = RetrofitClient.getInstance().getApiService();
 
         // Initialize views
         tilEmail = findViewById(R.id.tilEmail);
@@ -65,16 +49,31 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs() {
+        String fullName = etFullName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
         // Reset errors
+        tilFullName.setError(null);
         tilEmail.setError(null);
         tilPhone.setError(null);
         tilPassword.setError(null);
         tilConfirmPassword.setError(null);
+
+        // Validate full name
+        if (TextUtils.isEmpty(fullName)) {
+            tilFullName.setError("Vui lòng nhập họ và tên");
+            etFullName.requestFocus();
+            return false;
+        }
+
+        if (fullName.length() < 2) {
+            tilFullName.setError("Họ tên phải có ít nhất 2 ký tự");
+            etFullName.requestFocus();
+            return false;
+        }
 
         // Validate email
         if (TextUtils.isEmpty(email)) {
@@ -132,60 +131,20 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void performRegister() {
+        String fullName = etFullName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // Show loading
-        btnRegister.setEnabled(false);
-        btnRegister.setText("Đang đăng ký...");
+        // TODO: Implement actual registration logic here (e.g., Firebase, API call)
+        // For now, just show a success message and navigate to login
 
-        // Create register request
-        RegisterRequest registerRequest = new RegisterRequest(
-            email.split("@")[0], // Use email prefix as username
-            email,
-            password,
-            phone,
-            "", // address - empty for now
-            "User", // firstName - default
-            "" // lastName - empty
-        );
+        Toast.makeText(this, "Đăng ký thành công! Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
 
-        // Make API call
-        apiService.register(registerRequest).enqueue(new Callback<ApiResponse<User>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {
-                btnRegister.setEnabled(true);
-                btnRegister.setText("Đăng ký");
-
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<User> apiResponse = response.body();
-                    if (apiResponse.isSuccess()) {
-                        // Save auth data
-                        authManager.saveAuthData(apiResponse.getToken(), apiResponse.getUser());
-                        
-                        Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-                        
-                        // Navigate to home
-                        Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(RegisterActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Đăng ký thất bại. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
-                btnRegister.setEnabled(true);
-                btnRegister.setText("Đăng ký");
-                Toast.makeText(RegisterActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }
 

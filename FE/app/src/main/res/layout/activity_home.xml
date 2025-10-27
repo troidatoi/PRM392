@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="#FFFFFF">
 
     <!-- Main Content -->
     <ScrollView
@@ -12,8 +12,8 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomNavBar"
         android:fillViewport="true"
-        android:paddingBottom="16dp"
-        android:clipToPadding="false">
+        android:clipToPadding="false"
+        android:background="#F5F5F5">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,20 +42,21 @@
                 android:textColor="#666666"
                 android:layout_marginTop="4dp" />
 
-            <!-- Liquid Glass Search Box -->
+            <!-- Search Box -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/searchCard"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="56dp"
                 android:layout_marginTop="24dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardCornerRadius="28dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF"
+                android:clickable="true"
+                android:focusable="true">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_search"
                     android:padding="8dp">
 
                     <ImageView
@@ -66,8 +67,8 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="16dp"
                         android:src="@drawable/ic_search"
-                        app:tint="#5E7CE2"
-                        android:contentDescription="@string/search_icon" />
+                        app:tint="#2196F3"
+                        android:contentDescription="@string/app_name" />
 
                     <EditText
                         android:id="@+id/etSearch"
@@ -77,18 +78,17 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginEnd="16dp"
                         android:background="@android:color/transparent"
-                        android:hint="@string/search_hint"
-                        android:textColorHint="#8B9DC3"
-                        android:textColor="#3D5A80"
+                        android:hint="Tìm kiếm sản phẩm..."
+                        android:textColorHint="#999999"
+                        android:textColor="#000000"
                         android:textSize="16sp"
                         android:inputType="text"
                         android:imeOptions="actionSearch"
-                        android:autofillHints="search" />
+                        android:importantForAutofill="no" />
 
                 </RelativeLayout>
 
             </androidx.cardview.widget.CardView>
-
 
             <!-- Featured Section -->
             <TextView
@@ -96,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sản phẩm nổi bật"
-                android:textSize="22sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
                 android:layout_marginTop="32dp" />
@@ -113,7 +113,7 @@
 
     </ScrollView>
 
-    <!-- Liquid Glass Bottom Navigation Bar - Floating Style -->
+    <!-- Bottom Navigation Bar -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
@@ -123,13 +123,12 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:cardCornerRadius="35dp"
-        app:cardElevation="12dp"
-        android:backgroundTint="#00000000">
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_bottom_nav"
             android:orientation="horizontal"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
@@ -147,27 +146,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurHome"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconHome"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_home"
-                        android:contentDescription="Home" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconHome"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="#2196F3"
+                    android:contentDescription="@string/app_name" />
 
                 <TextView
                     android:id="@+id/tvHome"
@@ -175,7 +160,8 @@
                     android:layout_height="wrap_content"
                     android:text="Trang chủ"
                     android:textSize="11sp"
-                    android:textColor="#666666"
+                    android:textColor="#2196F3"
+                    android:textStyle="bold"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -192,27 +178,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurProducts"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconProducts"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_products"
-                        android:contentDescription="Products" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconProducts"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_products"
+                    app:tint="#666666"
+                    android:contentDescription="@string/app_name" />
 
                 <TextView
                     android:id="@+id/tvProducts"
@@ -237,27 +209,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurCart"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconCart"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_cart"
-                        android:contentDescription="Cart" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconCart"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_cart"
+                    app:tint="#666666"
+                    android:contentDescription="@string/app_name" />
 
                 <TextView
                     android:id="@+id/tvCart"
@@ -282,27 +240,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurAccount"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconAccount"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_account"
-                        android:contentDescription="Account" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconAccount"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_account"
+                    app:tint="#666666"
+                    android:contentDescription="@string/app_name" />
 
                 <TextView
                     android:id="@+id/tvAccount"
@@ -329,8 +273,8 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="100dp"
         app:cardCornerRadius="30dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#2196F3"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -338,18 +282,18 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_button"
             android:gravity="center">
 
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_chat_bubble"
+                android:src="@drawable/ic_message"
                 app:tint="#FFFFFF"
-                android:contentDescription="Chat" />
+                android:contentDescription="@string/app_name" />
 
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
+
