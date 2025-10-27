@@ -58,15 +58,15 @@ public class ShopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
 
+        // Initialize API service FIRST
+        apiService = RetrofitClient.getInstance().getApiService();
+        
         initViews();
         setupTopBar();
         setupCategories();
         setupViewToggle();
         setupRecyclerView();
         setupBottomNavigation();
-        
-        // Initialize API service
-        apiService = RetrofitClient.getInstance().getApiService();
         
         // Load bikes from API
         loadBikes();

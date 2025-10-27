@@ -50,7 +50,6 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
         holder.tvStoreName.setText(store.getName());
         holder.tvStoreAddress.setText(store.getFullAddress());
-        holder.tvProductCount.setText("• " + store.getProductCount() + " sản phẩm");
         holder.tvStoreStatus.setText(store.getDisplayStatus());
 
         // Set status badge color
@@ -93,7 +92,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
     }
 
     static class StoreViewHolder extends RecyclerView.ViewHolder {
-        TextView tvStoreName, tvStoreAddress, tvStoreStatus, tvProductCount;
+        TextView tvStoreName, tvStoreAddress, tvStoreStatus;
         CardView statusBadge, btnEditStore, btnDeleteStore;
 
         public StoreViewHolder(@NonNull View itemView) {
@@ -101,7 +100,6 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             tvStoreName = itemView.findViewById(R.id.tvStoreName);
             tvStoreAddress = itemView.findViewById(R.id.tvStoreAddress);
             tvStoreStatus = itemView.findViewById(R.id.tvStoreStatus);
-            tvProductCount = itemView.findViewById(R.id.tvProductCount);
             statusBadge = itemView.findViewById(R.id.statusBadge);
             btnEditStore = itemView.findViewById(R.id.btnEditStore);
             btnDeleteStore = itemView.findViewById(R.id.btnDeleteStore);

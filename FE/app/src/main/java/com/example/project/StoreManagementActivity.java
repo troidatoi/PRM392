@@ -30,7 +30,7 @@ import com.example.project.models.ApiResponse;
 
 public class StoreManagementActivity extends AppCompatActivity implements StoreAdapter.OnStoreActionListener, StoreAdapter.OnStoreClickListener {
 
-    private CardView btnBack, btnAddStore, btnSearch;
+    private CardView btnBack, btnAddStore;
     private RecyclerView rvStores;
     private TextView tvTotalStores, tvActiveStores;
     private LinearLayout emptyState;
@@ -80,7 +80,6 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         btnAddStore = findViewById(R.id.btnAddStore);
-        btnSearch = findViewById(R.id.btnSearch);
         rvStores = findViewById(R.id.rvStores);
         tvTotalStores = findViewById(R.id.tvTotalStores);
         tvActiveStores = findViewById(R.id.tvActiveStores);
@@ -93,13 +92,7 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
 
         // Add store button
         btnAddStore.setOnClickListener(v -> {
-            // TODO: Open Add Store Dialog or Activity
             showAddStoreDialog();
-        });
-
-        // Search button
-        btnSearch.setOnClickListener(v -> {
-            Toast.makeText(this, "Chức năng tìm kiếm - Coming soon", Toast.LENGTH_SHORT).show();
         });
     }
 

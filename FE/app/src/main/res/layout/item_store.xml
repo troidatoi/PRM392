@@ -14,43 +14,14 @@
         android:background="@drawable/liquid_glass_input"
         android:padding="16dp">
 
-        <!-- Store Icon -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/storeIcon"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="@android:color/transparent">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/liquid_glass_small"
-                android:gravity="center">
-
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_products"
-                    app:tint="#2196F3"
-                    android:contentDescription="Store icon" />
-
-            </RelativeLayout>
-
-        </androidx.cardview.widget.CardView>
-
         <!-- Store Info -->
         <LinearLayout
             android:id="@+id/storeInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/storeIcon"
             android:layout_toStartOf="@id/actionButtons"
             android:layout_centerVertical="true"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="12dp"
             android:orientation="vertical">
 
@@ -105,17 +76,6 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Product Count -->
-                <TextView
-                    android:id="@+id/tvProductCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• 25 sản phẩm"
-                    android:textSize="11sp"
-                    android:textColor="#999999"
-                    android:layout_marginStart="8dp"
-                    android:layout_gravity="center_vertical" />
-
             </LinearLayout>
 
         </LinearLayout>
@@ -133,7 +93,7 @@
             <!-- Edit Button -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnEditStore"
-                android:layout_width="36dp"
+                android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="4dp"
@@ -143,17 +103,20 @@
                 android:foreground="?attr/selectableItemBackground">
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:background="@drawable/liquid_glass_button"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_add_cart"
-                        app:tint="#FFFFFF"
-                        android:contentDescription="Edit store" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sửa"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                 </RelativeLayout>
 
@@ -162,7 +125,7 @@
             <!-- Delete Button -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnDeleteStore"
-                android:layout_width="36dp"
+                android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:layout_marginTop="8dp"
                 app:cardCornerRadius="18dp"
@@ -173,16 +136,19 @@
                 android:foreground="?attr/selectableItemBackground">
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_close"
-                        app:tint="#FFFFFF"
-                        android:contentDescription="Delete store" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Xóa"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
 
                 </RelativeLayout>
 
