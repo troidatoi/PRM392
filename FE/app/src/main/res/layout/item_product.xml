@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@drawable/auth_frosted_glass_card"
         android:padding="16dp">
 
         <!-- Product Content Row -->
@@ -53,9 +54,13 @@
                     android:text="Tên sản phẩm"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="#1A1A1A"
                     android:maxLines="2"
-                    android:ellipsize="end" />
+                    android:ellipsize="end"
+                    android:shadowColor="#40000000"
+                    android:shadowDx="0"
+                    android:shadowDy="1"
+                    android:shadowRadius="2" />
 
                 <!-- Product Description -->
                 <TextView
@@ -64,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:text="Mô tả sản phẩm"
                     android:textSize="13sp"
-                    android:textColor="#666666"
+                    android:textColor="#444444"
                     android:layout_marginTop="4dp"
                     android:maxLines="2"
                     android:ellipsize="end" />
@@ -74,11 +79,11 @@
                     android:id="@+id/tvProductPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 VNĐ"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#2196F3"
-                    android:layout_marginTop="8dp" />
+                android:text="0 VNĐ"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A"
+                android:layout_marginTop="8dp" />
 
             </LinearLayout>
 
@@ -100,7 +105,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/liquid_glass_small"
+                android:background="@drawable/auth_button_glass"
                 android:gravity="center">
 
                 <ImageView
@@ -111,7 +116,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="20dp"
                     android:src="@drawable/ic_add_cart"
-                    app:tint="#FFFFFF"
+                    app:tint="#1A1A1A"
                     android:contentDescription="Add to cart" />
 
                 <TextView
@@ -119,7 +124,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:text="Thêm vào giỏ hàng"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#1A1A1A"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.02" />

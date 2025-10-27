@@ -16,11 +16,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import com.example.project.models.ApiResponse;
+import com.example.project.models.Bike;
+import com.example.project.network.ApiService;
+import com.example.project.network.RetrofitClient;
+
 public class ShopActivity extends AppCompatActivity {
 
     private RecyclerView rvProducts;
     private ProductAdapter productAdapter;
     private List<Product> productList;
+    private ApiService apiService;
 
     // Bottom Navigation
     private View navHome, navProducts, navCart, navAccount;
@@ -41,7 +51,12 @@ public class ShopActivity extends AppCompatActivity {
         setupSearchBox();
         setupRecyclerView();
         setupBottomNavigation();
-        loadSampleProducts();
+        
+        // Initialize API service
+        apiService = RetrofitClient.getInstance().getApiService();
+        
+        // Load bikes from API
+        loadBikes();
     }
 
     private void initViews() {
@@ -141,6 +156,47 @@ public class ShopActivity extends AppCompatActivity {
         text.setTextColor(Color.parseColor("#666666"));
     }
 
+    private void loadBikes() {
+        // Call API to get all bikes
+        apiService.getBikes(1, 100, null, null, null, null, null, null, null)
+            .enqueue(new Callback<ApiResponse<Bike[]>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Bike[]>> call, Response<ApiResponse<Bike[]>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        Bike[] bikes = response.body().getData();
+                        if (bikes != null && bikes.length > 0) {
+                            productList.clear();
+                            
+                            // Convert bikes to products
+                            for (Bike bike : bikes) {
+                                String priceText = String.format("%.0f ₫", bike.getPrice());
+                                productList.add(new Product(
+                                    bike.getName(),
+                                    bike.getDescription(),
+                                    priceText,
+                                    R.drawable.splash_bike_background
+                                ));
+                            }
+                            
+                            productAdapter.notifyDataSetChanged();
+                        } else {
+                            // If no bikes, use sample data
+                            loadSampleProducts();
+                        }
+                    } else {
+                        // Fallback to sample data if API fails
+                        loadSampleProducts();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<Bike[]>> call, Throwable t) {
+                    // Fallback to sample data if API fails
+                    loadSampleProducts();
+                }
+            });
+    }
+    
     private void loadSampleProducts() {
         // === XE ĐẠP ĐIỆN (8 sản phẩm) ===
         productList.add(new Product(

@@ -4,7 +4,7 @@
     <!-- Soft background -->
     <item>
         <shape android:shape="oval">
-            <solid android:color="#1A2196F3" />
+            <solid android:color="#1A1A1A1A" />
         </shape>
     </item>
 
@@ -16,9 +16,9 @@
         android:right="2dp">
         <shape android:shape="oval">
             <gradient
-                android:startColor="#4D2196F3"
-                android:centerColor="#662196F3"
-                android:endColor="#802196F3"
+                android:startColor="#1A1A1A1A"
+                android:centerColor="#331A1A1A"
+                android:endColor="#4D1A1A1A"
                 android:angle="135" />
         </shape>
     </item>
