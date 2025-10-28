@@ -30,9 +30,8 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
 
     // Bottom Navigation
     private View navHome, navProducts, navCart, navAccount;
-    private View blurHome, blurProducts, blurCart, blurAccount;
     private ImageView iconHome, iconProducts, iconCart, iconAccount;
-    private TextView tvHome, tvProducts, tvCartNav, tvAccount;
+    private TextView tvHome, tvProducts, tvCart, tvAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +59,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         navCart = findViewById(R.id.navCart);
         navAccount = findViewById(R.id.navAccount);
 
-        blurHome = findViewById(R.id.blurHome);
-        blurProducts = findViewById(R.id.blurProducts);
-        blurCart = findViewById(R.id.blurCart);
-        blurAccount = findViewById(R.id.blurAccount);
 
         iconHome = findViewById(R.id.iconHome);
         iconProducts = findViewById(R.id.iconProducts);
@@ -72,7 +67,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
 
         tvHome = findViewById(R.id.tvHome);
         tvProducts = findViewById(R.id.tvProducts);
-        tvCartNav = findViewById(R.id.tvCart);
+        tvCart = findViewById(R.id.tvCart);
         tvAccount = findViewById(R.id.tvAccount);
 
         btnCheckout.setOnClickListener(v -> {
@@ -161,7 +156,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
 
     private void setupBottomNavigation() {
         // Set Cart as selected by default
-        selectNavItem(blurCart, iconCart, tvCartNav);
+        selectNavItem(iconCart, tvCart);
 
         navHome.setOnClickListener(v -> {
             Intent intent = new Intent(CartActivity.this, HomeActivity.class);
@@ -178,10 +173,10 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         });
 
         navCart.setOnClickListener(v -> {
-            selectNavItem(blurCart, iconCart, tvCartNav);
-            deselectNavItem(blurHome, iconHome, tvHome);
-            deselectNavItem(blurProducts, iconProducts, tvProducts);
-            deselectNavItem(blurAccount, iconAccount, tvAccount);
+            selectNavItem(iconCart, tvCart);
+            deselectNavItem(iconHome, tvHome);
+            deselectNavItem(iconProducts, tvProducts);
+            deselectNavItem(iconAccount, tvAccount);
         });
 
         navAccount.setOnClickListener(v -> {
@@ -191,14 +186,12 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         });
     }
 
-    private void selectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.VISIBLE);
+    private void selectNavItem(ImageView icon, TextView text) {
         icon.setColorFilter(Color.parseColor("#2196F3"));
         text.setTextColor(Color.parseColor("#2196F3"));
     }
 
-    private void deselectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.GONE);
+    private void deselectNavItem(ImageView icon, TextView text) {
         icon.setColorFilter(Color.parseColor("#666666"));
         text.setTextColor(Color.parseColor("#666666"));
     }
