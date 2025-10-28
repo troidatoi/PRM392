@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const passport = require('passport');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -11,6 +12,10 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Passport config
+app.use(passport.initialize());
+require('./config/passport')(passport);
 
 // Body parser
 app.use(express.json({ limit: '10mb' }));
@@ -23,6 +28,9 @@ app.use(cors({
     : ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true
 }));
+
+// Serve static files from public directory
+app.use(express.static('public'));
 
 // Routes
 app.use('/api/bikes', require('./routes/bikeRoutes'));
@@ -41,6 +49,11 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
   });
+});
+
+// Reset password page route
+app.get('/reset-password/:token', (req, res) => {
+  res.sendFile(__dirname + '/public/reset-password.html');
 });
 
 // 404 handler

@@ -1,13 +1,45 @@
-# Electric Bike Backend API
+# Electric Bike Shop - Backend API
 
-Backend API cho ứng dụng bán xe đạp điện được xây dựng với Node.js, Express và MongoDB.
+[![Node.js](https://img.shields.io/badge/Node.js-14%2B-green.svg)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4%2B-brightgreen.svg)](https://www.mongodb.com/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-lightgrey.svg)](https://expressjs.com/)
+[![JWT](https://img.shields.io/badge/JWT-Authentication-blue.svg)](https://jwt.io/)
 
-## Cài đặt
+> Hệ thống backend RESTful API cho ứng dụng quản lý cửa hàng xe điện với authentication hoàn chỉnh và các tính năng hiện đại.
 
-1. Cài đặt dependencies:
+## 🚀 Tính năng đã triển khai
+
+### 🔐 Authentication & Authorization
+- ✅ **Đăng ký/Đăng nhập** với email/username & password
+- ✅ **Google OAuth 2.0** - Đăng nhập bằng tài khoản Google
+- ✅ **JWT Authentication** - Stateless token-based auth
+- ✅ **Forgot Password** - Reset mật khẩu qua email
+- ✅ **Profile Management** - Cập nhật thông tin cá nhân
+- ✅ **Role-based Access Control** - Phân quyền admin/staff/customer
+
+### 📧 Email Service
+- ✅ **Password Reset Email** - HTML formatted với retry logic
+- ✅ **Professional Email Templates** - Responsive design
+- ✅ **Gmail Integration** - Sử dụng Gmail SMTP với App Password
+
+### 🔒 Security Features
+- ✅ **Password Hashing** - bcrypt với 12 salt rounds
+- ✅ **Input Validation** - express-validator cho tất cả endpoints
+- ✅ **Error Handling** - Comprehensive error handling middleware
+- ✅ **CORS Configuration** - Properly configured for production
+- ✅ **Rate Limiting Ready** - Cấu hình sẵn cho production
+
+### 🎨 User Experience
+- ✅ **Web Reset Password Page** - HTML form cho reset password
+- ✅ **Responsive Design** - Mobile-friendly interface
+- ✅ **Real-time Validation** - Client-side & server-side validation
+
+## 🛠️ Quick Start
+
+### 1. Cài đặt Dependencies
 ```bash
+cd BE
 npm install
-```
 
 2. Tạo file `.env` từ mẫu:
 ```bash
