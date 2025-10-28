@@ -52,6 +52,123 @@ public class BikeDetailActivity extends AppCompatActivity {
     private List<String> imageUrls;
     private ApiService apiService;
     private AuthManager authManager;
+    
+    private void openSelectStoreQtyDialog() {
+        if (bike == null) { Toast.makeText(this, "Không có dữ liệu sản phẩm", Toast.LENGTH_SHORT).show(); return; }
+        if (!authManager.isLoggedIn()) { Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show(); return; }
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_select_store_qty, null);
+        android.widget.Spinner sp = dialogView.findViewById(R.id.spStores);
+        android.widget.TextView tvQty = dialogView.findViewById(R.id.tvQty);
+        android.widget.TextView tvStockInfo = dialogView.findViewById(R.id.tvStockInfo);
+        androidx.cardview.widget.CardView btnDec = dialogView.findViewById(R.id.btnDec);
+        androidx.cardview.widget.CardView btnInc = dialogView.findViewById(R.id.btnInc);
+
+        final List<Store> stores = new ArrayList<>();
+        final List<String> display = new ArrayList<>();
+        final java.util.Map<String, Integer> storeIdToStock = new java.util.HashMap<>();
+        final int[] maxStock = {0};
+        final String[] selectedStoreId = {null};
+        final int[] qty = {1};
+
+        tvQty.setText("1");
+
+        // Load stores active
+        RetrofitClient.getInstance().getApiService().getStores(null, null, null, true, 1, 100, null)
+            .enqueue(new Callback<ApiService.StoreResponse>() {
+                @Override public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+                    if (response.isSuccessful() && response.body()!=null && response.body().getData()!=null) {
+                        stores.addAll(response.body().getData());
+                        ApiService api = RetrofitClient.getInstance().getApiService();
+                        for (Store s : stores) {
+                            java.util.Map<String,Object> body = new java.util.HashMap<>();
+                            body.put("productId", bike.getId());
+                            body.put("storeId", s.getId());
+                            body.put("quantity", 1);
+                            api.checkAvailability(authManager.getAuthHeader(), body).enqueue(new Callback<ApiResponse<Object>>() {
+                                @Override public void onResponse(Call<ApiResponse<Object>> call1, Response<ApiResponse<Object>> res1) {
+                                    int stock = 0;
+                                    if (res1.isSuccessful() && res1.body()!=null && res1.body().isSuccess() && res1.body().getData() instanceof java.util.Map) {
+                                        Object cur = ((java.util.Map)res1.body().getData()).get("currentStock");
+                                        if (cur instanceof Number) stock = ((Number)cur).intValue();
+                                    }
+                                    storeIdToStock.put(s.getId(), stock);
+                                    String row = s.getName() + " — còn " + stock;
+                                    display.add(row);
+                                    if (display.size()==stores.size()) {
+                                        android.widget.ArrayAdapter<String> ad = new android.widget.ArrayAdapter<>(BikeDetailActivity.this, android.R.layout.simple_spinner_item, display);
+                                        ad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                        sp.setAdapter(ad);
+                                        if (!stores.isEmpty()) {
+                                            selectedStoreId[0] = stores.get(0).getId();
+                                            maxStock[0] = storeIdToStock.getOrDefault(selectedStoreId[0], 0);
+                                            tvStockInfo.setText("Kho: " + maxStock[0]);
+                                        }
+                                    }
+                                }
+                                @Override public void onFailure(Call<ApiResponse<Object>> call1, Throwable t) { }
+                            });
+                        }
+                    }
+                }
+                @Override public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) { }
+            });
+
+        sp.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                if (position>=0 && position<stores.size()) {
+                    selectedStoreId[0] = stores.get(position).getId();
+                    maxStock[0] = storeIdToStock.getOrDefault(selectedStoreId[0], 0);
+                    tvStockInfo.setText("Kho: " + maxStock[0]);
+                    if (qty[0] > maxStock[0] && maxStock[0] > 0) { qty[0] = maxStock[0]; tvQty.setText(String.valueOf(qty[0])); }
+                }
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+
+        btnDec.setOnClickListener(v -> { if (qty[0] > 1) { qty[0]--; tvQty.setText(String.valueOf(qty[0])); } });
+        btnInc.setOnClickListener(v -> { int limit = maxStock[0] == 0 ? 99 : maxStock[0]; if (qty[0] < limit) { qty[0]++; tvQty.setText(String.valueOf(qty[0])); } });
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Thêm vào giỏ", (d, w) -> {
+                if (selectedStoreId[0] == null) { Toast.makeText(this, "Vui lòng chọn cửa hàng", Toast.LENGTH_SHORT).show(); return; }
+                String userId = authManager.getCurrentUser()!=null ? authManager.getCurrentUser().getId() : null;
+                ApiService api = RetrofitClient.getInstance().getApiService();
+                // Bước 5: kiểm tra tồn kho với số lượng đã chọn
+                java.util.Map<String,Object> check = new java.util.HashMap<>();
+                check.put("productId", bike.getId());
+                check.put("storeId", selectedStoreId[0]);
+                check.put("quantity", qty[0]);
+                api.checkAvailability(authManager.getAuthHeader(), check).enqueue(new Callback<ApiResponse<Object>>() {
+                    @Override public void onResponse(Call<ApiResponse<Object>> callCk, Response<ApiResponse<Object>> resCk) {
+                        if (resCk.isSuccessful() && resCk.body()!=null && resCk.body().isSuccess()) {
+                            // Bước 4: đảm bảo cart
+                            java.util.Map<String,String> c = new java.util.HashMap<>(); c.put("userId", userId);
+                            api.createCart(authManager.getAuthHeader(), c).enqueue(new Callback<ApiResponse<Object>>() {
+                                @Override public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> resp) {
+                                    // Bước 6: add item
+                                    java.util.Map<String,Object> add = new java.util.HashMap<>();
+                                    add.put("userId", userId); add.put("productId", bike.getId()); add.put("storeId", selectedStoreId[0]); add.put("quantity", qty[0]);
+                                    api.addItemToCart(authManager.getAuthHeader(), add).enqueue(new Callback<ApiResponse<Object>>() {
+                                        @Override public void onResponse(Call<ApiResponse<Object>> call2, Response<ApiResponse<Object>> r2) {
+                                            Toast.makeText(BikeDetailActivity.this, r2.isSuccessful()? "Đã thêm vào giỏ" : "Thêm thất bại", Toast.LENGTH_SHORT).show();
+                                        }
+                                        @Override public void onFailure(Call<ApiResponse<Object>> call2, Throwable t2) { Toast.makeText(BikeDetailActivity.this, "Lỗi: "+t2.getMessage(), Toast.LENGTH_SHORT).show(); }
+                                    });
+                                }
+                                @Override public void onFailure(Call<ApiResponse<Object>> call, Throwable t) { Toast.makeText(BikeDetailActivity.this, "Lỗi: "+t.getMessage(), Toast.LENGTH_SHORT).show(); }
+                            });
+                        } else {
+                            Toast.makeText(BikeDetailActivity.this, "Số lượng vượt tồn kho", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override public void onFailure(Call<ApiResponse<Object>> callCk, Throwable t) { Toast.makeText(BikeDetailActivity.this, "Lỗi kiểm tra tồn kho: "+t.getMessage(), Toast.LENGTH_SHORT).show(); }
+                });
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,84 +249,7 @@ public class BikeDetailActivity extends AppCompatActivity {
             }
         });
 
-        btnAddToCart.setOnClickListener(v -> {
-            if (bike == null) {
-                Toast.makeText(this, "Không có dữ liệu sản phẩm", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (!authManager.isLoggedIn()) {
-                Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            ApiService api = RetrofitClient.getInstance().getApiService();
-            String userId = authManager.getCurrentUser() != null ? authManager.getCurrentUser().getId() : null;
-
-            // Lấy 1 store đang hoạt động
-            api.getStores(null, null, null, true, 1, 1, null).enqueue(new Callback<ApiService.StoreResponse>() {
-                @Override
-                public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
-                    final String[] storeIdHolder = new String[1];
-                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
-                        storeIdHolder[0] = response.body().getData().get(0).getId();
-                    }
-                    if (storeIdHolder[0] == null) {
-                        Toast.makeText(BikeDetailActivity.this, "Không tìm thấy cửa hàng khả dụng", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    // B5: Kiểm tra tồn kho
-                    java.util.Map<String, Object> checkBody = new java.util.HashMap<>();
-                    checkBody.put("productId", bike.getId());
-                    checkBody.put("storeId", storeIdHolder[0]);
-                    checkBody.put("quantity", 1);
-                    api.checkAvailability(authManager.getAuthHeader(), checkBody).enqueue(new Callback<ApiResponse<Object>>() {
-                        @Override
-                        public void onResponse(Call<ApiResponse<Object>> call1, Response<ApiResponse<Object>> res1) {
-                            // B4: đảm bảo cart & B6: add item
-                            java.util.Map<String, String> createBody = new java.util.HashMap<>();
-                            createBody.put("userId", userId);
-                            api.createCart(authManager.getAuthHeader(), createBody).enqueue(new Callback<ApiResponse<Object>>() {
-                                @Override
-                                public void onResponse(Call<ApiResponse<Object>> call2, Response<ApiResponse<Object>> r2) {
-                                    java.util.Map<String, Object> addBody = new java.util.HashMap<>();
-                                    addBody.put("userId", userId);
-                                    addBody.put("productId", bike.getId());
-                                    addBody.put("storeId", storeIdHolder[0]);
-                                    addBody.put("quantity", 1);
-                                    api.addItemToCart(authManager.getAuthHeader(), addBody).enqueue(new Callback<ApiResponse<Object>>() {
-                                        @Override
-                                        public void onResponse(Call<ApiResponse<Object>> call3, Response<ApiResponse<Object>> r3) {
-                                            Toast.makeText(BikeDetailActivity.this, r3.isSuccessful() ? "Đã thêm vào giỏ: " + bike.getName() : "Thêm vào giỏ thất bại", Toast.LENGTH_SHORT).show();
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ApiResponse<Object>> call3, Throwable t) {
-                                            Toast.makeText(BikeDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onFailure(Call<ApiResponse<Object>> call2, Throwable t) {
-                                    Toast.makeText(BikeDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onFailure(Call<ApiResponse<Object>> call1, Throwable t) {
-                            Toast.makeText(BikeDetailActivity.this, "Lỗi kiểm tra tồn kho: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-
-                @Override
-                public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
-                    Toast.makeText(BikeDetailActivity.this, "Lỗi lấy cửa hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
+        btnAddToCart.setOnClickListener(v -> openSelectStoreQtyDialog());
     }
 
     private void onImageClick(int position) {
