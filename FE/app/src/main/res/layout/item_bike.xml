@@ -15,15 +15,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="12dp">
 
         <!-- Bike Image -->
         <ImageView
             android:id="@+id/ivBikeImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginEnd="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
             android:background="@drawable/liquid_glass_small"
             android:contentDescription="Bike Image"
             android:scaleType="centerCrop"
@@ -31,10 +30,10 @@
 
         <!-- Bike Info -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
 
             <!-- Bike Name -->
             <TextView
@@ -76,50 +75,41 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:gravity="end">
 
-                <!-- Stock -->
-                <TextView
-                    android:id="@+id/tvBikeStock"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Kho: 10"
-                    android:textColor="@color/gray"
-                    android:textSize="12sp" />
-
-                <!-- Status -->
-                <TextView
-                    android:id="@+id/tvBikeStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/ivAddToCart"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/liquid_glass_small"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:text="Available"
-                    android:textColor="@color/green"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:clickable="true"
+                    android:contentDescription="Add To Cart"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_add_cart"
+                    android:tint="@color/primary" />
+
+                <ImageView
+                    android:id="@+id/ivDetailIcon"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/liquid_glass_small"
+                    android:clickable="true"
+                    android:contentDescription="View Details"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_visibility"
+                    android:tint="@color/primary" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Detail Icon -->
-        <ImageView
-            android:id="@+id/ivDetailIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/liquid_glass_small"
-            android:clickable="true"
-            android:contentDescription="View Details"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:padding="6dp"
-            android:src="@drawable/ic_visibility"
-            android:tint="@color/primary" />
 
     </LinearLayout>
 

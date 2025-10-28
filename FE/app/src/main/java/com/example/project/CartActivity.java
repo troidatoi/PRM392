@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressWarnings("deprecation")
 public class CartActivity extends AppCompatActivity implements CartAdapter.OnCartItemListener {
 
     private RecyclerView rvCartItems;

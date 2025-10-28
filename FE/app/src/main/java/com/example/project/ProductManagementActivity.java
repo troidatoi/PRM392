@@ -132,7 +132,7 @@ public class ProductManagementActivity extends AppCompatActivity {
     private void onBikeClick(Bike bike) {
         Intent intent = new Intent(ProductManagementActivity.this, BikeDetailActivity.class);
         intent.putExtra("bike_id", bike.getId());
-        startActivityForResult(intent, 1002);
+        startActivity(intent);
     }
 
     private void showError(String message) {
@@ -146,21 +146,11 @@ public class ProductManagementActivity extends AppCompatActivity {
 
         btnAddProduct.setOnClickListener(v -> {
             Intent intent = new Intent(ProductManagementActivity.this, CreateBikeActivity.class);
-            startActivityForResult(intent, 1001);
+            startActivity(intent);
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1001 && resultCode == RESULT_OK) {
-            // Reload bikes when bike is created successfully
-            loadBikes();
-        } else if (requestCode == 1002 && resultCode == RESULT_OK) {
-            // Reload bikes when bike is updated or deleted
-            loadBikes();
-        }
-    }
+    // Không cần onActivityResult nữa vì đã chuyển sang startActivity
 
     @Override
     protected void onResume() {

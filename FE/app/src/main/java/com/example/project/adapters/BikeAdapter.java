@@ -58,22 +58,18 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
         private CardView cardViewBike;
         private ImageView ivBikeImage;
         private TextView tvBikeName;
-        private TextView tvBikeBrand;
         private TextView tvBikePrice;
-        private TextView tvBikeStock;
-        private TextView tvBikeStatus;
         private ImageView ivDetailIcon;
+        private ImageView ivAddToCart;
 
         public BikeViewHolder(@NonNull View itemView) {
             super(itemView);
             cardViewBike = itemView.findViewById(R.id.cardViewBike);
             ivBikeImage = itemView.findViewById(R.id.ivBikeImage);
             tvBikeName = itemView.findViewById(R.id.tvBikeName);
-            tvBikeBrand = itemView.findViewById(R.id.tvBikeBrand);
             tvBikePrice = itemView.findViewById(R.id.tvBikePrice);
-            tvBikeStock = itemView.findViewById(R.id.tvBikeStock);
-            tvBikeStatus = itemView.findViewById(R.id.tvBikeStatus);
             ivDetailIcon = itemView.findViewById(R.id.ivDetailIcon);
+            ivAddToCart = itemView.findViewById(R.id.ivAddToCart);
         }
 
         public void bind(Bike bike) {
@@ -95,43 +91,11 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
             // Set bike name
             tvBikeName.setText(bike.getName());
 
-            // Set brand and model
-            String brandModel = bike.getBrand();
-            if (bike.getModel() != null && !bike.getModel().isEmpty()) {
-                brandModel += " " + bike.getModel();
-            }
-            tvBikeBrand.setText(brandModel);
-
             // Format and set price
             NumberFormat formatter = NumberFormat.getNumberInstance(Locale.getDefault());
             String formattedPrice = formatter.format(bike.getPrice()) + " ₫";
             tvBikePrice.setText(formattedPrice);
 
-            // Set stock
-            tvBikeStock.setText("Kho: " + bike.getStock());
-
-            // Set status with color
-            String status = bike.getStatus();
-            tvBikeStatus.setText(status);
-            switch (status.toLowerCase()) {
-                case "available":
-                    tvBikeStatus.setTextColor(itemView.getContext().getColor(R.color.green));
-                    break;
-                case "out_of_stock":
-                    tvBikeStatus.setTextColor(itemView.getContext().getColor(R.color.red));
-                    break;
-                case "discontinued":
-                    tvBikeStatus.setTextColor(itemView.getContext().getColor(R.color.orange));
-                    break;
-                default:
-                    tvBikeStatus.setTextColor(itemView.getContext().getColor(R.color.gray));
-                    break;
-            }
-
-            // Set featured badge
-            if (bike.isFeatured()) {
-                tvBikeStatus.setText("⭐ " + status);
-            }
 
             // Set click listener
             cardViewBike.setOnClickListener(v -> {
@@ -145,6 +109,13 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
                 if (onBikeClickListener != null) {
                     onBikeClickListener.onBikeClick(bike);
                 }
+            });
+
+            // Add to cart click (UI only)
+            ivAddToCart.setOnClickListener(v -> {
+                android.widget.Toast.makeText(itemView.getContext(),
+                        "Đã thêm vào giỏ: " + bike.getName(),
+                        android.widget.Toast.LENGTH_SHORT).show();
             });
         }
     }

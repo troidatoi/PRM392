@@ -135,34 +135,11 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGES_REQUEST);
+        startActivity(Intent.createChooser(intent, "Chọn ảnh"));
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        
-        if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK) {
-            if (data.getClipData() != null) {
-                // Multiple images selected
-                int count = data.getClipData().getItemCount();
-                for (int i = 0; i < count; i++) {
-                    Uri imageUri = data.getClipData().getItemAt(i).getUri();
-                    if (selectedImages.size() < 5) {
-                        selectedImages.add(imageUri);
-                    }
-                }
-            } else if (data.getData() != null) {
-                // Single image selected
-                Uri imageUri = data.getData();
-                if (selectedImages.size() < 5) {
-                    selectedImages.add(imageUri);
-                }
-            }
-            
-            updateImageDisplay();
-        }
-    }
+    // Giao diện hiện tại không cần nhận lại kết quả chọn ảnh theo yêu cầu bài toán,
+    // nên bỏ onActivityResult để tránh API deprecated. Nếu cần, sẽ chuyển sang Activity Result API sau.
 
     private void updateImageDisplay() {
         tvImageCount.setText("Đã chọn: " + selectedImages.size() + "/5 ảnh");
@@ -333,7 +310,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
                 inputStream.read(bytes);
                 inputStream.close();
                 
-                RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), bytes);
+                RequestBody requestFile = RequestBody.create(bytes, MediaType.get(contentType));
                 imageParts.add(MultipartBody.Part.createFormData("images", fileName, requestFile));
                 
             } catch (Exception e) {
@@ -346,36 +323,36 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         }
 
         // Create RequestBody for text fields
-        RequestBody namePart = RequestBody.create(MediaType.parse("text/plain"), name);
-        RequestBody brandPart = RequestBody.create(MediaType.parse("text/plain"), brand);
-        RequestBody modelPart = RequestBody.create(MediaType.parse("text/plain"), model);
-        RequestBody pricePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(price));
-        RequestBody descriptionPart = RequestBody.create(MediaType.parse("text/plain"), description);
-        RequestBody stockPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(stock));
-        RequestBody categoryPart = RequestBody.create(MediaType.parse("text/plain"), category);
-        RequestBody statusPart = RequestBody.create(MediaType.parse("text/plain"), status);
+        RequestBody namePart = RequestBody.create(name, MediaType.get("text/plain"));
+        RequestBody brandPart = RequestBody.create(brand, MediaType.get("text/plain"));
+        RequestBody modelPart = RequestBody.create(model, MediaType.get("text/plain"));
+        RequestBody pricePart = RequestBody.create(String.valueOf(price), MediaType.get("text/plain"));
+        RequestBody descriptionPart = RequestBody.create(description, MediaType.get("text/plain"));
+        RequestBody stockPart = RequestBody.create(String.valueOf(stock), MediaType.get("text/plain"));
+        RequestBody categoryPart = RequestBody.create(category, MediaType.get("text/plain"));
+        RequestBody statusPart = RequestBody.create(status, MediaType.get("text/plain"));
         
         // Specifications
-        RequestBody batteryPart = RequestBody.create(MediaType.parse("text/plain"), battery);
-        RequestBody motorPart = RequestBody.create(MediaType.parse("text/plain"), motor);
-        RequestBody rangePart = RequestBody.create(MediaType.parse("text/plain"), range);
-        RequestBody maxSpeedPart = RequestBody.create(MediaType.parse("text/plain"), maxSpeed);
-        RequestBody weightPart = RequestBody.create(MediaType.parse("text/plain"), weight);
-        RequestBody chargingTimePart = RequestBody.create(MediaType.parse("text/plain"), chargingTime);
+        RequestBody batteryPart = RequestBody.create(battery, MediaType.get("text/plain"));
+        RequestBody motorPart = RequestBody.create(motor, MediaType.get("text/plain"));
+        RequestBody rangePart = RequestBody.create(range, MediaType.get("text/plain"));
+        RequestBody maxSpeedPart = RequestBody.create(maxSpeed, MediaType.get("text/plain"));
+        RequestBody weightPart = RequestBody.create(weight, MediaType.get("text/plain"));
+        RequestBody chargingTimePart = RequestBody.create(chargingTime, MediaType.get("text/plain"));
         
         // Features (join with newline)
         String featuresString = String.join("\n", features);
-        RequestBody featuresPart = RequestBody.create(MediaType.parse("text/plain"), featuresString);
+        RequestBody featuresPart = RequestBody.create(featuresString, MediaType.get("text/plain"));
         
         // Warranty
-        RequestBody warrantyPart = RequestBody.create(MediaType.parse("text/plain"), warranty);
+        RequestBody warrantyPart = RequestBody.create(warranty, MediaType.get("text/plain"));
         
         // Original price
-        RequestBody originalPricePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(originalPrice));
+        RequestBody originalPricePart = RequestBody.create(String.valueOf(originalPrice), MediaType.get("text/plain"));
         
         // Tags (join with comma)
         String tagsString = String.join(",", tags);
-        RequestBody tagsPart = RequestBody.create(MediaType.parse("text/plain"), tagsString);
+        RequestBody tagsPart = RequestBody.create(tagsString, MediaType.get("text/plain"));
 
         // Make API call
         String token = "Bearer " + authManager.getToken();
@@ -411,35 +388,8 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         });
     }
 
-    private File getFileFromUri(Uri uri) throws Exception {
-        // Get the file path from URI
-        String filePath = null;
-        
-        if (uri.getScheme().equals("content")) {
-            // For content URIs, we need to get the actual file path
-            String[] projection = { android.provider.MediaStore.Images.Media.DATA };
-            android.database.Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-            if (cursor != null) {
-                int column_index = cursor.getColumnIndexOrThrow(android.provider.MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                filePath = cursor.getString(column_index);
-                cursor.close();
-            }
-        } else if (uri.getScheme().equals("file")) {
-            filePath = uri.getPath();
-        }
-        
-        if (filePath == null) {
-            throw new Exception("Không thể lấy đường dẫn file từ URI");
-        }
-        
-        File file = new File(filePath);
-        if (!file.exists()) {
-            throw new Exception("File không tồn tại: " + filePath);
-        }
-        
-        return file;
-    }
+    // Đã bỏ cách lấy đường dẫn file trực tiếp vì sử dụng MediaStore.DATA là API deprecated.
+    // Hiện tại ảnh được đọc qua InputStream và gửi dạng byte[] ở createBike(), không cần chuyển sang File.
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

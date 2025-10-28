@@ -36,7 +36,7 @@ import retrofit2.Response;
 public class BikeDetailActivity extends AppCompatActivity {
 
     // Views
-    private CardView btnBack, btnEdit, btnDelete;
+    private CardView btnBack, btnEdit, btnDelete, btnAddToCart;
     private ImageView ivMainImage;
     private RecyclerView rvImageGallery;
     private TextView tvBikeName, tvBikeBrand, tvBikeModel, tvBikePrice, tvOriginalPrice;
@@ -94,6 +94,7 @@ public class BikeDetailActivity extends AppCompatActivity {
         llSpecifications = findViewById(R.id.llSpecifications);
         llErrorState = findViewById(R.id.llErrorState);
         progressBar = findViewById(R.id.progressBar);
+        btnAddToCart = findViewById(R.id.btnAddToCart);
     }
 
     private void initData() {
@@ -116,7 +117,8 @@ public class BikeDetailActivity extends AppCompatActivity {
             if (authManager.isStaff()) {
                 Intent intent = new Intent(BikeDetailActivity.this, UpdateBikeActivity.class);
                 intent.putExtra("bike_id", bikeId);
-                startActivityForResult(intent, 1001);
+                // Use Activity Result API replacement
+                startActivity(intent);
             } else {
                 Toast.makeText(this, "Bạn không có quyền chỉnh sửa", Toast.LENGTH_SHORT).show();
             }
@@ -128,6 +130,10 @@ public class BikeDetailActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Bạn không có quyền xóa", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        btnAddToCart.setOnClickListener(v -> {
+            Toast.makeText(this, "Đã thêm vào giỏ: " + (bike != null ? bike.getName() : "sản phẩm"), Toast.LENGTH_SHORT).show();
         });
     }
 

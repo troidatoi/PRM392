@@ -25,14 +25,15 @@ import retrofit2.Response;
 
 import com.example.project.models.ApiResponse;
 import com.example.project.models.Bike;
+import com.example.project.adapters.BikeAdapter;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
 
 public class ShopActivity extends AppCompatActivity {
 
     private RecyclerView rvProducts;
-    private ProductAdapter productAdapter;
-    private List<Product> productList;
+    private BikeAdapter bikeAdapter;
+    private List<Bike> bikeList;
     private ApiService apiService;
 
     // Top Bar
@@ -224,15 +225,13 @@ public class ShopActivity extends AppCompatActivity {
     private void switchToGridLayout() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         rvProducts.setLayoutManager(layoutManager);
-        productAdapter = new ProductAdapter(productList, true);
-        rvProducts.setAdapter(productAdapter);
+        rvProducts.setAdapter(bikeAdapter);
     }
 
     private void switchToListLayout() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rvProducts.setLayoutManager(layoutManager);
-        productAdapter = new ProductAdapter(productList, false);
-        rvProducts.setAdapter(productAdapter);
+        rvProducts.setAdapter(bikeAdapter);
     }
 
     private void filterByCategory(String category) {
@@ -272,13 +271,18 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        productList = new ArrayList<>();
-        productAdapter = new ProductAdapter(productList, true);
+        bikeList = new ArrayList<>();
+        bikeAdapter = new BikeAdapter(bikeList);
+        bikeAdapter.setOnBikeClickListener(bike -> {
+            Intent intent = new Intent(ShopActivity.this, BikeDetailActivity.class);
+            intent.putExtra("bike_id", bike.getId());
+            startActivity(intent);
+        });
 
         // Set GridLayoutManager with 2 columns for shop view
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         rvProducts.setLayoutManager(layoutManager);
-        rvProducts.setAdapter(productAdapter);
+        rvProducts.setAdapter(bikeAdapter);
     }
 
     private void setupBottomNavigation() {
@@ -336,45 +340,11 @@ public class ShopActivity extends AppCompatActivity {
                 public void onResponse(Call<ApiResponse<Bike[]>> call, Response<ApiResponse<Bike[]>> response) {
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                         Bike[] bikes = response.body().getData();
-                        if (bikes != null && bikes.length > 0) {
-                            productList.clear();
-                            
-                            // Convert bikes to products
-                            for (Bike bike : bikes) {
-                                String priceText = formatPrice(bike.getPrice());
-                                String originalPriceText = null;
-                                
-                                // Check if there's an original price (discount)
-                                if (bike.getOriginalPrice() > 0 && bike.getOriginalPrice() > bike.getPrice()) {
-                                    originalPriceText = formatPrice(bike.getOriginalPrice());
-                                }
-                                
-                                // Get first image URL if available
-                                String imageUrl = null;
-                                if (bike.getImages() != null && !bike.getImages().isEmpty()) {
-                                    imageUrl = bike.getImages().get(0).getUrl();
-                                }
-                                
-                                // Determine status tags
-                                boolean isBestSeller = bike.isFeatured();
-                                boolean isSoldOut = "out_of_stock".equals(bike.getStatus());
-                                
-                                productList.add(new Product(
-                                    bike.getName(),
-                                    bike.getDescription() != null ? bike.getDescription() : "",
-                                    priceText,
-                                    originalPriceText,
-                                    R.drawable.splash_bike_background, // Default image
-                                    imageUrl, // Image URL from API
-                                    isBestSeller,
-                                    isSoldOut
-                                ));
-                            }
-                            
-                            // Update results count
-                            updateResultsCount(productList.size());
-                            
-                            productAdapter.notifyDataSetChanged();
+                        if (bikes != null) {
+                            bikeList.clear();
+                            java.util.Collections.addAll(bikeList, bikes);
+                            updateResultsCount(bikeList.size());
+                            bikeAdapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -420,6 +390,7 @@ public class ShopActivity extends AppCompatActivity {
     }
     
     private void updateCategoryButtons(Object[] categories) {
+        if (categories == null) return;
         // Map category IDs to display names
         java.util.Map<String, String> categoryNames = new java.util.HashMap<>();
         categoryNames.put("city", "City");
@@ -431,22 +402,25 @@ public class ShopActivity extends AppCompatActivity {
         
         // Update category buttons with real data
         for (Object categoryObj : categories) {
-            if (categoryObj instanceof java.util.Map) {
+            if (categoryObj instanceof java.util.Map<?, ?>) {
+                @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> category = (java.util.Map<String, Object>) categoryObj;
-                String categoryId = (String) category.get("id");
-                String displayName = categoryNames.get(categoryId);
-                
-                if (displayName != null) {
-                    switch (categoryId) {
-                        case "mountain":
-                            updateCategoryButton(categoryMountain, displayName);
-                            break;
-                        case "folding":
-                            updateCategoryButton(categoryFolding, displayName);
-                            break;
-                        case "cargo":
-                            updateCategoryButton(categoryEGravel, displayName);
-                            break;
+                Object idObj = category.get("id");
+                if (idObj instanceof String) {
+                    String categoryId = (String) idObj;
+                    String displayName = categoryNames.get(categoryId);
+                    if (displayName != null) {
+                        switch (categoryId) {
+                            case "mountain":
+                                updateCategoryButton(categoryMountain, displayName);
+                                break;
+                            case "folding":
+                                updateCategoryButton(categoryFolding, displayName);
+                                break;
+                            case "cargo":
+                                updateCategoryButton(categoryEGravel, displayName);
+                                break;
+                        }
                     }
                 }
             }
