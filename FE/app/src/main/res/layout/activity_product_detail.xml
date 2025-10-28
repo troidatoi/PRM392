@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="@drawable/light_gray_background">
 
     <!-- Header with Back Button -->
     <androidx.cardview.widget.CardView
@@ -16,12 +16,11 @@
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="25dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
             android:orientation="horizontal"
             android:padding="16dp"
             android:gravity="center_vertical">
@@ -32,7 +31,7 @@
                 android:layout_height="45dp"
                 app:cardCornerRadius="22.5dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#F5F5F5"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -40,14 +39,12 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
                     android:gravity="center">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="90"
+                        android:src="@drawable/ic_back"
                         app:tint="#2196F3"
                         android:contentDescription="Back" />
 
@@ -71,7 +68,7 @@
                 android:layout_height="45dp"
                 app:cardCornerRadius="22.5dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#F5F5F5"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -79,7 +76,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
                     android:gravity="center">
 
                     <ImageView
@@ -122,15 +118,13 @@
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_background"
                     android:padding="20dp">
 
-                    <!-- ViewPager2 for image carousel -->
                     <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/viewPagerImages"
                         android:layout_width="match_parent"
@@ -159,16 +153,14 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
                     android:padding="24dp">
 
-                    <!-- Product Name -->
                     <TextView
                         android:id="@+id/tvProductName"
                         android:layout_width="match_parent"
@@ -202,12 +194,11 @@
                             android:layout_height="32dp"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="2dp"
-                            app:cardBackgroundColor="@android:color/transparent">
+                            app:cardBackgroundColor="#FFFFFF">
 
                             <RelativeLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:background="@drawable/liquid_glass_button"
                                 android:paddingStart="16dp"
                                 android:paddingEnd="16dp"
                                 android:gravity="center">
@@ -216,7 +207,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Còn hàng"
-                                    android:textColor="#FFFFFF"
+                                    android:textColor="#4CAF50"
                                     android:textSize="12sp"
                                     android:textStyle="bold" />
 
@@ -283,12 +274,11 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -321,16 +311,14 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- Spec Item 1 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -484,16 +472,14 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <!-- RecyclerView for store stock -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvStoreStock"
                         android:layout_width="match_parent"
@@ -519,12 +505,11 @@
         android:layout_marginBottom="16dp"
         app:cardCornerRadius="28dp"
         app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_background"
             android:orientation="horizontal"
             android:padding="12dp">
 
@@ -537,7 +522,7 @@
                 android:layout_marginEnd="8dp"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -545,7 +530,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_input"
                     android:gravity="center">
 
                     <ImageView
@@ -556,7 +540,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="20dp"
                         android:src="@drawable/ic_cart"
-                        app:tint="#2196F3"
+                        app:tint="#000000"
                         android:contentDescription="Cart" />
 
                     <TextView
@@ -564,7 +548,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:text="Thêm vào giỏ"
-                        android:textColor="#2196F3"
+                        android:textColor="#000000"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -581,7 +565,7 @@
                 android:layout_marginStart="8dp"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -589,14 +573,13 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_button"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Mua Ngay"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#000000"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
