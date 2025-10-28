@@ -1,7 +1,6 @@
 package com.example.project;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -10,8 +9,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvHome, tvProducts, tvCart, tvAccount;
 
     // Floating Chat Button
-    private CardView btnFloatingChat;
+    private FloatingActionButton btnFloatingChat;
 
     // Search Box
     private EditText etSearch;
@@ -141,14 +143,16 @@ public class HomeActivity extends AppCompatActivity {
 
     private void selectNavItem(View blur, ImageView icon, TextView text) {
         blur.setVisibility(View.VISIBLE);
-        icon.setColorFilter(Color.parseColor("#2196F3"));
-        text.setTextColor(Color.parseColor("#2196F3"));
+        int accentColor = ContextCompat.getColor(this, R.color.accent_blue);
+        icon.setColorFilter(accentColor);
+        text.setTextColor(accentColor);
     }
 
     private void deselectNavItem(View blur, ImageView icon, TextView text) {
         blur.setVisibility(View.GONE);
-        icon.setColorFilter(Color.parseColor("#666666"));
-        text.setTextColor(Color.parseColor("#666666"));
+        int secondaryColor = ContextCompat.getColor(this, R.color.text_secondary);
+        icon.setColorFilter(secondaryColor);
+        text.setTextColor(secondaryColor);
     }
 
     private void loadSampleProducts() {

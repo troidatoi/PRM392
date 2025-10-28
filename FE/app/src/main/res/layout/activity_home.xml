@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="@color/background">
 
     <!-- Main Content -->
     <ScrollView
@@ -28,10 +28,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Chào mừng"
-                android:textSize="28sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:layout_marginTop="20dp" />
+                android:textColor="@color/text_dark"
+                android:layout_marginTop="8dp" />
 
             <TextView
                 android:id="@+id/tvSubtitle"
@@ -39,23 +39,22 @@
                 android:layout_height="wrap_content"
                 android:text="Tìm kiếm xe đạp điện của bạn"
                 android:textSize="16sp"
-                android:textColor="#666666"
+                android:textColor="@color/text_secondary"
                 android:layout_marginTop="4dp" />
 
-            <!-- Liquid Glass Search Box -->
+            <!-- Search Box -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/searchCard"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="24dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                android:layout_height="56dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/white">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_search"
                     android:padding="8dp">
 
                     <ImageView
@@ -64,9 +63,9 @@
                         android:layout_height="24dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="12dp"
                         android:src="@drawable/ic_search"
-                        app:tint="#5E7CE2"
+                        app:tint="@color/accent_blue"
                         android:contentDescription="@string/search_icon" />
 
                     <EditText
@@ -74,13 +73,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_toEndOf="@id/iconSearch"
-                        android:layout_marginStart="12dp"
+                        android:layout_marginStart="8dp"
                         android:layout_marginEnd="16dp"
                         android:background="@android:color/transparent"
                         android:hint="@string/search_hint"
-                        android:textColorHint="#8B9DC3"
-                        android:textColor="#3D5A80"
-                        android:textSize="16sp"
+                        android:textColorHint="@color/text_muted"
+                        android:textColor="@color/text_dark"
+                        android:textSize="15sp"
                         android:inputType="text"
                         android:imeOptions="actionSearch"
                         android:autofillHints="search" />
@@ -98,8 +97,8 @@
                 android:text="Sản phẩm nổi bật"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:layout_marginTop="32dp" />
+                android:textColor="@color/text_dark"
+                android:layout_marginTop="28dp" />
 
             <!-- Product RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
@@ -113,7 +112,7 @@
 
     </ScrollView>
 
-    <!-- Liquid Glass Bottom Navigation Bar - Floating Style -->
+    <!-- Bottom Navigation Bar - Modern Style -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
@@ -123,13 +122,12 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:cardCornerRadius="35dp"
-        app:cardElevation="12dp"
-        android:backgroundTint="#00000000">
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_bottom_nav"
             android:orientation="horizontal"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
@@ -153,18 +151,19 @@
 
                     <View
                         android:id="@+id/blurHome"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
+                        android:background="@drawable/bg_nav_item_selected"
                         android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/iconHome"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_home"
+                        app:tint="@color/text_secondary"
                         android:contentDescription="Home" />
 
                 </FrameLayout>
@@ -175,7 +174,7 @@
                     android:layout_height="wrap_content"
                     android:text="Trang chủ"
                     android:textSize="11sp"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -198,18 +197,19 @@
 
                     <View
                         android:id="@+id/blurProducts"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
+                        android:background="@drawable/bg_nav_item_selected"
                         android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/iconProducts"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_products"
+                        app:tint="@color/text_secondary"
                         android:contentDescription="Products" />
 
                 </FrameLayout>
@@ -220,7 +220,7 @@
                     android:layout_height="wrap_content"
                     android:text="Sản phẩm"
                     android:textSize="11sp"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -243,18 +243,19 @@
 
                     <View
                         android:id="@+id/blurCart"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
+                        android:background="@drawable/bg_nav_item_selected"
                         android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/iconCart"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_cart"
+                        app:tint="@color/text_secondary"
                         android:contentDescription="Cart" />
 
                 </FrameLayout>
@@ -265,7 +266,7 @@
                     android:layout_height="wrap_content"
                     android:text="Giỏ hàng"
                     android:textSize="11sp"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -288,18 +289,19 @@
 
                     <View
                         android:id="@+id/blurAccount"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
+                        android:background="@drawable/bg_nav_item_selected"
                         android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/iconAccount"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_account"
+                        app:tint="@color/text_secondary"
                         android:contentDescription="Account" />
 
                 </FrameLayout>
@@ -310,7 +312,7 @@
                     android:layout_height="wrap_content"
                     android:text="Tài khoản"
                     android:textSize="11sp"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp" />
 
             </LinearLayout>
@@ -320,36 +322,20 @@
     </androidx.cardview.widget.CardView>
 
     <!-- Floating Chat Button -->
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnFloatingChat"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="100dp"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackground">
+        android:src="@drawable/ic_chat_bubble"
+        app:tint="@color/white"
+        app:backgroundTint="@color/accent_blue"
+        app:elevation="6dp"
+        app:fabSize="normal"
+        android:contentDescription="Chat" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_button"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_chat_bubble"
-                app:tint="#FFFFFF"
-                android:contentDescription="Chat" />
-
-        </RelativeLayout>
-
-    </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
