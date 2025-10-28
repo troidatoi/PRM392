@@ -42,8 +42,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         initViews();
         setupRecyclerView();
         setupBottomNavigation();
-        loadCartItems();
-        updateCartSummary();
+        loadCartFromApi();
     }
 
     private void initViews() {
@@ -95,6 +94,70 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         rvCartItems.setLayoutManager(layoutManager);
         rvCartItems.setAdapter(cartAdapter);
     }
+
+    private void loadCartFromApi() {
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        com.example.project.models.User user = auth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        api.getCartByUser(auth.getAuthHeader(), user.getId()).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Object data = response.body().getData();
+                    // Parse tối thiểu: lấy cart.itemCount và items của từng store
+                    int itemCount = 0;
+                    java.util.List<CartItem> items = new java.util.ArrayList<>();
+                    try {
+                        java.util.Map dataMap = (java.util.Map) data;
+                        java.util.Map cartMap = (java.util.Map) dataMap.get("cart");
+                        if (cartMap != null && cartMap.get("itemCount") instanceof Number) {
+                            itemCount = ((Number) cartMap.get("itemCount")).intValue();
+                        }
+                        java.util.List stores = (java.util.List) dataMap.get("itemsByStore");
+                        if (stores != null) {
+                            for (Object s : stores) {
+                                java.util.Map store = (java.util.Map) s;
+                                java.util.List storeItems = (java.util.List) store.get("items");
+                                if (storeItems != null) {
+                                    for (Object it : storeItems) {
+                                        java.util.Map item = (java.util.Map) it;
+                                        java.util.Map product = (java.util.Map) item.get("product");
+                                        String name = String.valueOf(product.get("name"));
+                                        double price = product.get("price") instanceof Number ? ((Number) product.get("price")).doubleValue() : 0;
+                                        String priceText = formatPrice((long) price) + " VNĐ";
+                                        int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
+                                        CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
+                                        items.add(ci);
+                                    }
+                                }
+                            }
+                        }
+                    } catch (Exception ignore) {}
+
+                    cartItems.clear();
+                    cartItems.addAll(items);
+                    cartAdapter.notifyDataSetChanged();
+                    updateCartSummary();
+                    tvItemCount.setText(itemCount + " sản phẩm");
+                    tvBadge.setText(String.valueOf(itemCount));
+                } else {
+                    updateCartSummary();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(CartActivity.this, "Lỗi tải giỏ hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    
 
     private void setupBottomNavigation() {
         // Set Cart as selected by default

@@ -111,11 +111,81 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
                 }
             });
 
-            // Add to cart click (UI only)
+            // Add to cart: call API flow create cart (if needed) -> add item
             ivAddToCart.setOnClickListener(v -> {
-                android.widget.Toast.makeText(itemView.getContext(),
-                        "Đã thêm vào giỏ: " + bike.getName(),
-                        android.widget.Toast.LENGTH_SHORT).show();
+                com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(itemView.getContext());
+                com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+                com.example.project.models.User user = auth.getCurrentUser();
+                if (user == null) {
+                    android.widget.Toast.makeText(itemView.getContext(), "Vui lòng đăng nhập", android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Lấy 1 cửa hàng hoạt động để kiểm tra tồn kho và thêm vào giỏ
+                api.getStores(null, null, null, true, 1, 1, null).enqueue(new retrofit2.Callback<com.example.project.network.ApiService.StoreResponse>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<com.example.project.network.ApiService.StoreResponse> call, retrofit2.Response<com.example.project.network.ApiService.StoreResponse> response) {
+                        final String[] storeIdHolder = new String[1];
+                        if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
+                            storeIdHolder[0] = response.body().getData().get(0).getId();
+                        }
+
+                        if (storeIdHolder[0] == null) {
+                            android.widget.Toast.makeText(itemView.getContext(), "Không tìm thấy cửa hàng khả dụng", android.widget.Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // B5: kiểm tra tồn kho
+                        java.util.Map<String, Object> checkBody = new java.util.HashMap<>();
+                        checkBody.put("productId", bike.getId());
+                        checkBody.put("storeId", storeIdHolder[0]);
+                        checkBody.put("quantity", 1);
+                        api.checkAvailability(auth.getAuthHeader(), checkBody).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call1, retrofit2.Response<com.example.project.models.ApiResponse<Object>> res1) {
+                                // B4: đảm bảo có cart rồi B6: add item
+                                java.util.Map<String, String> createBody = new java.util.HashMap<>();
+                                createBody.put("userId", user.getId());
+                                api.createCart(auth.getAuthHeader(), createBody).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+                                    @Override
+                                    public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call2, retrofit2.Response<com.example.project.models.ApiResponse<Object>> r2) {
+                                        java.util.Map<String, Object> addBody = new java.util.HashMap<>();
+                                        addBody.put("userId", user.getId());
+                                        addBody.put("productId", bike.getId());
+                                        addBody.put("storeId", storeIdHolder[0]);
+                                        addBody.put("quantity", 1);
+                                        api.addItemToCart(auth.getAuthHeader(), addBody).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+                                            @Override
+                                            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call3, retrofit2.Response<com.example.project.models.ApiResponse<Object>> r3) {
+                                                android.widget.Toast.makeText(itemView.getContext(), r3.isSuccessful() ? "Đã thêm vào giỏ: " + bike.getName() : "Thêm vào giỏ thất bại", android.widget.Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            @Override
+                                            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call3, Throwable t) {
+                                                android.widget.Toast.makeText(itemView.getContext(), "Lỗi kết nối: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call2, Throwable t) {
+                                        android.widget.Toast.makeText(itemView.getContext(), "Lỗi kết nối: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call1, Throwable t) {
+                                android.widget.Toast.makeText(itemView.getContext(), "Lỗi kiểm tra tồn kho: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<com.example.project.network.ApiService.StoreResponse> call, Throwable t) {
+                        android.widget.Toast.makeText(itemView.getContext(), "Lỗi lấy cửa hàng: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                });
             });
         }
     }

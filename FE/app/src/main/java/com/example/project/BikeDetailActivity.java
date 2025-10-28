@@ -133,7 +133,82 @@ public class BikeDetailActivity extends AppCompatActivity {
         });
 
         btnAddToCart.setOnClickListener(v -> {
-            Toast.makeText(this, "Đã thêm vào giỏ: " + (bike != null ? bike.getName() : "sản phẩm"), Toast.LENGTH_SHORT).show();
+            if (bike == null) {
+                Toast.makeText(this, "Không có dữ liệu sản phẩm", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!authManager.isLoggedIn()) {
+                Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            ApiService api = RetrofitClient.getInstance().getApiService();
+            String userId = authManager.getCurrentUser() != null ? authManager.getCurrentUser().getId() : null;
+
+            // Lấy 1 store đang hoạt động
+            api.getStores(null, null, null, true, 1, 1, null).enqueue(new Callback<ApiService.StoreResponse>() {
+                @Override
+                public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+                    final String[] storeIdHolder = new String[1];
+                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
+                        storeIdHolder[0] = response.body().getData().get(0).getId();
+                    }
+                    if (storeIdHolder[0] == null) {
+                        Toast.makeText(BikeDetailActivity.this, "Không tìm thấy cửa hàng khả dụng", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // B5: Kiểm tra tồn kho
+                    java.util.Map<String, Object> checkBody = new java.util.HashMap<>();
+                    checkBody.put("productId", bike.getId());
+                    checkBody.put("storeId", storeIdHolder[0]);
+                    checkBody.put("quantity", 1);
+                    api.checkAvailability(authManager.getAuthHeader(), checkBody).enqueue(new Callback<ApiResponse<Object>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<Object>> call1, Response<ApiResponse<Object>> res1) {
+                            // B4: đảm bảo cart & B6: add item
+                            java.util.Map<String, String> createBody = new java.util.HashMap<>();
+                            createBody.put("userId", userId);
+                            api.createCart(authManager.getAuthHeader(), createBody).enqueue(new Callback<ApiResponse<Object>>() {
+                                @Override
+                                public void onResponse(Call<ApiResponse<Object>> call2, Response<ApiResponse<Object>> r2) {
+                                    java.util.Map<String, Object> addBody = new java.util.HashMap<>();
+                                    addBody.put("userId", userId);
+                                    addBody.put("productId", bike.getId());
+                                    addBody.put("storeId", storeIdHolder[0]);
+                                    addBody.put("quantity", 1);
+                                    api.addItemToCart(authManager.getAuthHeader(), addBody).enqueue(new Callback<ApiResponse<Object>>() {
+                                        @Override
+                                        public void onResponse(Call<ApiResponse<Object>> call3, Response<ApiResponse<Object>> r3) {
+                                            Toast.makeText(BikeDetailActivity.this, r3.isSuccessful() ? "Đã thêm vào giỏ: " + bike.getName() : "Thêm vào giỏ thất bại", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ApiResponse<Object>> call3, Throwable t) {
+                                            Toast.makeText(BikeDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Call<ApiResponse<Object>> call2, Throwable t) {
+                                    Toast.makeText(BikeDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<Object>> call1, Throwable t) {
+                            Toast.makeText(BikeDetailActivity.this, "Lỗi kiểm tra tồn kho: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+                    Toast.makeText(BikeDetailActivity.this, "Lỗi lấy cửa hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

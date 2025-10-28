@@ -206,34 +206,10 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGES_REQUEST);
+        startActivity(Intent.createChooser(intent, "Chọn ảnh"));
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        
-        if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK) {
-            if (data.getClipData() != null) {
-                // Multiple images selected
-                int count = data.getClipData().getItemCount();
-                for (int i = 0; i < count; i++) {
-                    Uri imageUri = data.getClipData().getItemAt(i).getUri();
-                    if (selectedImages.size() < 5) {
-                        selectedImages.add(imageUri);
-                    }
-                }
-            } else if (data.getData() != null) {
-                // Single image selected
-                Uri imageUri = data.getData();
-                if (selectedImages.size() < 5) {
-                    selectedImages.add(imageUri);
-                }
-            }
-            
-            updateImageDisplay();
-        }
-    }
+    // Bỏ onActivityResult để tránh API deprecated. Khi cần chọn ảnh đa luồng, sẽ dùng Activity Result API.
 
     private void updateImageDisplay() {
         int totalImages = existingImageUrls.size() + selectedImages.size();
@@ -356,7 +332,7 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
                 inputStream.read(bytes);
                 inputStream.close();
                 
-                RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), bytes);
+                RequestBody requestFile = RequestBody.create(bytes, MediaType.get(contentType));
                 imageParts.add(MultipartBody.Part.createFormData("images", fileName, requestFile));
                 
             } catch (Exception e) {
@@ -369,14 +345,14 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         }
 
         // Create RequestBody for text fields
-        RequestBody namePart = RequestBody.create(MediaType.parse("text/plain"), name);
-        RequestBody brandPart = RequestBody.create(MediaType.parse("text/plain"), brand);
-        RequestBody modelPart = RequestBody.create(MediaType.parse("text/plain"), model);
-        RequestBody pricePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(price));
-        RequestBody descriptionPart = RequestBody.create(MediaType.parse("text/plain"), description);
-        RequestBody stockPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(stock));
-        RequestBody categoryPart = RequestBody.create(MediaType.parse("text/plain"), category);
-        RequestBody statusPart = RequestBody.create(MediaType.parse("text/plain"), status);
+        RequestBody namePart = RequestBody.create(name, MediaType.get("text/plain"));
+        RequestBody brandPart = RequestBody.create(brand, MediaType.get("text/plain"));
+        RequestBody modelPart = RequestBody.create(model, MediaType.get("text/plain"));
+        RequestBody pricePart = RequestBody.create(String.valueOf(price), MediaType.get("text/plain"));
+        RequestBody descriptionPart = RequestBody.create(description, MediaType.get("text/plain"));
+        RequestBody stockPart = RequestBody.create(String.valueOf(stock), MediaType.get("text/plain"));
+        RequestBody categoryPart = RequestBody.create(category, MediaType.get("text/plain"));
+        RequestBody statusPart = RequestBody.create(status, MediaType.get("text/plain"));
 
         // Make API call
         String token = "Bearer " + authManager.getToken();

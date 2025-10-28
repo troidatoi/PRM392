@@ -118,6 +118,23 @@ public interface ApiService {
     @GET("bikes/categories/list")
     Call<ApiResponse<Object[]>> getCategories();
     
+    // Cart endpoints
+    @POST("cart/create")
+    Call<ApiResponse<Object>> createCart(@Header("Authorization") String token,
+                                         @Body java.util.Map<String, String> body);
+
+    @POST("inventory/check-availability")
+    Call<ApiResponse<Object>> checkAvailability(@Header("Authorization") String token,
+                                                @Body java.util.Map<String, Object> body);
+
+    @POST("cart/add-item")
+    Call<ApiResponse<Object>> addItemToCart(@Header("Authorization") String token,
+                                            @Body java.util.Map<String, Object> body);
+
+    @GET("cart/user/{userId}")
+    Call<ApiResponse<Object>> getCartByUser(@Header("Authorization") String token,
+                                            @retrofit2.http.Path("userId") String userId);
+
     // Store endpoints
     @GET("stores")
     Call<StoreResponse> getStores(
