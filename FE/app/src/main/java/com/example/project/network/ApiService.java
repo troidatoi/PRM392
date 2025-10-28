@@ -135,6 +135,28 @@ public interface ApiService {
     Call<ApiResponse<Object>> getCartByUser(@Header("Authorization") String token,
                                             @retrofit2.http.Path("userId") String userId);
 
+    // Inventory endpoints
+    @GET("inventory/store/{storeId}")
+    Call<ApiResponse<Object>> getInventoryByStore(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("storeId") String storeId,
+        @retrofit2.http.Query("page") Integer page,
+        @retrofit2.http.Query("limit") Integer limit,
+        @retrofit2.http.Query("status") String status
+    );
+
+    @POST("inventory/add")
+    Call<ApiResponse<Object>> addStock(
+        @Header("Authorization") String token,
+        @Body java.util.Map<String, Object> body
+    );
+
+    @POST("inventory/reduce")
+    Call<ApiResponse<Object>> reduceStock(
+        @Header("Authorization") String token,
+        @Body java.util.Map<String, Object> body
+    );
+
     // Store endpoints
     @GET("stores")
     Call<StoreResponse> getStores(

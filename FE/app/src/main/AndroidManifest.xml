@@ -182,6 +182,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Store Inventory Activity -->
+        <activity
+            android:name=".StoreInventoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
     </application>
 
 </manifest>

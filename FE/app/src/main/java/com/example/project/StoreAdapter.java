@@ -17,6 +17,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
     private List<Store> storeList;
     private OnStoreActionListener listener;
     private OnStoreClickListener clickListener;
+    private OnInventoryClickListener inventoryClickListener;
 
     public interface OnStoreActionListener {
         void onEditStore(Store store);
@@ -27,6 +28,10 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         void onStoreClick(Store store);
     }
 
+    public interface OnInventoryClickListener {
+        void onInventoryClick(Store store);
+    }
+
     public StoreAdapter(List<Store> storeList, OnStoreActionListener listener) {
         this.storeList = storeList;
         this.listener = listener;
@@ -34,6 +39,10 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     public void setOnStoreClickListener(OnStoreClickListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    public void setOnInventoryClickListener(OnInventoryClickListener listener) {
+        this.inventoryClickListener = listener;
     }
 
     @NonNull
@@ -73,6 +82,13 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             }
         });
 
+        // Inventory button
+        holder.btnInventory.setOnClickListener(v -> {
+            if (inventoryClickListener != null) {
+                inventoryClickListener.onInventoryClick(store);
+            }
+        });
+
         // Store item click
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) {
@@ -93,7 +109,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     static class StoreViewHolder extends RecyclerView.ViewHolder {
         TextView tvStoreName, tvStoreAddress, tvStoreStatus;
-        CardView statusBadge, btnEditStore, btnDeleteStore;
+        CardView statusBadge, btnEditStore, btnDeleteStore, btnInventory;
 
         public StoreViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -103,6 +119,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             statusBadge = itemView.findViewById(R.id.statusBadge);
             btnEditStore = itemView.findViewById(R.id.btnEditStore);
             btnDeleteStore = itemView.findViewById(R.id.btnDeleteStore);
+            btnInventory = itemView.findViewById(R.id.btnInventory);
         }
     }
 }

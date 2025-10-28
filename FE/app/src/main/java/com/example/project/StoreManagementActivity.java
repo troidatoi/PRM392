@@ -100,6 +100,12 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         storeList = new ArrayList<>();
         storeAdapter = new StoreAdapter(storeList, this);
         storeAdapter.setOnStoreClickListener(this);
+        storeAdapter.setOnInventoryClickListener(store -> {
+            Intent intent = new Intent(StoreManagementActivity.this, StoreInventoryActivity.class);
+            intent.putExtra("storeId", store.getId());
+            intent.putExtra("storeName", store.getName());
+            startActivity(intent);
+        });
         rvStores.setLayoutManager(new LinearLayoutManager(this));
         rvStores.setAdapter(storeAdapter);
     }
