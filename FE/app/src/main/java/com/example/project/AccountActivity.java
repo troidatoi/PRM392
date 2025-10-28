@@ -18,7 +18,6 @@ public class AccountActivity extends AppCompatActivity {
 
     // Bottom Navigation
     private View navHome, navProducts, navCart, navAccount;
-    private View blurHome, blurProducts, blurCart, blurAccount;
     private ImageView iconHome, iconProducts, iconCart, iconAccount;
     private TextView tvHome, tvProducts, tvCart, tvAccountNav;
 
@@ -53,10 +52,6 @@ public class AccountActivity extends AppCompatActivity {
         navCart = findViewById(R.id.navCart);
         navAccount = findViewById(R.id.navAccount);
 
-        blurHome = findViewById(R.id.blurHome);
-        blurProducts = findViewById(R.id.blurProducts);
-        blurCart = findViewById(R.id.blurCart);
-        blurAccount = findViewById(R.id.blurAccount);
 
         iconHome = findViewById(R.id.iconHome);
         iconProducts = findViewById(R.id.iconProducts);
@@ -71,7 +66,7 @@ public class AccountActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         // Set Account as selected by default
-        selectNavItem(blurAccount, iconAccount, tvAccountNav);
+        selectNavItem(iconAccount, tvAccountNav);
 
         navHome.setOnClickListener(v -> {
             Intent intent = new Intent(AccountActivity.this, HomeActivity.class);
@@ -95,21 +90,19 @@ public class AccountActivity extends AppCompatActivity {
         });
 
         navAccount.setOnClickListener(v -> {
-            selectNavItem(blurAccount, iconAccount, tvAccountNav);
-            deselectNavItem(blurHome, iconHome, tvHome);
-            deselectNavItem(blurProducts, iconProducts, tvProducts);
-            deselectNavItem(blurCart, iconCart, tvCart);
+            selectNavItem(iconAccount, tvAccountNav);
+            deselectNavItem(iconHome, tvHome);
+            deselectNavItem(iconProducts, tvProducts);
+            deselectNavItem(iconCart, tvCart);
         });
     }
 
-    private void selectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.VISIBLE);
+    private void selectNavItem(ImageView icon, TextView text) {
         icon.setColorFilter(Color.parseColor("#2196F3"));
         text.setTextColor(Color.parseColor("#2196F3"));
     }
 
-    private void deselectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.GONE);
+    private void deselectNavItem(ImageView icon, TextView text) {
         icon.setColorFilter(Color.parseColor("#666666"));
         text.setTextColor(Color.parseColor("#666666"));
     }
