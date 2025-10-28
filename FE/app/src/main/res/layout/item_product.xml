@@ -53,7 +53,7 @@
                     android:text="Tên sản phẩm"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="@color/text_dark"
                     android:maxLines="2"
                     android:ellipsize="end" />
 
@@ -64,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:text="Mô tả sản phẩm"
                     android:textSize="13sp"
-                    android:textColor="#666666"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp"
                     android:maxLines="2"
                     android:ellipsize="end" />
@@ -77,22 +77,22 @@
                     android:text="0 VNĐ"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#2196F3"
+                    android:textColor="@color/accent_blue"
                     android:layout_marginTop="8dp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Add to Cart Button with Liquid Glass Effect -->
+        <!-- Add to Cart Button -->
         <androidx.cardview.widget.CardView
             android:id="@+id/btnAddToCart"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="16dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="@android:color/transparent"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/accent_blue"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
@@ -100,7 +100,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/liquid_glass_small"
                 android:gravity="center">
 
                 <ImageView
@@ -111,7 +110,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="20dp"
                     android:src="@drawable/ic_add_cart"
-                    app:tint="#FFFFFF"
+                    app:tint="@color/white"
                     android:contentDescription="Add to cart" />
 
                 <TextView
@@ -119,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:text="Thêm vào giỏ hàng"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@color/white"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.02" />
