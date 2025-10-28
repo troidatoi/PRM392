@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@drawable/light_gray_background">
 
     <!-- Main Content -->
     <ScrollView
@@ -22,19 +22,18 @@
             android:padding="20dp"
             android:paddingBottom="100dp">
 
-            <!-- Profile Header with Liquid Glass -->
+            <!-- Profile Header -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_header"
                     android:orientation="vertical"
                     android:padding="24dp"
                     android:gravity="center">
@@ -45,12 +44,11 @@
                         android:layout_height="120dp"
                         app:cardCornerRadius="60dp"
                         app:cardElevation="8dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardBackgroundColor="#F5F5F5">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -91,7 +89,7 @@
                         android:layout_marginTop="16dp"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="6dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -99,7 +97,6 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_button"
                             android:paddingStart="24dp"
                             android:paddingEnd="24dp"
                             android:gravity="center">
@@ -108,7 +105,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Chỉnh sửa hồ sơ"
-                                android:textColor="#FFFFFF"
+                                android:textColor="#000000"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
@@ -137,12 +134,11 @@
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:gravity="center_vertical">
@@ -152,12 +148,11 @@
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardBackgroundColor="#F5F5F5">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -208,12 +203,11 @@
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:gravity="center_vertical">
@@ -223,12 +217,11 @@
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardBackgroundColor="#F5F5F5">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -290,7 +283,7 @@
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -298,7 +291,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:gravity="center_vertical">
@@ -308,12 +300,11 @@
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardBackgroundColor="#F5F5F5">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -357,7 +348,7 @@
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -365,7 +356,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:gravity="center_vertical">
@@ -375,12 +365,11 @@
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardBackgroundColor="#F5F5F5">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -424,7 +413,7 @@
                 android:layout_marginBottom="12dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -432,7 +421,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:gravity="center_vertical">
@@ -442,12 +430,11 @@
                         android:layout_height="50dp"
                         app:cardCornerRadius="25dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent">
+                        app:cardBackgroundColor="#F5F5F5">
 
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_small"
                             android:gravity="center">
 
                             <ImageView
@@ -491,7 +478,7 @@
                 android:layout_marginTop="24dp"
                 app:cardCornerRadius="28dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -499,7 +486,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_button"
                     android:gravity="center">
 
                     <ImageView
@@ -510,7 +496,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="24dp"
                         android:src="@drawable/ic_account"
-                        app:tint="#FFFFFF"
+                        app:tint="#000000"
                         android:contentDescription="Logout" />
 
                     <TextView
@@ -518,7 +504,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:text="Đăng Xuất"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#000000"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -563,13 +549,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <View
-                        android:id="@+id/blurHome"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/iconHome"
@@ -608,13 +587,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <View
-                        android:id="@+id/blurProducts"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/iconProducts"
@@ -653,13 +625,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <View
-                        android:id="@+id/blurCart"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/iconCart"
@@ -698,13 +663,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
-                    <View
-                        android:id="@+id/blurAccount"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="visible" />
 
                     <ImageView
                         android:id="@+id/iconAccount"
