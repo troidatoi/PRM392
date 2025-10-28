@@ -6,12 +6,11 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="20dp"
     app:cardElevation="6dp"
-    app:cardBackgroundColor="@android:color/transparent">
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/liquid_glass_background"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -21,7 +20,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Checkbox with Liquid Glass -->
+            <!-- Checkbox -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/checkboxCard"
                 android:layout_width="40dp"
@@ -29,7 +28,7 @@
                 android:layout_marginEnd="12dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#F5F5F5"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -37,7 +36,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
                     android:gravity="center">
 
                     <CheckBox
@@ -134,7 +132,7 @@
                     android:layout_height="36dp"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardBackgroundColor="#FFFFFF"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -142,7 +140,6 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_small"
                         android:gravity="center">
 
                         <TextView
@@ -151,7 +148,7 @@
                             android:text="-"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#2196F3" />
+                            android:textColor="#000000" />
 
                     </RelativeLayout>
 
@@ -175,7 +172,7 @@
                     android:layout_height="36dp"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardBackgroundColor="#FFFFFF"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -183,7 +180,6 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_small"
                         android:gravity="center">
 
                         <TextView
@@ -192,7 +188,7 @@
                             android:text="+"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#2196F3" />
+                            android:textColor="#000000" />
 
                     </RelativeLayout>
 
@@ -207,7 +203,7 @@
                 android:layout_height="40dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -215,7 +211,6 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
                     android:gravity="center">
 
                     <ImageView
