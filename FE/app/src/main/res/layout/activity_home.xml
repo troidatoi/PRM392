@@ -232,27 +232,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurHome"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="visible" />
-
-                    <ImageView
-                        android:id="@+id/iconHome"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_home"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconHome"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Home" />
 
                 <TextView
                     android:id="@+id/tvHome"
@@ -260,7 +246,8 @@
                     android:layout_height="wrap_content"
                     android:text="Trang chủ"
                     android:textSize="11sp"
-                    android:textColor="#1A1A1A" />
+                    android:textColor="#1A1A1A"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -276,27 +263,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurProducts"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconProducts"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_products"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconProducts"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_products"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Products" />
 
                 <TextView
                     android:id="@+id/tvProducts"
@@ -320,27 +293,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurCart"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconCart"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_cart"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconCart"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_cart"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Cart" />
 
                 <TextView
                     android:id="@+id/tvCart"
@@ -364,27 +323,13 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurAccount"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconAccount"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_account"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
+                <ImageView
+                    android:id="@+id/iconAccount"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_account"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Account" />
 
                 <TextView
                     android:id="@+id/tvAccount"
