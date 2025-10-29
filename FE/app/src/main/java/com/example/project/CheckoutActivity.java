@@ -73,12 +73,6 @@ public class CheckoutActivity extends AppCompatActivity {
         // Load cart items from API for the selected store
         orderItems = new ArrayList<>();
         
-        if (storeId == null) {
-            Toast.makeText(this, "Không có thông tin cửa hàng", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-        
         com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
         com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
         com.example.project.models.User user = auth.getCurrentUser();
@@ -100,40 +94,18 @@ public class CheckoutActivity extends AppCompatActivity {
                         if (stores != null) {
                             for (Object s : stores) {
                                 java.util.Map store = (java.util.Map) s;
-                                String currentStoreId = null;
-                                
-                                // Lấy storeId
-                                try {
-                                    Object sidOuter = store.get("storeId");
-                                    if (sidOuter == null) sidOuter = store.get("_id");
-                                    if (sidOuter == null) sidOuter = store.get("id");
-                                    if (sidOuter == null) {
-                                        Object storeObj = store.get("store");
-                                        if (storeObj instanceof java.util.Map) {
-                                            Object sId = ((java.util.Map) storeObj).get("_id");
-                                            if (sId == null) sId = ((java.util.Map) storeObj).get("id");
-                                            if (sId != null) sidOuter = sId;
-                                        }
+                                java.util.List storeItems = (java.util.List) store.get("items");
+                                if (storeItems != null) {
+                                    for (Object it : storeItems) {
+                                        java.util.Map item = (java.util.Map) it;
+                                        java.util.Map product = (java.util.Map) item.get("product");
+                                        String name = String.valueOf(product.get("name"));
+                                        double price = product.get("price") instanceof Number ? ((Number) product.get("price")).doubleValue() : 0;
+                                        String priceText = formatPrice((long) price) + " VNĐ";
+                                        int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
+                                        CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
+                                        orderItems.add(ci);
                                     }
-                                    if (sidOuter != null) currentStoreId = String.valueOf(sidOuter);
-                                } catch (Exception ignored) {}
-                                
-                                // Chỉ load items của cửa hàng được chọn
-                                if (storeId.equals(currentStoreId)) {
-                                    java.util.List storeItems = (java.util.List) store.get("items");
-                                    if (storeItems != null) {
-                                        for (Object it : storeItems) {
-                                            java.util.Map item = (java.util.Map) it;
-                                            java.util.Map product = (java.util.Map) item.get("product");
-                                            String name = String.valueOf(product.get("name"));
-                                            double price = product.get("price") instanceof Number ? ((Number) product.get("price")).doubleValue() : 0;
-                                            String priceText = formatPrice((long) price) + " VNĐ";
-                                            int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
-                                            CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
-                                            orderItems.add(ci);
-                                        }
-                                    }
-                                    break;
                                 }
                             }
                         }
@@ -228,13 +200,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
         // Get selected payment method
         int selectedPaymentId = rgPaymentMethod.getCheckedRadioButtonId();
-        String paymentMethod = "COD";
-
-        if (selectedPaymentId == R.id.rbBankTransfer) {
-            paymentMethod = "Chuyển khoản ngân hàng";
-        } else if (selectedPaymentId == R.id.rbEWallet) {
-            paymentMethod = "Ví điện tử";
-        }
+        String paymentMethod = "vnpay"; // Chỉ dùng VNPay
 
         // Show confirmation dialog
         showConfirmationDialog(receiverName, receiverPhone, shippingAddress, paymentMethod);
@@ -267,18 +233,76 @@ public class CheckoutActivity extends AppCompatActivity {
         // TODO: Clear cart
         // TODO: Send notification/email
 
-        Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        com.example.project.models.User user = auth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Show success dialog
-        new AlertDialog.Builder(this)
-                .setTitle("Đặt Hàng Thành Công")
-                .setMessage("Cảm ơn bạn đã đặt hàng!\n\nĐơn hàng của bạn đang được xử lý và sẽ được giao trong thời gian sớm nhất.")
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Return to home or order history
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("userId", user.getId());
+        java.util.Map<String, Object> shipping = new java.util.HashMap<>();
+        shipping.put("fullName", name);
+        shipping.put("phone", phone);
+        shipping.put("address", address);
+        shipping.put("city", "");
+        body.put("shippingAddress", shipping);
+        body.put("paymentMethod", "vnpay");
+        body.put("notes", "");
+
+        api.createOrders(auth.getAuthHeader(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    String message = "Đơn hàng đã được tạo và đang chờ thanh toán VNPay.";
+                    try {
+                        Object data = response.body().getData();
+                        if (data instanceof java.util.Map) {
+                            java.util.Map d = (java.util.Map) data;
+                            Object summaryObj = d.get("summary");
+                            if (summaryObj instanceof java.util.Map) {
+                                java.util.Map summary = (java.util.Map) summaryObj;
+                                Object totalOrders = summary.get("totalOrders");
+                                Object totalAmount = summary.get("totalAmount");
+                                message = "Tạo " + String.valueOf(totalOrders) + " đơn hàng. Tổng: " + formatCurrency(totalAmount) + " VNĐ";
+                            }
+                        }
+                    } catch (Exception ignored) {}
+
+                    new AlertDialog.Builder(CheckoutActivity.this)
+                        .setTitle("Thanh toán VNPay")
+                        .setMessage(message)
+                        .setPositiveButton("OK", (dialog, which) -> finish())
+                        .setCancelable(false)
+                        .show();
+                } else {
+                    String err = "Tạo đơn hàng thất bại. Vui lòng thử lại!";
+                    try {
+                        if (response.errorBody() != null) {
+                            String eb = response.errorBody().string();
+                            if (eb.contains("Thiếu tồn kho")) {
+                                err = "Cửa hàng không còn đủ xe cho một số sản phẩm.";
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    Toast.makeText(CheckoutActivity.this, err, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(CheckoutActivity.this, "Không thể tạo đơn hàng. Vui lòng thử lại!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private String formatCurrency(Object v) {
+        long val = 0;
+        if (v instanceof Number) val = ((Number) v).longValue();
+        NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return fmt.format(val);
     }
 }
 

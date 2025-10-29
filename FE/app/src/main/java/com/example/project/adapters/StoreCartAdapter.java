@@ -26,7 +26,6 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public interface OnCartItemListener {
         void onQuantityChanged(int position, int delta);
         void onItemRemoved(int position);
-        void onStoreCheckoutClicked(String storeId, String storeName);
     }
     
     public StoreCartAdapter(List<Object> items, OnCartItemListener listener) {
@@ -86,24 +85,16 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     
     public static class StoreHeaderViewHolder extends RecyclerView.ViewHolder {
         private TextView tvStoreName, tvStoreTotal;
-        private View btnCheckoutStore;
         
         public StoreHeaderViewHolder(@NonNull View itemView) {
             super(itemView);
             tvStoreName = itemView.findViewById(R.id.tvStoreName);
             tvStoreTotal = itemView.findViewById(R.id.tvStoreTotal);
-            btnCheckoutStore = itemView.findViewById(R.id.btnCheckoutStore);
         }
         
         void bind(StoreHeader header, OnCartItemListener listener) {
             tvStoreName.setText(header.storeName != null ? header.storeName : "Cửa hàng");
             tvStoreTotal.setText(formatPrice(header.storeTotal) + " VNĐ");
-            
-            btnCheckoutStore.setOnClickListener(v -> {
-                if (listener != null && header.storeId != null) {
-                    listener.onStoreCheckoutClicked(header.storeId, header.storeName);
-                }
-            });
         }
         
         private String formatPrice(long price) {

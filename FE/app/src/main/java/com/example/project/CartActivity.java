@@ -48,6 +48,13 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         loadCartFromApi();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reload giỏ hàng sau khi quay lại từ Checkout (cart có thể đã bị xóa)
+        loadCartFromApi();
+    }
+
     private void initViews() {
         rvCartItems = findViewById(R.id.rvCartItems);
         tvItemCount = findViewById(R.id.tvItemCount);
@@ -74,7 +81,12 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         tvCart = findViewById(R.id.tvCart);
         tvAccount = findViewById(R.id.tvAccount);
 
-        btnCheckout.setVisibility(View.GONE); // Ẩn nút thanh toán chung
+        btnCheckout.setVisibility(View.VISIBLE);
+        btnCheckout.setOnClickListener(v -> {
+            Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+            // Không truyền store_id để checkout tổng
+            startActivity(intent);
+        });
     }
 
     private static class StoreGroup {
@@ -153,28 +165,55 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                                 } catch (Exception ignored) {}
                                 
                                 java.util.List storeItems = (java.util.List) store.get("items");
+                                if (storeItems == null) {
+                                    Object altItems = store.get("cartItems");
+                                    if (altItems instanceof java.util.List) {
+                                        storeItems = (java.util.List) altItems;
+                                    }
+                                }
                                 if (storeItems != null) {
                                     for (Object it : storeItems) {
-                                        java.util.Map item = (java.util.Map) it;
-                                        java.util.Map product = (java.util.Map) item.get("product");
-                                        String name = String.valueOf(product.get("name"));
-                                        double price = product.get("price") instanceof Number ? ((Number) product.get("price")).doubleValue() : 0;
-                                        String priceText = formatPrice((long) price) + " VNĐ";
-                                        int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
-                                        CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
-                                        
-                                        // Lưu các ID cần thiết cho API calls
                                         try {
+                                            java.util.Map item = (java.util.Map) it;
+                                            Object productObj = item.get("product");
+                                            if (productObj == null) productObj = item.get("bike");
+                                            String name = "Sản phẩm";
+                                            double price = 0;
+                                            String productIdStr = null;
+
+                                            if (productObj instanceof java.util.Map) {
+                                                java.util.Map product = (java.util.Map) productObj;
+                                                Object n = product.get("name");
+                                                if (n != null) name = String.valueOf(n);
+                                                Object p = product.get("price");
+                                                if (p instanceof Number) price = ((Number) p).doubleValue();
+                                                Object pid = product.get("_id");
+                                                if (pid == null) pid = product.get("id");
+                                                if (pid != null) productIdStr = String.valueOf(pid);
+                                            } else {
+                                                // Fallback: lấy từ trường trên item
+                                                Object n2 = item.get("productName");
+                                                if (n2 != null) name = String.valueOf(n2);
+                                                Object p2 = item.get("unitPrice");
+                                                if (p2 instanceof Number) price = ((Number) p2).doubleValue();
+                                                Object pid2 = item.get("productId");
+                                                if (pid2 != null) productIdStr = String.valueOf(pid2);
+                                            }
+
+                                            String priceText = formatPrice((long) price) + " VNĐ";
+                                            int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
+                                            CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
+
+                                            // Lưu các ID cần thiết cho API calls
                                             Object itemId = item.get("_id");
                                             if (itemId != null) ci.setItemId(String.valueOf(itemId));
-                                            Object productId = product.get("_id");
-                                            if (productId != null) ci.setProductId(String.valueOf(productId));
+                                            if (productIdStr != null) ci.setProductId(productIdStr);
                                             if (outerStoreId != null) ci.setStoreId(outerStoreId);
                                             ci.setUnitPrice((long) price);
+
+                                            items.add(ci);
+                                            group.items.add(ci);
                                         } catch (Exception ignored) {}
-                                        
-                                        items.add(ci);
-                                        group.items.add(ci);
                                     }
                                 }
                                 groups.add(group);
@@ -326,9 +365,13 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
             rvCartItems.setVisibility(View.GONE);
             tvItemCount.setText("0 sản phẩm");
             tvBadge.setText("0");
+            btnCheckout.setEnabled(false);
+            btnCheckout.setAlpha(0.5f);
         } else {
             emptyCartCard.setVisibility(View.GONE);
             rvCartItems.setVisibility(View.VISIBLE);
+            btnCheckout.setEnabled(true);
+            btnCheckout.setAlpha(1f);
         }
     }
 
@@ -424,13 +467,7 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         Toast.makeText(this, "Đã xóa sản phẩm khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onStoreCheckoutClicked(String storeId, String storeName) {
-        Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
-        intent.putExtra("store_id", storeId);
-        intent.putExtra("store_name", storeName);
-        startActivity(intent);
-    }
+    // Đã bỏ thanh toán theo từng cửa hàng; dùng nút thanh toán chung ở cuối màn hình
     
     private void updateItemQuantity(CartItem cartItem, int newQuantity) {
         if (cartItem.getItemId() == null || cartItem.getItemId().isEmpty()) {

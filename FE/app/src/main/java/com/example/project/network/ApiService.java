@@ -195,6 +195,13 @@ public interface ApiService {
     
     @POST("stores/nearby")
     Call<ApiResponse<Store[]>> getNearbyStores(@Body NearbyStoreRequest request);
+
+    // Order endpoints
+    @POST("orders/create")
+    Call<ApiResponse<Object>> createOrders(
+        @Header("Authorization") String token,
+        @Body java.util.Map<String, Object> body
+    );
     
     // Change password request model
     class ChangePasswordRequest {
