@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="#FFFFFF">
 
     <!-- Header với Search Box -->
     <androidx.cardview.widget.CardView
@@ -16,12 +16,12 @@
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="25dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
+            android:background="#FFFFFF"
             android:orientation="horizontal"
             android:padding="16dp"
             android:gravity="center_vertical">
@@ -33,7 +33,7 @@
                 android:layout_height="45dp"
                 app:cardCornerRadius="22.5dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -41,14 +41,14 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
+                    android:background="#FFFFFF"
                     android:gravity="center">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_back"
-                        app:tint="#2196F3"
+                        app:tint="#000000"
                         android:contentDescription="Back" />
 
                 </RelativeLayout>
@@ -63,12 +63,12 @@
                 android:layout_marginStart="12dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_search"
+                    android:background="#FFFFFF"
                     android:padding="8dp">
 
                     <ImageView
@@ -79,7 +79,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="12dp"
                         android:src="@drawable/ic_search"
-                        app:tint="#5E7CE2"
+                        app:tint="#000000"
                         android:contentDescription="Search" />
 
                     <EditText
@@ -92,8 +92,8 @@
                         android:layout_marginEnd="8dp"
                         android:background="@android:color/transparent"
                         android:hint="Tìm kiếm sản phẩm..."
-                        android:textColorHint="#8B9DC3"
-                        android:textColor="#3D5A80"
+                        android:textColorHint="#999999"
+                        android:textColor="#000000"
                         android:textSize="15sp"
                         android:inputType="text"
                         android:imeOptions="actionSearch"
@@ -107,7 +107,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginEnd="12dp"
                         android:src="@drawable/ic_close"
-                        app:tint="#999999"
+                        app:tint="#000000"
                         android:visibility="gone"
                         android:clickable="true"
                         android:focusable="true"
@@ -143,12 +143,12 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
+                    android:background="#FFFFFF"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -169,7 +169,7 @@
                         android:layout_marginBottom="12dp"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -177,7 +177,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
+                            android:background="#FFFFFF"
                             android:padding="16dp">
 
                             <ImageView
@@ -187,7 +187,7 @@
                                 android:layout_alignParentStart="true"
                                 android:layout_centerVertical="true"
                                 android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
+                                app:tint="#000000"
                                 android:contentDescription="Search suggestion" />
 
                             <TextView
@@ -198,7 +198,7 @@
                                 android:layout_marginStart="12dp"
                                 android:text="Xe đạp điện"
                                 android:textSize="15sp"
-                                android:textColor="#3D5A80" />
+                                android:textColor="#000000" />
 
                         </RelativeLayout>
 
@@ -212,7 +212,7 @@
                         android:layout_marginBottom="12dp"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -220,7 +220,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
+                            android:background="#FFFFFF"
                             android:padding="16dp">
 
                             <ImageView
@@ -230,7 +230,7 @@
                                 android:layout_alignParentStart="true"
                                 android:layout_centerVertical="true"
                                 android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
+                                app:tint="#000000"
                                 android:contentDescription="Search suggestion" />
 
                             <TextView
@@ -241,7 +241,7 @@
                                 android:layout_marginStart="12dp"
                                 android:text="Xe thể thao"
                                 android:textSize="15sp"
-                                android:textColor="#3D5A80" />
+                                android:textColor="#000000" />
 
                         </RelativeLayout>
 
@@ -255,7 +255,7 @@
                         android:layout_marginBottom="12dp"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -263,7 +263,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
+                            android:background="#FFFFFF"
                             android:padding="16dp">
 
                             <ImageView
@@ -273,7 +273,7 @@
                                 android:layout_alignParentStart="true"
                                 android:layout_centerVertical="true"
                                 android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
+                                app:tint="#000000"
                                 android:contentDescription="Search suggestion" />
 
                             <TextView
@@ -284,7 +284,7 @@
                                 android:layout_marginStart="12dp"
                                 android:text="Xe đạp địa hình"
                                 android:textSize="15sp"
-                                android:textColor="#3D5A80" />
+                                android:textColor="#000000" />
 
                         </RelativeLayout>
 
@@ -298,7 +298,7 @@
                         android:layout_marginBottom="12dp"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -306,7 +306,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
+                            android:background="#FFFFFF"
                             android:padding="16dp">
 
                             <ImageView
@@ -316,7 +316,7 @@
                                 android:layout_alignParentStart="true"
                                 android:layout_centerVertical="true"
                                 android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
+                                app:tint="#000000"
                                 android:contentDescription="Search suggestion" />
 
                             <TextView
@@ -327,7 +327,7 @@
                                 android:layout_marginStart="12dp"
                                 android:text="Xe đạp trẻ em"
                                 android:textSize="15sp"
-                                android:textColor="#3D5A80" />
+                                android:textColor="#000000" />
 
                         </RelativeLayout>
 
@@ -340,7 +340,7 @@
                         android:layout_height="wrap_content"
                         app:cardCornerRadius="20dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -348,7 +348,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/liquid_glass_input"
+                            android:background="#FFFFFF"
                             android:padding="16dp">
 
                             <ImageView
@@ -358,7 +358,7 @@
                                 android:layout_alignParentStart="true"
                                 android:layout_centerVertical="true"
                                 android:src="@drawable/ic_search"
-                                app:tint="#5E7CE2"
+                                app:tint="#000000"
                                 android:contentDescription="Search suggestion" />
 
                             <TextView
@@ -369,7 +369,7 @@
                                 android:layout_marginStart="12dp"
                                 android:text="Xe đạp gấp"
                                 android:textSize="15sp"
-                                android:textColor="#3D5A80" />
+                                android:textColor="#000000" />
 
                         </RelativeLayout>
 
@@ -388,12 +388,12 @@
                 android:visibility="gone"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
+                    android:background="#FFFFFF"
                     android:orientation="vertical"
                     android:padding="20dp">
 
