@@ -2,6 +2,10 @@ package com.example.project;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -18,6 +22,11 @@ public class AdminChatListActivity extends AppCompatActivity implements ChatUser
 
     private ChatUserAdapter chatUserAdapter;
     private List<ChatUser> chatUsers;
+    
+    // Bottom navigation
+    private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
+    private ImageView iconChatManagement;
+    private TextView tvChatManagement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +37,22 @@ public class AdminChatListActivity extends AppCompatActivity implements ChatUser
         setupRecyclerView();
         loadChatUsers();
         setupClickListeners();
+        setupBottomNavigation();
     }
 
     private void initViews() {
         rvChatUsers = findViewById(R.id.rvChatUsers);
         btnBack = findViewById(R.id.btnBack);
+        
+        // Bottom navigation
+        navDashboard = findViewById(R.id.navDashboard);
+        navUserManagement = findViewById(R.id.navUserManagement);
+        navProductManagement = findViewById(R.id.navProductManagement);
+        navStoreManagement = findViewById(R.id.navStoreManagement);
+        navOrderManagement = findViewById(R.id.navOrderManagement);
+        navChatManagement = findViewById(R.id.navChatManagement);
+        iconChatManagement = findViewById(R.id.iconChatManagement);
+        tvChatManagement = findViewById(R.id.tvChatManagement);
     }
 
     private void setupRecyclerView() {
@@ -105,6 +125,47 @@ public class AdminChatListActivity extends AppCompatActivity implements ChatUser
         intent.putExtra("userId", chatUser.getUserId());
         intent.putExtra("userName", chatUser.getUserName());
         startActivity(intent);
+    }
+    
+    private void setupBottomNavigation() {
+        // Set Chat Management tab as active
+        if (iconChatManagement != null) {
+            iconChatManagement.setColorFilter(0xFF2196F3); // active blue
+        }
+        if (tvChatManagement != null) {
+            tvChatManagement.setTextColor(0xFF2196F3); // active blue
+        }
+        
+        // Bottom navigation click listeners
+        if (navDashboard != null) {
+            navDashboard.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminChatListActivity.this, AdminManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (navUserManagement != null) {
+            navUserManagement.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminChatListActivity.this, UserManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (navProductManagement != null) {
+            navProductManagement.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminChatListActivity.this, ProductManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (navStoreManagement != null) {
+            navStoreManagement.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminChatListActivity.this, StoreManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (navOrderManagement != null) {
+            navOrderManagement.setOnClickListener(v -> {
+                Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 }
 
