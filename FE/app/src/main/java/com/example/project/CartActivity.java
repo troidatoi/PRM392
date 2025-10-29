@@ -294,11 +294,15 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         int totalItems = 0;
         long subtotal = 0;
 
-        for (CartItem item : cartItems) {
-            totalItems += item.getQuantity();
-            // Only count selected items in subtotal
-            if (item.isSelected()) {
-                subtotal += item.getTotalPrice();
+        // Tính toán từ displayItems (chỉ lấy CartItem, bỏ qua StoreHeader)
+        for (Object item : displayItems) {
+            if (item instanceof CartItem) {
+                CartItem cartItem = (CartItem) item;
+                totalItems += cartItem.getQuantity();
+                // Only count selected items in subtotal
+                if (cartItem.isSelected()) {
+                    subtotal += cartItem.getTotalPrice();
+                }
             }
         }
 
@@ -343,15 +347,58 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
             return;
         }
         
-        // Cập nhật số lượng trong cartItem
+        // Nếu tăng số lượng (delta > 0), kiểm tra stock trước
+        if (delta > 0) {
+            checkStockAndUpdateQuantity(cartItem, newQuantity, position);
+        } else {
+            // Giảm số lượng thì cập nhật trực tiếp
+            updateQuantityDirectly(cartItem, newQuantity, position);
+        }
+    }
+    
+    private void checkStockAndUpdateQuantity(CartItem cartItem, int newQuantity, int position) {
+        if (cartItem.getProductId() == null || cartItem.getStoreId() == null) {
+            Toast.makeText(this, "Thiếu thông tin sản phẩm/cửa hàng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("productId", cartItem.getProductId());
+        body.put("storeId", cartItem.getStoreId());
+        body.put("quantity", newQuantity);
+        
+        api.checkAvailability(auth.getAuthHeader(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    // Stock đủ, cập nhật số lượng
+                    updateQuantityDirectly(cartItem, newQuantity, position);
+                } else {
+                    String errorMsg = "Cửa hàng không còn đủ xe";
+                    Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            }
+            
+            @Override
+            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(CartActivity.this, "Lỗi kiểm tra tồn kho: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    
+    private void updateQuantityDirectly(CartItem cartItem, int newQuantity, int position) {
+        // Cập nhật số lượng trong cartItem (optimistic update)
         cartItem.setQuantity(newQuantity);
+        
+        // Cập nhật UI ngay lập tức (optimistic UI)
+        storeCartAdapter.notifyItemChanged(position);
+        updateCartSummary();
         
         // Gọi API để cập nhật
         updateItemQuantity(cartItem, newQuantity);
-        
-        // Cập nhật UI
-        storeCartAdapter.notifyItemChanged(position);
-        updateCartSummary();
     }
 
     @Override
@@ -401,9 +448,10 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
             @Override
             public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    // Thành công, reload giỏ hàng để đồng bộ
-                    loadCartFromApi();
+                    // Thành công - UI đã được cập nhật optimistic, không cần làm gì thêm
+                    Toast.makeText(CartActivity.this, "Cập nhật số lượng thành công", Toast.LENGTH_SHORT).show();
                 } else {
+                    // Thất bại - revert lại số lượng cũ và reload
                     String errorMsg = "Cập nhật số lượng thất bại";
                     if (response.errorBody() != null) {
                         try {
@@ -413,14 +461,14 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                         }
                     }
                     Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
-                    loadCartFromApi(); // Reload để đồng bộ
+                    loadCartFromApi(); // Reload để revert về trạng thái cũ
                 }
             }
             
             @Override
             public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
                 Toast.makeText(CartActivity.this, "Lỗi cập nhật số lượng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                loadCartFromApi(); // Reload để đồng bộ
+                loadCartFromApi(); // Reload để revert về trạng thái cũ
             }
         });
     }
