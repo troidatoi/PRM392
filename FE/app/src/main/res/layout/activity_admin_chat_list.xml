@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="@drawable/admin_elegant_background">
 
     <!-- Header -->
     <androidx.cardview.widget.CardView
@@ -104,5 +104,13 @@
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <!-- Bottom Navigation -->
+    <include
+        layout="@layout/view_admin_bottom_nav"
+        android:id="@+id/bottomNavBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

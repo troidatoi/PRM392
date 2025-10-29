@@ -1,154 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/google_ai_studio_1"
-    android:padding="16dp">
+    android:background="@drawable/admin_elegant_background">
 
-    <!-- Header -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/headerCard"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
-            android:orientation="horizontal"
-            android:padding="20dp"
-            android:gravity="center_vertical">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBack"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="90"
-                        app:tint="#2196F3"
-                        android:contentDescription="Back" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Quản Lý Người Dùng"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="center"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp" />
-
-            <View
-                android:layout_width="50dp"
-                android:layout_height="50dp" />
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <!-- User Count -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="4dp"
-        app:cardBackgroundColor="@android:color/transparent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_background"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="16dp"
-            android:gravity="center_vertical">
+            android:paddingBottom="100dp">
 
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_phone"
-                app:tint="#9C27B0"
-                android:layout_marginEnd="12dp"
-                android:contentDescription="Users" />
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="User Management"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#1F2937" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_search"
+                    android:tint="#2196F3" />
+            </LinearLayout>
+
+            <!-- User Count -->
             <TextView
                 android:id="@+id/tvUserCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tổng: 0 người dùng"
+                android:text="Total: 0 users"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="8dp" />
+
+            <!-- Tabs -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp">
+
+                <TextView
+                    android:id="@+id/tabAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Users"
+                    android:textStyle="bold"
+                    android:textColor="#2196F3"
+                    android:padding="8dp" />
+
+                <TextView
+                    android:id="@+id/tabCustomers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Customers"
+                    android:textColor="#6B7280"
+                    android:padding="8dp"
+                    android:layout_marginStart="12dp" />
+
+                <TextView
+                    android:id="@+id/tabAdmins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Admins"
+                    android:textColor="#6B7280"
+                    android:padding="8dp"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+
+            <!-- Users List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewUsers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Empty / Loading -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvEmptyState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No users"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#9C27B0" />
+                android:textColor="#666666"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Add New Button -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnAddNewUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@android:color/transparent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/modern_button_background"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add New"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Main Content -->
-    <FrameLayout
+    <!-- Bottom Nav -->
+    <include
+        layout="@layout/view_admin_bottom_nav"
+        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="wrap_content" />
 
-        <!-- Loading Indicator -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
-        <!-- Empty State -->
-        <TextView
-            android:id="@+id/tvEmptyState"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Không có người dùng nào"
-            android:textSize="16sp"
-            android:textColor="#666666"
-            android:gravity="center"
-            android:visibility="gone" />
-
-        <!-- Users List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewUsers"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp"
-            android:visibility="visible" />
-
-    </FrameLayout>
-
-</LinearLayout>
+</RelativeLayout>

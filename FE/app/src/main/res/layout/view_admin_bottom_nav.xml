@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomNavBar"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_alignParentBottom="true"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="12dp"
+    android:backgroundTint="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:baselineAligned="false">
+
+        <!-- Dashboard Tab -->
+        <LinearLayout
+            android:id="@+id/navDashboard"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/iconDashboard"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_modern_dashboard"
+                app:tint="#9CA3AF" />
+
+            <TextView
+                android:id="@+id/tvDashboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dashboard"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF" />
+
+        </LinearLayout>
+
+        <!-- User Management Tab -->
+        <LinearLayout
+            android:id="@+id/navUserManagement"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/iconUserManagement"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_modern_users"
+                app:tint="#9CA3AF" />
+
+            <TextView
+                android:id="@+id/tvUserManagement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Người dùng"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF" />
+
+        </LinearLayout>
+
+        <!-- Product Management Tab -->
+        <LinearLayout
+            android:id="@+id/navProductManagement"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/iconProductManagement"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_modern_products"
+                app:tint="#9CA3AF" />
+
+            <TextView
+                android:id="@+id/tvProductManagement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sản phẩm"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF" />
+
+        </LinearLayout>
+
+        <!-- Store Management Tab -->
+        <LinearLayout
+            android:id="@+id/navStoreManagement"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/iconStoreManagement"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_modern_branches"
+                app:tint="#9CA3AF" />
+
+            <TextView
+                android:id="@+id/tvStoreManagement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cửa hàng"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF" />
+
+        </LinearLayout>
+
+        <!-- Order Management Tab -->
+        <LinearLayout
+            android:id="@+id/navOrderManagement"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/iconOrderManagement"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_modern_orders"
+                app:tint="#9CA3AF" />
+
+            <TextView
+                android:id="@+id/tvOrderManagement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đơn hàng"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF" />
+
+        </LinearLayout>
+
+        <!-- Chat Management Tab -->
+        <LinearLayout
+            android:id="@+id/navChatManagement"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:id="@+id/iconChatManagement"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chat_bubble"
+                app:tint="#9CA3AF" />
+
+            <TextView
+                android:id="@+id/tvChatManagement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chat"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+
+

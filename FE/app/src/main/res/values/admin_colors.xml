@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Admin Dashboard Color Palette based on #E0E0E0 -->
+    
+    <!-- Primary Colors (neutral, harmonious) -->
+    <color name="admin_primary">#1F2937</color> <!-- slate-800 -->
+    <color name="admin_primary_dark">#111827</color> <!-- slate-900 -->
+    <color name="admin_primary_light">#6B7280</color> <!-- slate-500 -->
+    
+    <!-- Background Colors -->
+    <color name="admin_background_light">#F7F7F8</color>
+    <color name="admin_background_medium">#EDEEF0</color>
+    <color name="admin_background_dark">#E3E4E8</color>
+    
+    <!-- Card Colors -->
+    <color name="admin_card_background">#FFFFFF</color>
+    <color name="admin_card_border">#E5E7EB</color>
+    <color name="admin_card_shadow">#D1D5DB</color>
+    
+    <!-- Text Colors -->
+    <color name="admin_text_primary">#1F2937</color>
+    <color name="admin_text_secondary">#6B7280</color>
+    <color name="admin_text_hint">#9CA3AF</color>
+    
+    <!-- Accent Colors -->
+    <color name="admin_accent_blue">#2563EB</color> <!-- indigo-600 -->
+    <color name="admin_accent_green">#22C55E</color> <!-- emerald-500 -->
+    <color name="admin_accent_orange">#F59E0B</color> <!-- amber-500 -->
+    <color name="admin_accent_red">#F44336</color>
+    <color name="admin_beige">#F2E8D5</color>
+    
+    <!-- Status Colors -->
+    <color name="admin_success">#4CAF50</color>
+    <color name="admin_warning">#FF9800</color>
+    <color name="admin_error">#F44336</color>
+    <color name="admin_info">#2196F3</color>
+</resources>
