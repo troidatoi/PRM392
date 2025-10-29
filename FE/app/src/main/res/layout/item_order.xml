@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#FFFFFF"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -14,7 +14,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/liquid_glass_product_card"
+        android:background="#FFFFFF"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -29,20 +29,20 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
+                    android:background="#FFFFFF"
                     android:gravity="center">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/ic_cart"
-                        app:tint="#2196F3"
+                        app:tint="#000000"
                         android:contentDescription="Order" />
 
                 </RelativeLayout>
@@ -81,13 +81,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_button"
+                    android:background="#FFFFFF"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="6dp"
@@ -100,7 +100,7 @@
                         android:text="Đã giao"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        android:textColor="#FFFFFF" />
+                        android:textColor="#000000" />
 
                 </RelativeLayout>
 
@@ -172,8 +172,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -181,7 +181,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_button"
+                    android:background="#FFFFFF"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
                     android:gravity="center">
@@ -190,7 +190,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Chi tiết"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#000000"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
