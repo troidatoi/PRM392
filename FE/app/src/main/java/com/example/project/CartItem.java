@@ -8,6 +8,10 @@ public class CartItem {
     private int quantity;
     private int priceValue; // Store numeric price for calculations
     private boolean isSelected; // For checkbox state
+    private String itemId; // Cart item ID from API
+    private String productId; // Product ID
+    private String storeId; // Store ID
+    private long unitPrice; // Unit price for API calls
 
     public CartItem(String name, String description, String price, int imageResId, int quantity) {
         this.name = name;
@@ -84,5 +88,38 @@ public class CartItem {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    // Getters and setters for API IDs
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
+    }
+
+    public long getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(long unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

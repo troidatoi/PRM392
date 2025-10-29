@@ -172,7 +172,7 @@
                 android:layout_marginTop="24dp"
                 android:nestedScrollingEnabled="false" />
 
-            <!-- Coupon Section with Liquid Glass -->
+            <!-- Coupon Section with Liquid Glass - HIDDEN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -180,7 +180,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
-                android:layout_marginTop="24dp" />
+                android:layout_marginTop="24dp"
+                android:visibility="gone" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -188,7 +189,8 @@
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="30dp"
                 app:cardElevation="2dp"
-                app:cardBackgroundColor="#F5F5F5">
+                app:cardBackgroundColor="#F5F5F5"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -246,7 +248,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Order Summary with Liquid Glass -->
+            <!-- Order Summary with Liquid Glass - HIDDEN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -254,7 +256,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
-                android:layout_marginTop="24dp" />
+                android:layout_marginTop="24dp"
+                android:visibility="gone" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -262,7 +265,8 @@
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="#FFFFFF">
+                app:cardBackgroundColor="#FFFFFF"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
