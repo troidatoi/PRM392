@@ -377,14 +377,15 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                     // Stock đủ, cập nhật số lượng
                     updateQuantityDirectly(cartItem, newQuantity, position);
                 } else {
-                    String errorMsg = "Cửa hàng không còn đủ xe";
-                    Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    // Hiển thị thông báo thân thiện cho khách hàng
+                    String errorMsg = "Cửa hàng không còn đủ xe này trong kho!";
+                    Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
             
             @Override
             public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
-                Toast.makeText(CartActivity.this, "Lỗi kiểm tra tồn kho: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(CartActivity.this, "Không thể kiểm tra tồn kho. Vui lòng thử lại!", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -451,23 +452,16 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                     // Thành công - UI đã được cập nhật optimistic, không cần làm gì thêm
                     Toast.makeText(CartActivity.this, "Cập nhật số lượng thành công", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Thất bại - revert lại số lượng cũ và reload
-                    String errorMsg = "Cập nhật số lượng thất bại";
-                    if (response.errorBody() != null) {
-                        try {
-                            errorMsg += ": " + response.errorBody().string();
-                        } catch (Exception e) {
-                            errorMsg += " (HTTP " + response.code() + ")";
-                        }
-                    }
-                    Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    // Thất bại - hiển thị thông báo hết hàng và reload
+                    String errorMsg = "Cửa hàng không còn đủ xe này trong kho!";
+                    Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                     loadCartFromApi(); // Reload để revert về trạng thái cũ
                 }
             }
             
             @Override
             public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
-                Toast.makeText(CartActivity.this, "Lỗi cập nhật số lượng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(CartActivity.this, "Cửa hàng không còn đủ xe này trong kho!", Toast.LENGTH_LONG).show();
                 loadCartFromApi(); // Reload để revert về trạng thái cũ
             }
         });
