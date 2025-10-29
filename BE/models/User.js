@@ -12,9 +12,19 @@ const userSchema = new mongoose.Schema({
   },
   passwordHash: {
     type: String,
-    required: [true, 'Mật khẩu là bắt buộc'],
+    required: function() {
+      // Chỉ bắt buộc nếu không đăng nhập qua Google
+      return !this.googleId;
+    },
     minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự']
   },
+  googleId: {
+    type: String,
+    sparse: true, // Cho phép multiple null values nhưng unique khi có giá trị
+    unique: true
+  },
+  passwordResetToken: String,
+  passwordResetExpire: Date,
   email: {
     type: String,
     required: [true, 'Email là bắt buộc'],
@@ -67,7 +77,8 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  toObject: { virtuals: true },
+  suppressReservedKeysWarning: true
 });
 
 // Virtual for full name
@@ -78,9 +89,7 @@ userSchema.virtual('fullName').get(function() {
   return this.username;
 });
 
-// Index for better search performance
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
+// Index for better search performance (username and email already have unique indexes)
 userSchema.index({ role: 1, isActive: 1 });
 
 // Pre-save middleware to hash password
@@ -105,6 +114,23 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 userSchema.methods.updateLastLogin = function() {
   this.lastLogin = new Date();
   return this.save();
+};
+
+// Method to generate reset password token
+userSchema.methods.getResetPasswordToken = function() {
+  const crypto = require('crypto');
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token and set to passwordResetToken field
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expire to 10 minutes
+  this.passwordResetExpire = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 module.exports = mongoose.model('User', userSchema);
