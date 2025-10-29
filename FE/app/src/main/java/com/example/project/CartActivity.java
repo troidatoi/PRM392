@@ -18,12 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.project.adapters.StoreCartAdapter;
+
 @SuppressWarnings("deprecation")
-public class CartActivity extends AppCompatActivity implements CartAdapter.OnCartItemListener {
+public class CartActivity extends AppCompatActivity implements StoreCartAdapter.OnCartItemListener {
 
     private RecyclerView rvCartItems;
-    private CartAdapter cartAdapter;
+    private StoreCartAdapter storeCartAdapter;
+    private List<Object> displayItems = new ArrayList<>();
     private List<CartItem> cartItems;
+    private List<StoreGroup> storeGroups;
 
     private TextView tvItemCount, tvBadge, tvSubtotal, tvTotal;
     private CardView emptyCartCard, btnCheckout;
@@ -70,24 +74,26 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         tvCart = findViewById(R.id.tvCart);
         tvAccount = findViewById(R.id.tvAccount);
 
-        btnCheckout.setOnClickListener(v -> {
-            if (cartItems.isEmpty()) {
-                Toast.makeText(this, "Giỏ hàng trống!", Toast.LENGTH_SHORT).show();
-            } else {
-                // Navigate to Checkout Activity
-                Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
-                startActivity(intent);
-            }
-        });
+        btnCheckout.setVisibility(View.GONE); // Ẩn nút thanh toán chung
     }
+
+    private static class StoreGroup {
+        String storeId;
+        String storeName;
+        long storeTotal;
+        List<CartItem> items = new ArrayList<>();
+    }
+
 
     private void setupRecyclerView() {
         cartItems = new ArrayList<>();
-        cartAdapter = new CartAdapter(cartItems, this);
+        storeGroups = new ArrayList<>();
+        displayItems = new ArrayList<>();
+        storeCartAdapter = new StoreCartAdapter(displayItems, this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rvCartItems.setLayoutManager(layoutManager);
-        rvCartItems.setAdapter(cartAdapter);
+        rvCartItems.setAdapter(storeCartAdapter);
     }
 
     private void loadCartFromApi() {
@@ -107,6 +113,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
                     // Parse tối thiểu: lấy cart.itemCount và items của từng store
                     int itemCount = 0;
                     java.util.List<CartItem> items = new java.util.ArrayList<>();
+                    java.util.List<StoreGroup> groups = new java.util.ArrayList<>();
                     try {
                         java.util.Map dataMap = (java.util.Map) data;
                         java.util.Map cartMap = (java.util.Map) dataMap.get("cart");
@@ -117,6 +124,34 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
                         if (stores != null) {
                             for (Object s : stores) {
                                 java.util.Map store = (java.util.Map) s;
+                                StoreGroup group = new StoreGroup();
+                                
+                                // Lấy storeId và storeName
+                                String outerStoreId = null;
+                                try {
+                                    Object sidOuter = store.get("storeId");
+                                    if (sidOuter == null) sidOuter = store.get("_id");
+                                    if (sidOuter == null) sidOuter = store.get("id");
+                                    if (sidOuter == null) {
+                                        Object storeObj = store.get("store");
+                                        if (storeObj instanceof java.util.Map) {
+                                            Object sId = ((java.util.Map) storeObj).get("_id");
+                                            if (sId == null) sId = ((java.util.Map) storeObj).get("id");
+                                            if (sId != null) sidOuter = sId;
+                                            Object sName = ((java.util.Map) storeObj).get("name");
+                                            if (sName != null) group.storeName = String.valueOf(sName);
+                                        }
+                                    }
+                                    if (sidOuter != null) outerStoreId = String.valueOf(sidOuter);
+                                } catch (Exception ignored) {}
+                                group.storeId = outerStoreId;
+                                
+                                // Lấy storeTotal
+                                try {
+                                    Object st = store.get("storeTotal");
+                                    if (st instanceof Number) group.storeTotal = ((Number) st).longValue();
+                                } catch (Exception ignored) {}
+                                
                                 java.util.List storeItems = (java.util.List) store.get("items");
                                 if (storeItems != null) {
                                     for (Object it : storeItems) {
@@ -127,16 +162,45 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
                                         String priceText = formatPrice((long) price) + " VNĐ";
                                         int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
                                         CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
+                                        
+                                        // Lưu các ID cần thiết cho API calls
+                                        try {
+                                            Object itemId = item.get("_id");
+                                            if (itemId != null) ci.setItemId(String.valueOf(itemId));
+                                            Object productId = product.get("_id");
+                                            if (productId != null) ci.setProductId(String.valueOf(productId));
+                                            if (outerStoreId != null) ci.setStoreId(outerStoreId);
+                                            ci.setUnitPrice((long) price);
+                                        } catch (Exception ignored) {}
+                                        
                                         items.add(ci);
+                                        group.items.add(ci);
                                     }
                                 }
+                                groups.add(group);
                             }
                         }
                     } catch (Exception ignore) {}
 
                     cartItems.clear();
                     cartItems.addAll(items);
-                    cartAdapter.notifyDataSetChanged();
+                    storeGroups.clear();
+                    storeGroups.addAll(groups);
+                    
+                    // Tạo danh sách hiển thị theo từng cửa hàng
+                    displayItems.clear();
+                    for (StoreGroup group : groups) {
+                        // Thêm header cửa hàng
+                        displayItems.add(new StoreCartAdapter.StoreHeader(
+                            group.storeId,
+                            group.storeName != null ? group.storeName : "Cửa hàng", 
+                            group.storeTotal
+                        ));
+                        // Thêm các item của cửa hàng
+                        displayItems.addAll(group.items);
+                    }
+                    
+                    storeCartAdapter.notifyDataSetChanged();
                     updateCartSummary();
                     tvItemCount.setText(itemCount + " sản phẩm");
                     tvBadge.setText(String.valueOf(itemCount));
@@ -222,7 +286,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
             1
         ));
 
-        cartAdapter.notifyDataSetChanged();
+        storeCartAdapter.notifyDataSetChanged();
         checkEmptyCart();
     }
 
@@ -265,21 +329,137 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
     }
 
     @Override
-    public void onQuantityChanged(int position, int newQuantity) {
+    public void onQuantityChanged(int position, int delta) {
+        if (position < 0 || position >= displayItems.size()) return;
+        
+        Object item = displayItems.get(position);
+        if (!(item instanceof CartItem)) return;
+        
+        CartItem cartItem = (CartItem) item;
+        int newQuantity = cartItem.getQuantity() + delta;
+        
+        if (newQuantity <= 0) {
+            onItemRemoved(position);
+            return;
+        }
+        
+        // Cập nhật số lượng trong cartItem
+        cartItem.setQuantity(newQuantity);
+        
+        // Gọi API để cập nhật
+        updateItemQuantity(cartItem, newQuantity);
+        
+        // Cập nhật UI
+        storeCartAdapter.notifyItemChanged(position);
         updateCartSummary();
     }
 
     @Override
     public void onItemRemoved(int position) {
-        cartItems.remove(position);
-        cartAdapter.notifyItemRemoved(position);
+        if (position < 0 || position >= displayItems.size()) return;
+        
+        Object item = displayItems.get(position);
+        if (!(item instanceof CartItem)) return;
+        
+        CartItem cartItem = (CartItem) item;
+        
+        // Gọi API để xóa
+        removeItemFromCart(cartItem);
+        
+        // Cập nhật UI
+        displayItems.remove(position);
+        cartItems.remove(cartItem);
+        storeCartAdapter.notifyItemRemoved(position);
+        
         updateCartSummary();
         checkEmptyCart();
         Toast.makeText(this, "Đã xóa sản phẩm khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onItemSelected(int position, boolean isSelected) {
-        updateCartSummary();
+    public void onStoreCheckoutClicked(String storeId, String storeName) {
+        Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+        intent.putExtra("store_id", storeId);
+        intent.putExtra("store_name", storeName);
+        startActivity(intent);
+    }
+    
+    private void updateItemQuantity(CartItem cartItem, int newQuantity) {
+        if (cartItem.getItemId() == null || cartItem.getItemId().isEmpty()) {
+            Toast.makeText(this, "Thiếu itemId cho cập nhật số lượng, tải lại giỏ hàng", Toast.LENGTH_SHORT).show();
+            loadCartFromApi();
+            return;
+        }
+        
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("quantity", newQuantity);
+        
+        api.updateCartItemQuantity(auth.getAuthHeader(), cartItem.getItemId(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    // Thành công, reload giỏ hàng để đồng bộ
+                    loadCartFromApi();
+                } else {
+                    String errorMsg = "Cập nhật số lượng thất bại";
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMsg += ": " + response.errorBody().string();
+                        } catch (Exception e) {
+                            errorMsg += " (HTTP " + response.code() + ")";
+                        }
+                    }
+                    Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    loadCartFromApi(); // Reload để đồng bộ
+                }
+            }
+            
+            @Override
+            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(CartActivity.this, "Lỗi cập nhật số lượng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                loadCartFromApi(); // Reload để đồng bộ
+            }
+        });
+    }
+    
+    private void removeItemFromCart(CartItem cartItem) {
+        if (cartItem.getItemId() == null || cartItem.getItemId().isEmpty()) {
+            Toast.makeText(this, "Thiếu itemId cho xóa sản phẩm, tải lại giỏ hàng", Toast.LENGTH_SHORT).show();
+            loadCartFromApi();
+            return;
+        }
+        
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        
+        api.removeCartItem(auth.getAuthHeader(), cartItem.getItemId()).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    // Thành công, reload giỏ hàng để đồng bộ
+                    loadCartFromApi();
+                } else {
+                    String errorMsg = "Xóa sản phẩm thất bại";
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMsg += ": " + response.errorBody().string();
+                        } catch (Exception e) {
+                            errorMsg += " (HTTP " + response.code() + ")";
+                        }
+                    }
+                    Toast.makeText(CartActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    loadCartFromApi(); // Reload để đồng bộ
+                }
+            }
+            
+            @Override
+            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(CartActivity.this, "Lỗi xóa sản phẩm: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                loadCartFromApi(); // Reload để đồng bộ
+            }
+        });
     }
 }

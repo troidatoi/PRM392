@@ -28,6 +28,8 @@ public class CheckoutActivity extends AppCompatActivity {
     private CheckoutAdapter checkoutAdapter;
     private List<CartItem> orderItems;
     private double totalAmount = 0;
+    private String storeId;
+    private String storeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +37,20 @@ public class CheckoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_checkout);
 
         initViews();
+        getStoreInfo();
         loadOrderItems();
         setupRecyclerView();
         calculateTotal();
         setupClickListeners();
+    }
+
+    private void getStoreInfo() {
+        storeId = getIntent().getStringExtra("store_id");
+        storeName = getIntent().getStringExtra("store_name");
+        
+        if (storeName != null) {
+            setTitle("Thanh toán - " + storeName);
+        }
     }
 
     private void initViews() {
@@ -58,33 +70,94 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void loadOrderItems() {
-        // Load cart items from intent or database
-        // For now, using sample data
+        // Load cart items from API for the selected store
         orderItems = new ArrayList<>();
+        
+        if (storeId == null) {
+            Toast.makeText(this, "Không có thông tin cửa hàng", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        com.example.project.models.User user = auth.getCurrentUser();
+        
+        if (user == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
-        orderItems.add(new CartItem(
-            "Xe đạp điện VinFast Klara S",
-            "Xe đạp điện thông minh",
-            "29.990.000 VNĐ",
-            R.drawable.splash_bike_background,
-            1
-        ));
+        api.getCartByUser(auth.getAuthHeader(), user.getId()).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Object data = response.body().getData();
+                    try {
+                        java.util.Map dataMap = (java.util.Map) data;
+                        java.util.List stores = (java.util.List) dataMap.get("itemsByStore");
+                        if (stores != null) {
+                            for (Object s : stores) {
+                                java.util.Map store = (java.util.Map) s;
+                                String currentStoreId = null;
+                                
+                                // Lấy storeId
+                                try {
+                                    Object sidOuter = store.get("storeId");
+                                    if (sidOuter == null) sidOuter = store.get("_id");
+                                    if (sidOuter == null) sidOuter = store.get("id");
+                                    if (sidOuter == null) {
+                                        Object storeObj = store.get("store");
+                                        if (storeObj instanceof java.util.Map) {
+                                            Object sId = ((java.util.Map) storeObj).get("_id");
+                                            if (sId == null) sId = ((java.util.Map) storeObj).get("id");
+                                            if (sId != null) sidOuter = sId;
+                                        }
+                                    }
+                                    if (sidOuter != null) currentStoreId = String.valueOf(sidOuter);
+                                } catch (Exception ignored) {}
+                                
+                                // Chỉ load items của cửa hàng được chọn
+                                if (storeId.equals(currentStoreId)) {
+                                    java.util.List storeItems = (java.util.List) store.get("items");
+                                    if (storeItems != null) {
+                                        for (Object it : storeItems) {
+                                            java.util.Map item = (java.util.Map) it;
+                                            java.util.Map product = (java.util.Map) item.get("product");
+                                            String name = String.valueOf(product.get("name"));
+                                            double price = product.get("price") instanceof Number ? ((Number) product.get("price")).doubleValue() : 0;
+                                            String priceText = formatPrice((long) price) + " VNĐ";
+                                            int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
+                                            CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
+                                            orderItems.add(ci);
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    
+                    checkoutAdapter.notifyDataSetChanged();
+                    calculateTotal();
+                } else {
+                    Toast.makeText(CheckoutActivity.this, "Lỗi tải giỏ hàng", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        orderItems.add(new CartItem(
-            "Xe đạp điện Yadea E3",
-            "Thiết kế thời trang",
-            "19.990.000 VNĐ",
-            R.drawable.splash_bike_background,
-            1
-        ));
-
-        orderItems.add(new CartItem(
-            "Xe đạp điện Pega Cap A",
-            "Tiết kiệm năng lượng",
-            "15.000.000 VNĐ",
-            R.drawable.splash_bike_background,
-            1
-        ));
+            @Override
+            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                Toast.makeText(CheckoutActivity.this, "Lỗi tải giỏ hàng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    
+    private String formatPrice(long price) {
+        NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+        return formatter.format(price);
     }
 
     private void setupRecyclerView() {
