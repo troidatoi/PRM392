@@ -1,12 +1,12 @@
 package com.example.project;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -50,16 +50,14 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         // View detail button click
         holder.btnViewDetail.setOnClickListener(v -> {
-            Intent intent = new Intent(context, OrderDetailActivity.class);
-            intent.putExtra("ORDER_ID", order.getOrderId());
-            context.startActivity(intent);
+            Toast.makeText(context, "Chi tiết đơn hàng #" + order.getOrderId(), Toast.LENGTH_SHORT).show();
+            // TODO: Navigate to order detail activity
         });
 
         // Order item click
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, OrderDetailActivity.class);
-            intent.putExtra("ORDER_ID", order.getOrderId());
-            context.startActivity(intent);
+            Toast.makeText(context, "Xem đơn hàng #" + order.getOrderId(), Toast.LENGTH_SHORT).show();
+            // TODO: Navigate to order detail activity
         });
     }
 
