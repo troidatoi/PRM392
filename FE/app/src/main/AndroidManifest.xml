@@ -133,6 +133,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Order Detail Activity -->
+        <activity
+            android:name=".OrderDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Add Product Activity -->
         <activity
             android:name=".AddProductActivity"
@@ -152,9 +158,9 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
-        <!-- User Detail Activity -->
+        <!-- Order Detail Activity -->
         <activity
-            android:name=".UserDetailActivity"
+            android:name=".OrderDetailActivity_new"
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
