@@ -84,6 +84,38 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             });
         });
 
+        // Hiện nút "Giao hàng" nếu trạng thái là "Đã xác nhận"
+        if (order.getStatus().equalsIgnoreCase("Đã xác nhận") || order.getStatus().equalsIgnoreCase("confirmed")) {
+            holder.btnShipOrder.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnShipOrder.setVisibility(View.GONE);
+        }
+        holder.btnShipOrder.setOnClickListener(v -> {
+            v.setEnabled(false);
+            AuthManager auth = AuthManager.getInstance(context);
+            ApiService api = RetrofitClient.getInstance().getApiService();
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("status", "shipped");
+            api.updateOrderStatus(auth.getAuthHeader(), order.getOrderId(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+                @Override
+                public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                    if (response.isSuccessful() && response.body()!=null && response.body().isSuccess()) {
+                        Toast.makeText(context, "Đã chuyển sang trạng thái Đang giao hàng!", Toast.LENGTH_SHORT).show();
+                        order.setStatus("Đang giao hàng");
+                        notifyItemChanged(position);
+                    } else {
+                        Toast.makeText(context, "Chuyển trạng thái thất bại", Toast.LENGTH_SHORT).show();
+                        v.setEnabled(true);
+                    }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                    Toast.makeText(context, "Lỗi mạng", Toast.LENGTH_SHORT).show();
+                    v.setEnabled(true);
+                }
+            });
+        });
+
         // View detail button click
         holder.btnViewDetail.setOnClickListener(v -> {
             Intent intent = new Intent(context, OrderDetailActivity.class);
@@ -106,7 +138,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     static class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView tvOrderId, tvOrderDate, tvOrderStatus, tvOrderItems, tvOrderTotal;
-        CardView statusBadge, btnViewDetail, btnConfirmOrder;
+        CardView statusBadge, btnViewDetail, btnConfirmOrder, btnShipOrder;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -118,6 +150,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             statusBadge = itemView.findViewById(R.id.statusBadge);
             btnViewDetail = itemView.findViewById(R.id.btnViewDetail);
             btnConfirmOrder = itemView.findViewById(R.id.btnConfirmOrder);
+            btnShipOrder = itemView.findViewById(R.id.btnShipOrder);
         }
     }
 }
