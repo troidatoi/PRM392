@@ -20,7 +20,7 @@ import java.util.Locale;
 public class CheckoutActivity extends AppCompatActivity {
 
     private CardView btnBack, btnConfirmOrder;
-    private EditText etReceiverName, etReceiverPhone, etShippingAddress;
+    private EditText etReceiverName, etReceiverPhone, etShippingAddress, etCity;
     private RadioGroup rgPaymentMethod;
     private RecyclerView rvOrderItems;
     private TextView tvSubtotal, tvShippingFee, tvTotal;
@@ -60,6 +60,7 @@ public class CheckoutActivity extends AppCompatActivity {
         etReceiverName = findViewById(R.id.etReceiverName);
         etReceiverPhone = findViewById(R.id.etReceiverPhone);
         etShippingAddress = findViewById(R.id.etShippingAddress);
+        etCity = findViewById(R.id.etCity);
 
         rgPaymentMethod = findViewById(R.id.rgPaymentMethod);
         rvOrderItems = findViewById(R.id.rvOrderItems);
@@ -173,6 +174,7 @@ public class CheckoutActivity extends AppCompatActivity {
         String receiverName = etReceiverName.getText().toString().trim();
         String receiverPhone = etReceiverPhone.getText().toString().trim();
         String shippingAddress = etShippingAddress.getText().toString().trim();
+        String city = etCity.getText().toString().trim();
 
         if (receiverName.isEmpty()) {
             etReceiverName.setError("Vui lòng nhập tên người nhận");
@@ -198,12 +200,18 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
+        if (city.isEmpty()) {
+            etCity.setError("Vui lòng nhập thành phố");
+            etCity.requestFocus();
+            return;
+        }
+
         // Get selected payment method
         int selectedPaymentId = rgPaymentMethod.getCheckedRadioButtonId();
         String paymentMethod = "vnpay"; // Chỉ dùng VNPay
 
         // Show confirmation dialog
-        showConfirmationDialog(receiverName, receiverPhone, shippingAddress, paymentMethod);
+        showConfirmationDialog(receiverName, receiverPhone, shippingAddress + "\n" + city, paymentMethod);
     }
 
     private void showConfirmationDialog(String name, String phone, String address, String paymentMethod) {
@@ -247,7 +255,7 @@ public class CheckoutActivity extends AppCompatActivity {
         shipping.put("fullName", name);
         shipping.put("phone", phone);
         shipping.put("address", address);
-        shipping.put("city", "");
+        shipping.put("city", etCity.getText().toString().trim());
         body.put("shippingAddress", shipping);
         body.put("paymentMethod", "vnpay");
         body.put("notes", "");
