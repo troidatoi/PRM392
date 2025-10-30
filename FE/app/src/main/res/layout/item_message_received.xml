@@ -20,22 +20,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:cardCornerRadius="18dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="@android:color/transparent">
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#F5F5F5">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/liquid_glass_input"
-                android:padding="12dp">
+                android:padding="12dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
                 <TextView
                     android:id="@+id/tvMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chào bạn! Tôi có thể giúp gì cho bạn?"
-                    android:textSize="14sp"
-                    android:textColor="#000000"
+                    android:textSize="15sp"
+                    android:textColor="#212121"
                     android:lineSpacingExtra="2dp" />
 
             </RelativeLayout>
@@ -47,8 +48,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="10:30"
-            android:textSize="10sp"
-            android:textColor="#999999"
+            android:textSize="11sp"
+            android:textColor="#9E9E9E"
             android:layout_gravity="start"
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp" />
