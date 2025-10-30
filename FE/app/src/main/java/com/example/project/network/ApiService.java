@@ -218,6 +218,21 @@ public interface ApiService {
         @retrofit2.http.Path("orderId") String orderId
     );
     
+    @GET("orders")
+    Call<ApiResponse<Object>> getAllOrders(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("status") String status,
+        @retrofit2.http.Query("page") Integer page,
+        @retrofit2.http.Query("limit") Integer limit
+    );
+    
+    @PUT("orders/{orderId}/status")
+    Call<ApiResponse<Object>> updateOrderStatus(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("orderId") String orderId,
+        @Body java.util.Map<String, Object> body
+    );
+    
     // Change password request model
     class ChangePasswordRequest {
         private String currentPassword;

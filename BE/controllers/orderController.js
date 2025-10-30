@@ -386,11 +386,42 @@ const getOrdersByStore = async (req, res) => {
   }
 };
 
+// Get all orders (admin)
+const getAllOrders = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, status } = req.query;
+    const query = {};
+    if (status) query.orderStatus = status;
+    const skip = (page - 1) * limit;
+    const orders = await Order.find(query)
+      .populate('user', 'username email')
+      .populate('store', 'name')
+      .populate('orderDetails', 'product quantity price totalPrice')
+      .sort({ orderDate: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    const total = await Order.countDocuments(query);
+    res.json({
+      success: true,
+      data: orders,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+  }
+};
+
 module.exports = {
   createOrders,
   getUserOrders,
   getOrderDetails,
   updateOrderStatus,
   cancelOrder,
-  getOrdersByStore
+  getOrdersByStore,
+  getAllOrders
 };

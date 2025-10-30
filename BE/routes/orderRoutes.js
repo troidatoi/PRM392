@@ -8,7 +8,7 @@ const {
   cancelOrder,
   getOrdersByStore
 } = require('../controllers/orderController');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 // Create orders from cart (split by store)
 router.post('/create', protect, createOrders);
@@ -27,5 +27,8 @@ router.post('/:orderId/cancel', protect, cancelOrder);
 
 // Get orders by store
 router.get('/store/:storeId', protect, getOrdersByStore);
+
+// Get all orders (admin only)
+router.get('/', protect, authorize('admin'), require('../controllers/orderController').getAllOrders);
 
 module.exports = router;

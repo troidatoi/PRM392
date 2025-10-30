@@ -101,7 +101,8 @@ public class AdminManagementActivity extends AppCompatActivity {
         }
         if (navOrderManagement != null) {
             navOrderManagement.setOnClickListener(v -> {
-                Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(AdminManagementActivity.this, AdminOrderListActivity.class);
+                startActivity(intent);
             });
         }
         if (navChatManagement != null) {
