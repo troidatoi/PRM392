@@ -212,6 +212,12 @@ public interface ApiService {
         @retrofit2.http.Query("limit") Integer limit
     );
     
+    @GET("orders/{orderId}")
+    Call<ApiResponse<Object>> getOrderDetails(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("orderId") String orderId
+    );
+    
     // Change password request model
     class ChangePasswordRequest {
         private String currentPassword;

@@ -44,6 +44,9 @@ public class HomeActivity extends AppCompatActivity {
     private EditText etSearch;
     private CardView searchCard;
 
+    private static final String COLOR_BROWN = "#7B6047";
+    private static final String COLOR_BE = "#CEB797";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,37 +122,61 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        // Set Home as selected by default
-        selectNavItem(iconHome, tvHome);
+        // Đặt mặc định: TẤT CẢ tab be, chỉ tab hiện tại là nâu đậm
+        iconHome.setColorFilter(Color.parseColor(COLOR_BROWN));
+        tvHome.setTextColor(Color.parseColor(COLOR_BROWN));
+        iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
+        tvProducts.setTextColor(Color.parseColor(COLOR_BE));
+        iconCart.setColorFilter(Color.parseColor(COLOR_BE));
+        tvCart.setTextColor(Color.parseColor(COLOR_BE));
+        iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
+        tvAccount.setTextColor(Color.parseColor(COLOR_BE));
 
         navHome.setOnClickListener(v -> {
-            selectNavItem(iconHome, tvHome);
-            deselectNavItem(iconProducts, tvProducts);
-            deselectNavItem(iconCart, tvCart);
-            deselectNavItem(iconAccount, tvAccount);
+            iconHome.setColorFilter(Color.parseColor(COLOR_BROWN));
+            tvHome.setTextColor(Color.parseColor(COLOR_BROWN));
+            iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
+            tvProducts.setTextColor(Color.parseColor(COLOR_BE));
+            iconCart.setColorFilter(Color.parseColor(COLOR_BE));
+            tvCart.setTextColor(Color.parseColor(COLOR_BE));
+            iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
+            tvAccount.setTextColor(Color.parseColor(COLOR_BE));
+            // Không cần mở lại Home nếu đã ở Home
         });
-
         navProducts.setOnClickListener(v -> {
-            // Open Shop Activity
+            iconHome.setColorFilter(Color.parseColor(COLOR_BE));
+            tvHome.setTextColor(Color.parseColor(COLOR_BE));
+            iconProducts.setColorFilter(Color.parseColor(COLOR_BROWN));
+            tvProducts.setTextColor(Color.parseColor(COLOR_BROWN));
+            iconCart.setColorFilter(Color.parseColor(COLOR_BE));
+            tvCart.setTextColor(Color.parseColor(COLOR_BE));
+            iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
+            tvAccount.setTextColor(Color.parseColor(COLOR_BE));
             Intent intent = new Intent(HomeActivity.this, ShopActivity.class);
             startActivity(intent);
         });
-
         navCart.setOnClickListener(v -> {
-            // Open Cart Activity
+            iconHome.setColorFilter(Color.parseColor(COLOR_BE));
+            tvHome.setTextColor(Color.parseColor(COLOR_BE));
+            iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
+            tvProducts.setTextColor(Color.parseColor(COLOR_BE));
+            iconCart.setColorFilter(Color.parseColor(COLOR_BROWN));
+            tvCart.setTextColor(Color.parseColor(COLOR_BROWN));
+            iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
+            tvAccount.setTextColor(Color.parseColor(COLOR_BE));
             Intent intent = new Intent(HomeActivity.this, CartActivity.class);
             startActivity(intent);
         });
-
         navAccount.setOnClickListener(v -> {
-            // Open Account Activity
+            iconHome.setColorFilter(Color.parseColor(COLOR_BE));
+            tvHome.setTextColor(Color.parseColor(COLOR_BE));
+            iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
+            tvProducts.setTextColor(Color.parseColor(COLOR_BE));
+            iconCart.setColorFilter(Color.parseColor(COLOR_BE));
+            tvCart.setTextColor(Color.parseColor(COLOR_BE));
+            iconAccount.setColorFilter(Color.parseColor(COLOR_BROWN));
+            tvAccount.setTextColor(Color.parseColor(COLOR_BROWN));
             Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
-            startActivity(intent);
-        });
-
-        View navOrders = findViewById(R.id.navOrders);
-        navOrders.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, OrderHistoryActivity.class);
             startActivity(intent);
         });
     }
