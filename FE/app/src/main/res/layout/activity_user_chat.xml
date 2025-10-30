@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="#F5F5F5">
 
     <!-- Header -->
     <androidx.cardview.widget.CardView
@@ -15,24 +15,24 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
+            android:background="#FFFFFF"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:padding="18dp"
             android:gravity="center_vertical">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#F5F5F5"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -40,7 +40,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
+                    android:background="#F5F5F5"
                     android:gravity="center">
 
                     <ImageView
@@ -63,21 +63,21 @@
                 android:gravity="center_vertical">
 
                 <androidx.cardview.widget.CardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    app:cardCornerRadius="22dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#E3F2FD">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_small"
+                        android:background="#E3F2FD"
                         android:gravity="center">
 
                         <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
                             android:src="@drawable/ic_account"
                             app:tint="#2196F3"
                             android:contentDescription="Admin" />
@@ -127,13 +127,13 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="#FFFFFF">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_background"
+            android:background="#FFFFFF"
             android:padding="16dp">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -158,13 +158,13 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:cardCornerRadius="28dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_background"
+            android:background="#FFFFFF"
             android:orientation="horizontal"
             android:padding="12dp"
             android:gravity="center_vertical">
@@ -175,13 +175,13 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="12dp"
                 app:cardCornerRadius="22dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="#F5F5F5"
                     android:padding="14dp">
 
                     <EditText
@@ -206,8 +206,8 @@
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 app:cardCornerRadius="28dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#2196F3"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -215,7 +215,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_button"
+                    android:background="#2196F3"
                     android:gravity="center">
 
                     <ImageView

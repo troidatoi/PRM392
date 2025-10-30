@@ -80,7 +80,7 @@
                             android:layout_height="26dp"
                             android:src="@drawable/ic_account"
                             app:tint="#2196F3"
-                            android:contentDescription="User" />
+                            android:contentDescription="Admin" />
 
                     </RelativeLayout>
 
@@ -93,10 +93,9 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvUserName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nguyễn Văn A"
+                        android:text="Hỗ Trợ Admin"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="#000000" />
@@ -235,3 +234,4 @@
     </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
+
