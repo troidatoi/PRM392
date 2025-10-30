@@ -33,7 +33,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     private TextView tvSubtotal, tvShippingFee, tvTotal;
     private RecyclerView rvOrderItems;
     private View loadingView;
-    private Button btnConfirmOrder, btnShipOrder;
+    private Button btnConfirmOrder, btnShipOrder, btnDelivered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +75,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         }
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
         btnShipOrder = findViewById(R.id.btnShipOrder);
+        btnDelivered = findViewById(R.id.btnDelivered);
     }
 
     private void setupListeners() {
@@ -163,62 +164,19 @@ public class OrderDetailActivity extends AppCompatActivity {
                         updateTimeline(status, val(m, "orderDate"), val(m, "updatedAt"));
                         AuthManager auth = AuthManager.getInstance(OrderDetailActivity.this);
                         boolean isAdmin = auth.getCurrentUser() != null && "admin".equalsIgnoreCase(auth.getCurrentUser().getRole());
-                        if ((status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận")) && isAdmin) {
-                            btnConfirmOrder.setVisibility(View.VISIBLE);
-                            btnConfirmOrder.setOnClickListener(v -> {
-                                btnConfirmOrder.setEnabled(false);
-                                ApiService api = RetrofitClient.getInstance().getApiService();
-                                java.util.Map<String, Object> body = new java.util.HashMap<>();
-                                body.put("status", "confirmed");
-                                api.updateOrderStatus(auth.getAuthHeader(), id, body).enqueue(new retrofit2.Callback<ApiResponse<Object>>() {
-                                    @Override
-                                    public void onResponse(retrofit2.Call<ApiResponse<Object>> call, retrofit2.Response<ApiResponse<Object>> res) {
-                                        if (res.isSuccessful() && res.body() != null && res.body().isSuccess()) {
-                                            android.widget.Toast.makeText(OrderDetailActivity.this, "Đã xác nhận đơn hàng!", android.widget.Toast.LENGTH_SHORT).show();
-                                            btnConfirmOrder.setVisibility(View.GONE);
-                                            loadOrderData(); // refresh lại giao diện
-                                        } else {
-                                            android.widget.Toast.makeText(OrderDetailActivity.this, "Xác nhận thất bại", android.widget.Toast.LENGTH_SHORT).show();
-                                            btnConfirmOrder.setEnabled(true);
-                                        }
-                                    }
-                                    @Override
-                                    public void onFailure(retrofit2.Call<ApiResponse<Object>> call, Throwable t) {
-                                        android.widget.Toast.makeText(OrderDetailActivity.this, "Lỗi kết nối", android.widget.Toast.LENGTH_SHORT).show();
-                                        btnConfirmOrder.setEnabled(true);
-                                    }
-                                });
-                            });
+                        if (isAdmin) {
+                            if ((status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận"))) {
+                                btnConfirmOrder.setVisibility(View.VISIBLE);
+                            } else { btnConfirmOrder.setVisibility(View.GONE); }
+                            if ((status.equalsIgnoreCase("confirmed") || mapStatusText(status).equals("Đã xác nhận"))) {
+                                btnShipOrder.setVisibility(View.VISIBLE);
+                            } else { btnShipOrder.setVisibility(View.GONE); }
+                            btnDelivered.setVisibility(View.GONE);
                         } else {
+                            if ((status.equalsIgnoreCase("shipped") || mapStatusText(status).equals("Đang giao hàng"))) {
+                                btnDelivered.setVisibility(View.VISIBLE);
+                            } else { btnDelivered.setVisibility(View.GONE); }
                             btnConfirmOrder.setVisibility(View.GONE);
-                        }
-                        if ((status.equalsIgnoreCase("confirmed") || mapStatusText(status).equals("Đã xác nhận")) && isAdmin) {
-                            btnShipOrder.setVisibility(View.VISIBLE);
-                            btnShipOrder.setOnClickListener(v -> {
-                                btnShipOrder.setEnabled(false);
-                                ApiService api = RetrofitClient.getInstance().getApiService();
-                                java.util.Map<String, Object> body = new java.util.HashMap<>();
-                                body.put("status", "shipped");
-                                api.updateOrderStatus(auth.getAuthHeader(), id, body).enqueue(new retrofit2.Callback<ApiResponse<Object>>() {
-                                    @Override
-                                    public void onResponse(retrofit2.Call<ApiResponse<Object>> call, retrofit2.Response<ApiResponse<Object>> res) {
-                                        if (res.isSuccessful() && res.body() != null && res.body().isSuccess()) {
-                                            android.widget.Toast.makeText(OrderDetailActivity.this, "Đơn đã chuyển sang Đang giao hàng!", android.widget.Toast.LENGTH_SHORT).show();
-                                            btnShipOrder.setVisibility(View.GONE);
-                                            loadOrderData();
-                                        } else {
-                                            android.widget.Toast.makeText(OrderDetailActivity.this, "Chuyển trạng thái thất bại", android.widget.Toast.LENGTH_SHORT).show();
-                                            btnShipOrder.setEnabled(true);
-                                        }
-                                    }
-                                    @Override
-                                    public void onFailure(retrofit2.Call<ApiResponse<Object>> call, Throwable t) {
-                                        android.widget.Toast.makeText(OrderDetailActivity.this, "Lỗi kết nối", android.widget.Toast.LENGTH_SHORT).show();
-                                        btnShipOrder.setEnabled(true);
-                                    }
-                                });
-                            });
-                        } else {
                             btnShipOrder.setVisibility(View.GONE);
                         }
                     } catch(Exception e) {

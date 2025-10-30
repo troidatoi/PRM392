@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
 import com.example.project.utils.AuthManager;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -84,15 +86,23 @@ public class AdminOrderListActivity extends AppCompatActivity {
                 if(response.isSuccessful() && response.body()!=null && response.body().isSuccess()){
                     if(page==1) orders.clear();
                     List list = (List)response.body().getData();
+                    NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
                     if(list!=null) for(Object o: list){
                         if (!(o instanceof java.util.Map)) continue;
                         java.util.Map m = (java.util.Map) o;
                         String id = m.get("_id")+"";
                         String status = m.get("orderStatus")+"";
                         String date = m.get("orderDate")+"";
-                        String amount = m.get("finalAmount")+"";
                         String summary = "";
-                        orders.add(new Order(id, date, status, summary, amount, Order.mapStatusColor(status)));
+                        String amount = m.get("finalAmount")+"";
+                        long amountNum = 0L;
+                        try {
+                            Object amt = m.get("finalAmount");
+                            if (amt instanceof Number) amountNum = ((Number) amt).longValue();
+                            else if (amt instanceof String) amountNum = (long) Double.parseDouble((String)amt);
+                        } catch(Exception ignored){}
+                        String amountFormatted = fmt.format(amountNum) + " ₫";
+                        orders.add(new Order(id, date, status, summary, amountFormatted, Order.mapStatusColor(status)));
                     }
                     orderAdapter.notifyDataSetChanged();
                     rvOrders.setVisibility(orders.isEmpty()?View.GONE:View.VISIBLE);
