@@ -203,6 +203,15 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
     
+    @GET("orders/user/{userId}")
+    Call<ApiResponse<Object>> getUserOrders(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("userId") String userId,
+        @retrofit2.http.Query("status") String status,
+        @retrofit2.http.Query("page") Integer page,
+        @retrofit2.http.Query("limit") Integer limit
+    );
+    
     // Change password request model
     class ChangePasswordRequest {
         private String currentPassword;

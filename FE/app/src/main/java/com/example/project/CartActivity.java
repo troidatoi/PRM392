@@ -33,9 +33,9 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
     private CardView emptyCartCard, btnCheckout;
 
     // Bottom Navigation
-    private View navHome, navProducts, navCart, navAccount;
-    private ImageView iconHome, iconProducts, iconCart, iconAccount;
-    private TextView tvHome, tvProducts, tvCart, tvAccount;
+    private View navHome, navProducts, navCart, navOrders, navAccount;
+    private ImageView iconHome, iconProducts, iconCart, iconAccount, iconOrders;
+    private TextView tvHome, tvProducts, tvCart, tvOrders, tvAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,17 +69,20 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         navProducts = findViewById(R.id.navProducts);
         navCart = findViewById(R.id.navCart);
         navAccount = findViewById(R.id.navAccount);
+        navOrders = findViewById(R.id.navOrders);
 
 
         iconHome = findViewById(R.id.iconHome);
         iconProducts = findViewById(R.id.iconProducts);
         iconCart = findViewById(R.id.iconCart);
         iconAccount = findViewById(R.id.iconAccount);
+        iconOrders = findViewById(R.id.iconOrders);
 
         tvHome = findViewById(R.id.tvHome);
         tvProducts = findViewById(R.id.tvProducts);
         tvCart = findViewById(R.id.tvCart);
         tvAccount = findViewById(R.id.tvAccount);
+        tvOrders = findViewById(R.id.tvOrders);
 
         btnCheckout.setVisibility(View.VISIBLE);
         btnCheckout.setOnClickListener(v -> {
@@ -286,6 +289,13 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
             // Open Account Activity
             Intent intent = new Intent(CartActivity.this, AccountActivity.class);
             startActivity(intent);
+        });
+
+        navOrders.setOnClickListener(v -> {
+            Intent intent = new Intent(CartActivity.this, OrderHistoryActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         });
     }
 

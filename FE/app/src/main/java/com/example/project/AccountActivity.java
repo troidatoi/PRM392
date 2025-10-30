@@ -17,9 +17,9 @@ public class AccountActivity extends AppCompatActivity {
     private CardView btnEditProfile, btnOrders, btnFavorites, btnSettings, btnLogout;
 
     // Bottom Navigation
-    private View navHome, navProducts, navCart, navAccount;
-    private ImageView iconHome, iconProducts, iconCart, iconAccount;
-    private TextView tvHome, tvProducts, tvCart, tvAccountNav;
+    private View navHome, navProducts, navCart, navOrders, navAccount;
+    private ImageView iconHome, iconProducts, iconCart, iconOrders, iconAccount;
+    private TextView tvHome, tvProducts, tvCart, tvOrders, tvAccountNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +50,20 @@ public class AccountActivity extends AppCompatActivity {
         navHome = findViewById(R.id.navHome);
         navProducts = findViewById(R.id.navProducts);
         navCart = findViewById(R.id.navCart);
+        navOrders = findViewById(R.id.navOrders);
         navAccount = findViewById(R.id.navAccount);
 
 
         iconHome = findViewById(R.id.iconHome);
         iconProducts = findViewById(R.id.iconProducts);
         iconCart = findViewById(R.id.iconCart);
+        iconOrders = findViewById(R.id.iconOrders);
         iconAccount = findViewById(R.id.iconAccount);
 
         tvHome = findViewById(R.id.tvHome);
         tvProducts = findViewById(R.id.tvProducts);
         tvCart = findViewById(R.id.tvCart);
+        tvOrders = findViewById(R.id.tvOrders);
         tvAccountNav = findViewById(R.id.tvAccount);
     }
 
@@ -94,6 +97,13 @@ public class AccountActivity extends AppCompatActivity {
             deselectNavItem(iconHome, tvHome);
             deselectNavItem(iconProducts, tvProducts);
             deselectNavItem(iconCart, tvCart);
+        });
+
+        navOrders.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, OrderHistoryActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         });
     }
 

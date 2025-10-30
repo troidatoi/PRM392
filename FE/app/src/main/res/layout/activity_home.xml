@@ -311,6 +311,36 @@
 
             </LinearLayout>
 
+            <!-- Orders Tab -->
+            <LinearLayout
+                android:id="@+id/navOrders"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <ImageView
+                    android:id="@+id/iconOrders"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_cart"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Orders" />
+
+                <TextView
+                    android:id="@+id/tvOrders"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đơn hàng"
+                    android:textSize="11sp"
+                    android:textColor="#1A1A1A" />
+
+            </LinearLayout>
+
             <!-- Account Tab -->
             <LinearLayout
                 android:id="@+id/navAccount"

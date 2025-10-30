@@ -146,6 +146,12 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
             startActivity(intent);
         });
+
+        View navOrders = findViewById(R.id.navOrders);
+        navOrders.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, OrderHistoryActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void selectNavItem(ImageView icon, TextView text) {
