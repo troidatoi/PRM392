@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="@android:color/transparent"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -14,22 +14,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/liquid_glass_input"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="12dp"
         android:gravity="center_vertical">
 
         <androidx.cardview.widget.CardView
             android:layout_width="50dp"
             android:layout_height="50dp"
             app:cardCornerRadius="25dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="@android:color/transparent">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#E3F2FD">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/liquid_glass_small"
                 android:gravity="center">
 
                 <ImageView
@@ -64,15 +62,15 @@
                     android:text="Nguyễn Văn A"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#000000" />
+                    android:textColor="#212121" />
 
                 <TextView
                     android:id="@+id/tvMessageTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="10:30"
-                    android:textSize="11sp"
-                    android:textColor="#999999" />
+                    android:textSize="12sp"
+                    android:textColor="#9E9E9E" />
 
             </LinearLayout>
 
@@ -89,8 +87,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Xin chào, tôi cần hỗ trợ..."
-                    android:textSize="13sp"
-                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    android:textColor="#757575"
                     android:maxLines="1"
                     android:ellipsize="end" />
 
@@ -100,7 +98,7 @@
                     android:layout_height="22dp"
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="11dp"
-                    app:cardElevation="2dp"
+                    app:cardElevation="0dp"
                     app:cardBackgroundColor="#FF5722"
                     android:visibility="visible">
 
