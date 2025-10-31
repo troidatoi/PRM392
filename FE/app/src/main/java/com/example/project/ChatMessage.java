@@ -20,9 +20,7 @@ public class ChatMessage {
     private String messageType;
     
     @SerializedName("sentAt")
-    private String sentAtString; // Receive as String from API
-    
-    private transient long sentAt; // Parsed timestamp
+    private long sentAt; // Receive as timestamp (long) from API
     
     @SerializedName("isRead")
     private boolean isRead;
@@ -196,9 +194,7 @@ public class ChatMessage {
     }
 
     public long getTimestamp() {
-        if (sentAt == 0 && sentAtString != null) {
-            sentAt = parseISODateToTimestamp(sentAtString);
-        }
+        // Return sentAt if available, otherwise fallback to timestamp
         return sentAt != 0 ? sentAt : timestamp;
     }
 
@@ -208,44 +204,12 @@ public class ChatMessage {
     }
 
     public long getSentAt() {
-        if (sentAt == 0 && sentAtString != null) {
-            sentAt = parseISODateToTimestamp(sentAtString);
-        }
         return sentAt;
     }
 
     public void setSentAt(long sentAt) {
         this.sentAt = sentAt;
         this.timestamp = sentAt;
-    }
-    
-    public void setSentAt(String sentAtString) {
-        this.sentAtString = sentAtString;
-        this.sentAt = parseISODateToTimestamp(sentAtString);
-        this.timestamp = this.sentAt;
-    }
-    
-    // Helper method to parse ISO 8601 date string to timestamp
-    private long parseISODateToTimestamp(String isoDate) {
-        if (isoDate == null || isoDate.isEmpty()) {
-            return 0;
-        }
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            return sdf.parse(isoDate).getTime();
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Try without milliseconds
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-                return sdf.parse(isoDate).getTime();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                return System.currentTimeMillis(); // Fallback to current time
-            }
-        }
     }
 
     public boolean isRead() {

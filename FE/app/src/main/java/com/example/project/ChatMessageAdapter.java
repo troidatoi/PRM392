@@ -61,14 +61,17 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         String time;
         try {
             long timestamp = message.getTimestamp();
+            android.util.Log.d("ChatMessageAdapter", "Message: " + message.getMessage() + ", Timestamp: " + timestamp);
             if (timestamp > 0) {
                 time = sdf.format(new Date(timestamp));
+                android.util.Log.d("ChatMessageAdapter", "Formatted time: " + time);
             } else {
                 time = "N/A";
+                android.util.Log.w("ChatMessageAdapter", "Timestamp is 0 or negative");
             }
         } catch (Exception e) {
             time = "N/A";
-            e.printStackTrace();
+            android.util.Log.e("ChatMessageAdapter", "Error formatting timestamp", e);
         }
 
         if (holder instanceof SentMessageViewHolder) {

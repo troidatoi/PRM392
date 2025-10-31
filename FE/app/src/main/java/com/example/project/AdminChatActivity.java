@@ -166,6 +166,8 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
                                 Log.d(TAG, "---");
                                 Log.d(TAG, "Message: " + msg.getMessage());
                                 Log.d(TAG, "Message sender ID: " + messageSenderId);
+                                Log.d(TAG, "Message timestamp: " + msg.getTimestamp());
+                                Log.d(TAG, "Message sentAt: " + msg.getSentAt());
                                 
                                 // For admin view:
                                 // isFromUser = true if message is FROM customer (userId)
@@ -336,13 +338,21 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
             String message = data.getString("message");
             String messageType = data.optString("messageType", "text");
             
-            // Parse sentAt - handle both timestamp and ISO string
+            // Parse sentAt - should be a number (timestamp) from backend
             long sentAt;
-            if (data.get("sentAt") instanceof Long) {
+            try {
                 sentAt = data.getLong("sentAt");
-            } else {
-                String sentAtStr = data.getString("sentAt");
-                sentAt = parseISODate(sentAtStr);
+                Log.d(TAG, "Received timestamp: " + sentAt);
+            } catch (Exception e) {
+                // Fallback: try parsing as string
+                Log.w(TAG, "sentAt is not a number, trying to parse as string");
+                String sentAtStr = data.optString("sentAt");
+                if (sentAtStr != null && !sentAtStr.isEmpty()) {
+                    sentAt = parseISODate(sentAtStr);
+                } else {
+                    sentAt = System.currentTimeMillis();
+                    Log.w(TAG, "No sentAt found, using current time");
+                }
             }
             
             JSONObject userObj = data.getJSONObject("user");
@@ -358,8 +368,10 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
             }
             
             Log.d(TAG, "Real-time message received:");
+            Log.d(TAG, "  Message: " + message);
             Log.d(TAG, "  Sender: " + senderId);
             Log.d(TAG, "  Customer: " + userId);
+            Log.d(TAG, "  Timestamp: " + sentAt);
             Log.d(TAG, "  isFromUser (customer): " + isFromUser);
             
             ChatMessage chatMessage = new ChatMessage(
