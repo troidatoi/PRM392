@@ -110,10 +110,19 @@ exports.getConversations = async (req, res, next) => {
       console.log('First conversation:', JSON.stringify(conversations[0], null, 2));
     }
 
+    // Convert sentAt to timestamp in lastMessage
+    const formattedConversations = conversations.map(conv => ({
+      ...conv,
+      lastMessage: {
+        ...conv.lastMessage,
+        sentAt: conv.lastMessage.sentAt ? new Date(conv.lastMessage.sentAt).getTime() : Date.now()
+      }
+    }));
+
     res.status(200).json({
       success: true,
-      count: conversations.length,
-      data: conversations
+      count: formattedConversations.length,
+      data: formattedConversations
     });
   } catch (error) {
     next(error);
