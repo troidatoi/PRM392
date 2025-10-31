@@ -68,6 +68,7 @@ const setupChatSocket = (io) => {
         // Tạo message mới trong database
         const newMessage = await ChatMessage.create({
           user: socket.userId,
+          roomId: roomId, // Lưu roomId để có thể query sau
           message,
           messageType,
           attachments,

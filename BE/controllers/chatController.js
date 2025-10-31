@@ -9,8 +9,11 @@ exports.getChatHistory = async (req, res, next) => {
     const { userId } = req.params;
     const { limit = 50, before } = req.query;
 
+    // Tạo roomId theo format: "admin_userId"
+    const roomId = `admin_${userId}`;
+    
     const query = {
-      user: userId,
+      roomId: roomId, // Lấy tất cả tin nhắn trong room này
       isDeleted: false
     };
     
@@ -22,6 +25,8 @@ exports.getChatHistory = async (req, res, next) => {
       .populate('user', 'username email avatar')
       .sort({ sentAt: 1 }) // Ascending order (oldest first)
       .limit(parseInt(limit));
+
+    console.log(`Found ${messages.length} messages in room ${roomId}`);
 
     // Convert sentAt to timestamp for consistency with Socket.IO
     const formattedMessages = messages.map(msg => ({

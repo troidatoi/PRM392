@@ -150,35 +150,39 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
                             messages.clear();
                             
                             // Get current admin ID from AuthManager
-                            String currentUserId = null;
+                            String currentAdminId = null;
                             if (authManager.getCurrentUser() != null) {
-                                currentUserId = authManager.getCurrentUser().getId();
+                                currentAdminId = authManager.getCurrentUser().getId();
                             }
                             
-                            Log.d(TAG, "=== Setting up messages ===");
-                            Log.d(TAG, "Current Admin ID: " + currentUserId);
-                            Log.d(TAG, "Customer ID (userId): " + userId);
+                            Log.d(TAG, "=== Loading messages for Admin ===");
+                            Log.d(TAG, "Current Admin ID: " + currentAdminId);
+                            Log.d(TAG, "Customer ID: " + userId);
 
                             for (ChatMessage msg : messagesArray) {
-                                // Set isFromUser based on sender
-                                // For admin view: isFromUser should be true if message is FROM the customer (user)
-                                // false if message is from admin (self)
-                                String senderId = msg.getSenderId();
+                                // Get sender ID from the User object in the message
+                                String messageSenderId = msg.getSenderId();
                                 
+                                Log.d(TAG, "---");
                                 Log.d(TAG, "Message: " + msg.getMessage());
-                                Log.d(TAG, "  SenderId: " + senderId);
+                                Log.d(TAG, "Message sender ID: " + messageSenderId);
                                 
-                                if (currentUserId != null && senderId != null) {
-                                    // If sender is customer (not admin), isFromUser = true
-                                    boolean isFromUser = !senderId.equals(currentUserId);
-                                    msg.setFromUser(isFromUser);
-                                    Log.d(TAG, "  senderId.equals(currentUserId): " + senderId.equals(currentUserId));
-                                    Log.d(TAG, "  isFromUser set to: " + isFromUser);
+                                // For admin view:
+                                // isFromUser = true if message is FROM customer (userId)
+                                // isFromUser = false if message is FROM admin (currentAdminId)
+                                boolean isFromUser;
+                                if (messageSenderId != null && userId != null) {
+                                    // Check if sender is the customer we're chatting with
+                                    isFromUser = messageSenderId.equals(userId);
+                                    Log.d(TAG, "Sender is customer: " + isFromUser);
                                 } else {
-                                    // Default: if we can't determine, treat as from user
-                                    msg.setFromUser(true);
-                                    Log.d(TAG, "  isFromUser set to true (default)");
+                                    // If we can't determine, assume it's from customer
+                                    isFromUser = true;
+                                    Log.d(TAG, "Could not determine sender, treating as customer message");
                                 }
+                                
+                                msg.setFromUser(isFromUser);
+                                Log.d(TAG, "Final isFromUser: " + isFromUser);
                                 messages.add(msg);
                             }
                             
@@ -240,8 +244,13 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
     
     private void setupSocketConnection() {
         socketManager = SocketManager.getInstance(this);
+        // Add listener for this activity
         socketManager.addListener(this);
-        socketManager.connect();
+        
+        // Connect if not already connected
+        if (!socketManager.isConnected()) {
+            socketManager.connect();
+        }
         
         // Wait a bit for connection then join room
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -340,17 +349,18 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
             String senderId = userObj.getString("_id");
             String senderName = userObj.getString("username");
             
-            // Get current admin ID to determine message direction
-            String currentUserId = null;
-            if (authManager.getCurrentUser() != null) {
-                currentUserId = authManager.getCurrentUser().getId();
+            // For admin view: 
+            // isFromUser = true if message is FROM customer (userId)
+            // isFromUser = false if message is FROM admin (different from customer)
+            boolean isFromUser = false; // Default to false (from admin)
+            if (userId != null && senderId != null && senderId.equals(userId)) {
+                isFromUser = true; // Message from customer
             }
             
-            // For admin view: isFromUser should be true if message is FROM customer (not admin)
-            boolean isFromUser = true; // Default to true (from customer)
-            if (currentUserId != null && senderId.equals(currentUserId)) {
-                isFromUser = false; // Message from admin (self)
-            }
+            Log.d(TAG, "Real-time message received:");
+            Log.d(TAG, "  Sender: " + senderId);
+            Log.d(TAG, "  Customer: " + userId);
+            Log.d(TAG, "  isFromUser (customer): " + isFromUser);
             
             ChatMessage chatMessage = new ChatMessage(
                 messageId,
@@ -413,6 +423,34 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
         } catch (Exception e) {
             Log.e(TAG, "Error parsing ISO date: " + isoDate, e);
             return System.currentTimeMillis();
+        }
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Re-add listener when returning to this activity
+        if (socketManager != null) {
+            socketManager.addListener(this);
+            if (socketManager.isConnected()) {
+                socketManager.joinRoom(roomId);
+            }
+        }
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Remove listener when activity goes to background
+        if (socketManager != null) {
+            socketManager.removeListener(this);
+            if (isTyping) {
+                socketManager.stopTyping(roomId);
+                isTyping = false;
+            }
+        }
+        if (typingHandler != null && typingTimeout != null) {
+            typingHandler.removeCallbacks(typingTimeout);
         }
     }
     
