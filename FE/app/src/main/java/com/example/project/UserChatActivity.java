@@ -138,25 +138,33 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
                         if (messagesArray != null && messagesArray.length > 0) {
                             messages.clear();
                             
-                            Log.d(TAG, "Current userId: " + userId);
+                            Log.d(TAG, "=== Loading messages for Customer ===");
+                            Log.d(TAG, "Current Customer userId: " + userId);
 
                             for (ChatMessage msg : messagesArray) {
-                                // Set isFromUser based on sender
-                                // Null-safe comparison
-                                String senderId = msg.getSenderId();
+                                // Get sender ID from the User object in the message
+                                String messageSenderId = msg.getSenderId();
+                                
+                                Log.d(TAG, "---");
+                                Log.d(TAG, "Message: " + msg.getMessage());
+                                Log.d(TAG, "Message sender ID: " + messageSenderId);
+                                Log.d(TAG, "Current user ID: " + userId);
 
-                                Log.d(TAG, "Message senderId: " + senderId + ", userId: " + userId);
-                                Log.d(TAG, "Message content: " + msg.getMessage());
-
-                                if (senderId != null && userId != null) {
-                                    boolean isFromUser = senderId.equals(userId);
-                                    msg.setFromUser(isFromUser);
-                                    Log.d(TAG, "isFromUser set to: " + isFromUser);
+                                // For customer view:
+                                // isFromUser = true if the message sender is the current customer
+                                // isFromUser = false if the message sender is admin (different from customer)
+                                boolean isFromUser;
+                                if (messageSenderId != null && userId != null) {
+                                    isFromUser = messageSenderId.equals(userId);
+                                    Log.d(TAG, "Sender equals current user: " + isFromUser);
                                 } else {
-                                    // Default: if we can't determine, treat as not from user
-                                    msg.setFromUser(false);
-                                    Log.d(TAG, "isFromUser set to false (senderId or userId is null)");
+                                    // If we can't determine, assume it's from admin
+                                    isFromUser = false;
+                                    Log.d(TAG, "Could not determine sender, treating as admin message");
                                 }
+                                
+                                msg.setFromUser(isFromUser);
+                                Log.d(TAG, "Final isFromUser: " + isFromUser);
                                 messages.add(msg);
                             }
                             
@@ -217,8 +225,13 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
     
     private void setupSocketConnection() {
         socketManager = SocketManager.getInstance(this);
+        // Add listener for this activity
         socketManager.addListener(this);
-        socketManager.connect();
+        
+        // Connect if not already connected
+        if (!socketManager.isConnected()) {
+            socketManager.connect();
+        }
         
         // Wait a bit for connection then join room
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -317,8 +330,18 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
             String senderId = userObj.getString("_id");
             String senderName = userObj.getString("username");
             
-            // Null-safe comparison for isFromUser
-            boolean isFromCurrentUser = (senderId != null && userId != null && senderId.equals(userId));
+            // For customer view:
+            // isFromUser = true if message is FROM current customer (userId)
+            // isFromUser = false if message is FROM admin (different from customer)
+            boolean isFromCurrentUser = false; // Default to false (from admin)
+            if (senderId != null && userId != null && senderId.equals(userId)) {
+                isFromCurrentUser = true; // Message from current customer
+            }
+            
+            Log.d(TAG, "Real-time message received:");
+            Log.d(TAG, "  Sender: " + senderId);
+            Log.d(TAG, "  Current User: " + userId);
+            Log.d(TAG, "  isFromCurrentUser: " + isFromCurrentUser);
 
             ChatMessage chatMessage = new ChatMessage(
                 messageId,
@@ -389,6 +412,34 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
         } catch (Exception e) {
             Log.e(TAG, "Error parsing ISO date: " + isoDate, e);
             return System.currentTimeMillis();
+        }
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Re-add listener when returning to this activity
+        if (socketManager != null) {
+            socketManager.addListener(this);
+            if (socketManager.isConnected()) {
+                socketManager.joinRoom(roomId);
+            }
+        }
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Remove listener when activity goes to background
+        if (socketManager != null) {
+            socketManager.removeListener(this);
+            if (isTyping) {
+                socketManager.stopTyping(roomId);
+                isTyping = false;
+            }
+        }
+        if (typingHandler != null && typingTimeout != null) {
+            typingHandler.removeCallbacks(typingTimeout);
         }
     }
     

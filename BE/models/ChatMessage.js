@@ -6,6 +6,11 @@ const chatMessageSchema = new mongoose.Schema({
     ref: 'User',
     required: [true, 'User là bắt buộc']
   },
+  roomId: {
+    type: String,
+    trim: true,
+    index: true // Thêm index để query nhanh hơn
+  },
   message: {
     type: String,
     required: [true, 'Tin nhắn là bắt buộc'],
