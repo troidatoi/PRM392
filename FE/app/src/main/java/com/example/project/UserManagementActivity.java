@@ -180,6 +180,21 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void onUserClick(User user) {
+        // Guard: require admin/staff and valid token before navigating
+        if (authManager == null) authManager = AuthManager.getInstance(this);
+        if (!authManager.isStaff()) {
+            Toast.makeText(this, "Bạn không có quyền xem chi tiết người dùng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String header = authManager.getAuthHeader();
+        if (header == null) {
+            Toast.makeText(this, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (user == null || user.getId() == null) {
+            Toast.makeText(this, "Không xác định được người dùng", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = new Intent(this, UserDetailActivity.class);
         intent.putExtra("userId", user.getId());
         startActivity(intent);

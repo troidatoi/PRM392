@@ -37,11 +37,59 @@ public class CheckoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_checkout);
 
         initViews();
+        prefillFromProfile();
         getStoreInfo();
         loadOrderItems();
         setupRecyclerView();
         calculateTotal();
         setupClickListeners();
+    }
+
+    private void prefillFromProfile() {
+        try {
+            com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+            com.example.project.models.User user = auth.getCurrentUser();
+            if (user == null) return;
+
+            // Name
+            String name = null;
+            if (user.getProfile() != null) {
+                String fn = user.getProfile().getFirstName();
+                String ln = user.getProfile().getLastName();
+                if (fn != null || ln != null) {
+                    name = ((fn==null?"":fn) + " " + (ln==null?"":ln)).trim();
+                }
+            }
+            if ((name == null || name.isEmpty()) && user.getUsername() != null) {
+                name = user.getUsername();
+            }
+            if (name != null && name.length() > 0 && etReceiverName.getText().toString().trim().isEmpty()) {
+                etReceiverName.setText(name);
+            }
+
+            // Phone
+            if (user.getPhoneNumber() != null && !user.getPhoneNumber().isEmpty() && etReceiverPhone.getText().toString().trim().isEmpty()) {
+                etReceiverPhone.setText(user.getPhoneNumber());
+            }
+
+            // Address and City (best-effort split by last comma)
+            if (user.getAddress() != null && !user.getAddress().isEmpty()) {
+                String addr = user.getAddress();
+                if (etShippingAddress.getText().toString().trim().isEmpty()) {
+                    String main = addr;
+                    String city = null;
+                    int lastComma = addr.lastIndexOf(',');
+                    if (lastComma > 0) {
+                        main = addr.substring(0, lastComma).trim();
+                        city = addr.substring(lastComma + 1).trim();
+                    }
+                    etShippingAddress.setText(main);
+                    if (city != null && etCity.getText().toString().trim().isEmpty()) {
+                        etCity.setText(city);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     private void getStoreInfo() {

@@ -114,11 +114,16 @@ public class OrderDetailActivity extends AppCompatActivity {
                         if (!(d instanceof java.util.Map)) return;
                         java.util.Map m = (java.util.Map) d;
                         String id = val(m,"_id");
+                        String orderNumber = val(m, "orderNumber");
                         String date = formatDate(val(m, "orderDate"));
                         String status = val(m,"orderStatus");
                         String payment = val(m, "paymentMethod");
                         String note = val(m, "notes");
-                        tvOrderId.setText("#"+id.substring(Math.max(0, id.length()-6)));
+                        String displayNumber = orderNumber;
+                        if (displayNumber == null || displayNumber.isEmpty()) {
+                            displayNumber = id != null && id.length() > 6 ? id.substring(id.length()-6) : id;
+                        }
+                        tvOrderId.setText("#" + displayNumber);
                         tvOrderDate.setText(date);
                         tvOrderStatus.setText(mapStatusText(status));
                         tvOrderStatus.setTextColor(android.graphics.Color.parseColor(mapStatusColor(status)));

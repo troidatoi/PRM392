@@ -2,14 +2,16 @@ package com.example.project;
 
 public class Order {
     private String orderId;
+    private String orderNumber;
     private String orderDate;
     private String status;
     private String items;
     private String totalAmount;
     private String statusColor;
 
-    public Order(String orderId, String orderDate, String status, String items, String totalAmount, String statusColor) {
+    public Order(String orderId, String orderNumber, String orderDate, String status, String items, String totalAmount, String statusColor) {
         this.orderId = orderId;
+        this.orderNumber = orderNumber;
         this.orderDate = orderDate;
         this.status = status;
         this.items = items;
@@ -23,6 +25,14 @@ public class Order {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
     public String getOrderDate() {

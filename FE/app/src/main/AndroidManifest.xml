@@ -158,6 +158,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- User Detail Activity -->
+        <activity
+            android:name=".UserDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Order Detail Activity -->
         <activity
             android:name=".OrderDetailActivity_new"

@@ -42,7 +42,13 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         AuthManager auth = AuthManager.getInstance(context);
         boolean isAdmin = auth.getCurrentUser() != null && "admin".equalsIgnoreCase(auth.getCurrentUser().getRole());
 
-        holder.tvOrderId.setText("Đơn hàng #" + order.getOrderId());
+        String displayNumber = order.getOrderNumber();
+        if (displayNumber == null || displayNumber.isEmpty()) {
+            String id = order.getOrderId();
+            if (id != null && id.length() > 6) displayNumber = id.substring(id.length() - 6);
+            else displayNumber = id;
+        }
+        holder.tvOrderId.setText("Đơn hàng #" + displayNumber);
         holder.tvOrderDate.setText(order.getOrderDate());
         holder.tvOrderStatus.setText(order.getStatus());
         holder.tvOrderItems.setText(order.getItems());

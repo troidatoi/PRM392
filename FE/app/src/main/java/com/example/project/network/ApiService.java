@@ -50,7 +50,7 @@ public interface ApiService {
     Call<ApiResponse<User>> getUser(@Header("Authorization") String token, @retrofit2.http.Path("id") String userId);
     
     @PUT("users/{id}")
-    Call<ApiResponse<User>> updateUser(@Header("Authorization") String token, @retrofit2.http.Path("id") String userId, @Body User user);
+    Call<ApiResponse<User>> updateUser(@Header("Authorization") String token, @retrofit2.http.Path("id") String userId, @Body java.util.Map<String, Object> body);
     
     @retrofit2.http.DELETE("users/{id}")
     Call<ApiResponse<Void>> deleteUser(@Header("Authorization") String token, @retrofit2.http.Path("id") String userId);
