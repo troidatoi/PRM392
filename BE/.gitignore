@@ -44,6 +44,13 @@ ehthumbs.db
 Thumbs.db
 
 # IDE files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+[Bb]in/
+[Oo]bj/
 .vscode/
 .idea/
 *.swp
