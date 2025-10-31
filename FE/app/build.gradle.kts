@@ -46,6 +46,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     
+    // Socket.IO client for real-time chat
+    implementation("io.socket:socket.io-client:2.1.0")
+    
     // Image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
     

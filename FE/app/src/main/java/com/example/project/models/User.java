@@ -3,7 +3,7 @@ package com.example.project.models;
 import com.google.gson.annotations.SerializedName;
 
 public class User {
-    @SerializedName("id")
+    @SerializedName(value = "_id", alternate = {"id"})
     private String id;
     
     @SerializedName("username")

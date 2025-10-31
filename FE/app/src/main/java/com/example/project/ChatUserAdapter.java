@@ -1,5 +1,6 @@
 package com.example.project;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.Locale;
 
 public class ChatUserAdapter extends RecyclerView.Adapter<ChatUserAdapter.ViewHolder> {
 
+    private static final String TAG = "ChatUserAdapter";
     private List<ChatUser> chatUsers;
     private OnChatUserClickListener listener;
 
@@ -26,11 +28,13 @@ public class ChatUserAdapter extends RecyclerView.Adapter<ChatUserAdapter.ViewHo
     public ChatUserAdapter(List<ChatUser> chatUsers, OnChatUserClickListener listener) {
         this.chatUsers = chatUsers;
         this.listener = listener;
+        Log.d(TAG, "ChatUserAdapter created with " + chatUsers.size() + " users");
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder called");
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_chat_user, parent, false);
         return new ViewHolder(view);
@@ -39,6 +43,7 @@ public class ChatUserAdapter extends RecyclerView.Adapter<ChatUserAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ChatUser chatUser = chatUsers.get(position);
+        Log.d(TAG, "onBindViewHolder position " + position + ": " + chatUser.getUserName());
 
         holder.tvUserName.setText(chatUser.getUserName());
         holder.tvLastMessage.setText(chatUser.getLastMessage());
@@ -65,7 +70,9 @@ public class ChatUserAdapter extends RecyclerView.Adapter<ChatUserAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return chatUsers.size();
+        int count = chatUsers.size();
+        Log.d(TAG, "getItemCount: " + count);
+        return count;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -1,9 +1,12 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const setupChatSocket = require('./socket/chatSocket');
 
 // Load env vars
 dotenv.config();
@@ -12,6 +15,25 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
+
+// Setup Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production' 
+      ? ['https://yourdomain.com'] 
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.2:5001'],
+    credentials: true,
+    methods: ['GET', 'POST']
+  },
+  transports: ['websocket', 'polling']
+});
+
+// Setup chat socket handlers
+setupChatSocket(io);
+
+// Make io accessible to routes
+app.set('io', io);
 
 // Passport config
 app.use(passport.initialize());
@@ -40,6 +62,7 @@ app.use('/api/stores', require('./routes/storeRoutes')); // Store routes
 app.use('/api/cart', require('./routes/cartRoutes')); // Cart routes
 app.use('/api/orders', require('./routes/orderRoutes')); // Order routes
 app.use('/api/inventory', require('./routes/inventoryRoutes')); // Inventory routes
+app.use('/api/chat', require('./routes/chatRoutes')); // Chat routes
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -67,10 +90,11 @@ app.use('*', (req, res) => {
 // Error handler
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`WebSocket server is ready`);
 });
 
 // Handle unhandled promise rejections
