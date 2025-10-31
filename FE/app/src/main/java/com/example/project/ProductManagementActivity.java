@@ -99,7 +99,7 @@ public class ProductManagementActivity extends AppCompatActivity {
             public void onProductClick(Bike product) {
                 // Open product detail
                 Intent intent = new Intent(ProductManagementActivity.this, BikeDetailActivity.class);
-                intent.putExtra("bikeId", product.getId());
+                intent.putExtra("bike_id", product.getId());
                 startActivity(intent);
             }
 
@@ -107,7 +107,7 @@ public class ProductManagementActivity extends AppCompatActivity {
             public void onProductEdit(Bike product) {
                 // Open edit product
                 Intent intent = new Intent(ProductManagementActivity.this, UpdateBikeActivity.class);
-                intent.putExtra("bikeId", product.getId());
+                intent.putExtra("bike_id", product.getId());
                 startActivity(intent);
             }
 

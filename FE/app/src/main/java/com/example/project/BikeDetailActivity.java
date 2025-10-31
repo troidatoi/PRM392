@@ -36,11 +36,11 @@ import retrofit2.Response;
 public class BikeDetailActivity extends AppCompatActivity {
 
     // Views
-    private CardView btnBack, btnEdit, btnDelete, btnAddToCart;
+    private CardView btnBack, btnEdit, btnDelete;
     private ImageView ivMainImage;
     private RecyclerView rvImageGallery;
     private TextView tvBikeName, tvBikeBrand, tvBikeModel, tvBikePrice, tvOriginalPrice;
-    private TextView tvBikeDescription, tvBikeCategory, tvBikeStatus, tvBikeStock;
+    private TextView tvBikeDescription, tvBikeCategory, tvBikeStatus;
     private TextView tvBikeWarranty, tvBikeRating, tvBikeFeatures;
     private LinearLayout llSpecifications, llErrorState;
     private ProgressBar progressBar;
@@ -53,6 +53,7 @@ public class BikeDetailActivity extends AppCompatActivity {
     private ApiService apiService;
     private AuthManager authManager;
     
+    // Removed add-to-cart flow for admin detail screen
     private void openSelectStoreQtyDialog() {
         if (bike == null) { Toast.makeText(this, "Không có dữ liệu sản phẩm", Toast.LENGTH_SHORT).show(); return; }
         if (!authManager.isLoggedIn()) { Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show(); return; }
@@ -204,14 +205,14 @@ public class BikeDetailActivity extends AppCompatActivity {
         tvBikeDescription = findViewById(R.id.tvBikeDescription);
         tvBikeCategory = findViewById(R.id.tvBikeCategory);
         tvBikeStatus = findViewById(R.id.tvBikeStatus);
-        tvBikeStock = findViewById(R.id.tvBikeStock);
+        // Stock label removed from layout
         tvBikeWarranty = findViewById(R.id.tvBikeWarranty);
         tvBikeRating = findViewById(R.id.tvBikeRating);
         tvBikeFeatures = findViewById(R.id.tvBikeFeatures);
         llSpecifications = findViewById(R.id.llSpecifications);
         llErrorState = findViewById(R.id.llErrorState);
         progressBar = findViewById(R.id.progressBar);
-        btnAddToCart = findViewById(R.id.btnAddToCart);
+        // Add to cart button removed from layout
     }
 
     private void initData() {
@@ -249,7 +250,7 @@ public class BikeDetailActivity extends AppCompatActivity {
             }
         });
 
-        btnAddToCart.setOnClickListener(v -> openSelectStoreQtyDialog());
+        // No add-to-cart action on admin bike detail
     }
 
     private void onImageClick(int position) {
@@ -303,7 +304,7 @@ public class BikeDetailActivity extends AppCompatActivity {
         tvBikeDescription.setText(bike.getDescription());
         tvBikeCategory.setText(getCategoryDisplayName(bike.getCategory()));
         tvBikeStatus.setText(bike.getStatus());
-        tvBikeStock.setText("Kho: " + bike.getStock());
+        // Stock row removed
         tvBikeWarranty.setText(bike.getWarranty() != null ? bike.getWarranty() : "12 tháng");
 
         // Format and set price

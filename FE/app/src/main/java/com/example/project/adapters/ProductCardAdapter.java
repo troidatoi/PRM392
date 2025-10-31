@@ -9,6 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.project.R;
 import com.example.project.models.Bike;
 
@@ -77,20 +81,53 @@ public class ProductCardAdapter extends RecyclerView.Adapter<ProductCardAdapter.
         }
 
         public void bind(Bike product) {
-            // Set product name
-            tvProductName.setText(product.getName());
+            // Name
+            tvProductName.setText(product.getName() != null ? product.getName() : "");
 
-            // Set product ID (using a mock ID for now)
-            tvProductId.setText("#" + product.getId());
+            // Secondary line: brand • model (fallback to id)
+            String brand = safe(product.getBrand());
+            String model = safe(product.getModel());
+            String secondary = (brand.isEmpty() && model.isEmpty()) ? ("#" + safe(product.getId())) :
+                    (brand.isEmpty() ? model : (model.isEmpty() ? brand : brand + " • " + model));
+            tvProductId.setText(secondary);
 
-            // Set product value/price
-            tvProductValue.setText("$" + product.getPrice());
+            // Price formatted and stock suffix
+            String priceText = formatCurrency(product.getPrice());
+            tvProductValue.setText(priceText);
 
-            // Set status indicator based on product status
+            // Image: first image url if available
+            if (product.getImages() != null && !product.getImages().isEmpty() && product.getImages().get(0) != null) {
+                String url = product.getImages().get(0).getUrl();
+                if (url != null && !url.isEmpty()) {
+                    RequestOptions opts = new RequestOptions()
+                            .transform(new RoundedCorners(24))
+                            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                            .placeholder(R.drawable.ic_bike_placeholder)
+                            .error(R.drawable.ic_bike_placeholder);
+                    Glide.with(itemView.getContext()).load(url).apply(opts).into(ivProductImage);
+                } else {
+                    ivProductImage.setImageResource(R.drawable.ic_bike_placeholder);
+                }
+            } else {
+                ivProductImage.setImageResource(R.drawable.ic_bike_placeholder);
+            }
+
+            // Status indicator
             setStatusIndicator(product);
 
-            // Set action button if needed
+            // Action button state
             setActionButton(product);
+        }
+
+        private String safe(String s) { return s == null ? "" : s; }
+
+        private String formatCurrency(double price) {
+            try {
+                java.text.NumberFormat nf = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"));
+                return nf.format(price);
+            } catch (Exception e) {
+                return String.valueOf(price);
+            }
         }
 
         private void setStatusIndicator(Bike product) {
@@ -136,23 +173,11 @@ public class ProductCardAdapter extends RecyclerView.Adapter<ProductCardAdapter.
         }
 
         private void setActionButton(Bike product) {
-            // Show action button for some products
-            int action = Math.abs(product.getId().hashCode()) % 3;
-            
-            if (action == 0) {
-                btnAction.setVisibility(View.VISIBLE);
-                btnAction.setText("Edit");
-                statusIndicator.setVisibility(View.GONE);
-                
-                btnAction.setOnClickListener(v -> {
-                    if (listener != null) {
-                        listener.onProductEdit(product);
-                    }
-                });
-            } else {
-                btnAction.setVisibility(View.GONE);
-                statusIndicator.setVisibility(View.VISIBLE);
-            }
+            // Always show Edit button as requested
+            btnAction.setVisibility(View.VISIBLE);
+            btnAction.setText("Edit");
+            statusIndicator.setVisibility(View.GONE);
+            btnAction.setOnClickListener(v -> { if (listener != null) listener.onProductEdit(product); });
         }
     }
 }

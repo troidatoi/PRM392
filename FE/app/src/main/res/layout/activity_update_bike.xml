@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/green">
+    android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@drawable/white_rounded_background">
 
         <!-- Header -->
         <LinearLayout
@@ -42,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Cập nhật xe"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
@@ -167,36 +168,14 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="Số lượng tồn kho"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
-            app:boxBackgroundColor="@color/white"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp">
-
-            <EditText
-                android:id="@+id/etStock"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textColorHint="@color/gray"
-                android:inputType="number"
-                android:background="@android:color/transparent" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+        
 
         <!-- Category Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Danh mục"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -212,7 +191,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Trạng thái"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -228,7 +207,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Thông số kỹ thuật"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -377,7 +356,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Đặc điểm nổi bật"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="12dp" />
@@ -412,7 +391,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Bảo hành"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -446,7 +425,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Giá gốc (tùy chọn)"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -481,7 +460,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tags (tùy chọn)"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -515,7 +494,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Ảnh sản phẩm"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -533,7 +512,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Đã chọn: 0/5 ảnh"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 

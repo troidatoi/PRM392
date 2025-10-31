@@ -44,7 +44,7 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
 
     // Views
     private CardView btnBack;
-    private EditText etName, etBrand, etModel, etPrice, etDescription, etStock;
+    private EditText etName, etBrand, etModel, etPrice, etDescription;
     private Spinner spinnerCategory, spinnerStatus;
     private Button btnSelectImages, btnUpdateBike;
     private TextView tvImageCount;
@@ -88,7 +88,7 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         etModel = findViewById(R.id.etModel);
         etPrice = findViewById(R.id.etPrice);
         etDescription = findViewById(R.id.etDescription);
-        etStock = findViewById(R.id.etStock);
+        // Stock field removed from UI
         spinnerCategory = findViewById(R.id.spinnerCategory);
         spinnerStatus = findViewById(R.id.spinnerStatus);
         btnSelectImages = findViewById(R.id.btnSelectImages);
@@ -173,7 +173,7 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         etModel.setText(originalBike.getModel());
         etPrice.setText(String.valueOf(originalBike.getPrice()));
         etDescription.setText(originalBike.getDescription());
-        etStock.setText(String.valueOf(originalBike.getStock()));
+        // Stock not editable in this screen
 
         // Set spinner selections
         String[] categories = {"city", "mountain", "folding", "cargo", "sport", "other"};
@@ -267,25 +267,17 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
             showToast("Vui lòng nhập mô tả");
             return;
         }
-        if (etStock.getText().toString().trim().isEmpty()) {
-            showToast("Vui lòng nhập số lượng tồn kho");
-            return;
-        }
 
         try {
             double price = Double.parseDouble(etPrice.getText().toString());
-            int stock = Integer.parseInt(etStock.getText().toString());
+            int stock = originalBike != null ? originalBike.getStock() : 0;
             
             if (price <= 0) {
                 showToast("Giá phải lớn hơn 0");
                 return;
             }
-            if (stock < 0) {
-                showToast("Số lượng tồn kho không được âm");
-                return;
-            }
         } catch (NumberFormatException e) {
-            showToast("Giá và số lượng tồn kho phải là số hợp lệ");
+            showToast("Giá phải là số hợp lệ");
             return;
         }
 
@@ -304,7 +296,7 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         String model = etModel.getText().toString().trim();
         double price = Double.parseDouble(etPrice.getText().toString());
         String description = etDescription.getText().toString().trim();
-        int stock = Integer.parseInt(etStock.getText().toString());
+        int stock = originalBike != null ? originalBike.getStock() : 0;
         String category = spinnerCategory.getSelectedItem().toString();
         String status = spinnerStatus.getSelectedItem().toString();
 

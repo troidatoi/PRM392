@@ -75,7 +75,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/status_indicator_blue"
+            android:background="@drawable/status_indicator_green"
             app:layout_constraintTop_toBottomOf="@id/tvProductValue"
             app:layout_constraintStart_toStartOf="parent" />
 
