@@ -112,9 +112,9 @@ public class OrderHistoryActivity extends AppCompatActivity {
                                     // Build items summary from orderDetails
                                     String itemsSummary = buildItemsSummary(m.get("orderDetails"));
 
-                                    String color = statusToColor(status);
-
-                                    orders.add(new Order(id, date, status, itemsSummary, amountText, color));
+                                    String color = Order.mapStatusColor(status);
+                                    String displayStatus = Order.mapStatusText(status);
+                                    orders.add(new Order(id, date, displayStatus, itemsSummary, amountText, color));
                                     added++;
                                 }
                             }
@@ -132,13 +132,13 @@ public class OrderHistoryActivity extends AppCompatActivity {
                             }
                             isLastPage = (current >= pages) || (added == 0) || (orders.size() >= total && total > 0);
 
-                            if (orders.isEmpty()) {
-                                emptyState.setVisibility(View.VISIBLE);
-                                rvOrders.setVisibility(View.GONE);
-                            } else {
-                                emptyState.setVisibility(View.GONE);
-                                rvOrders.setVisibility(View.VISIBLE);
-                            }
+        if (orders.isEmpty()) {
+            emptyState.setVisibility(View.VISIBLE);
+            rvOrders.setVisibility(View.GONE);
+        } else {
+            emptyState.setVisibility(View.GONE);
+            rvOrders.setVisibility(View.VISIBLE);
+        }
                         } catch (Exception e) {
                             android.widget.Toast.makeText(OrderHistoryActivity.this, "Lỗi xử lý dữ liệu", android.widget.Toast.LENGTH_SHORT).show();
                         }

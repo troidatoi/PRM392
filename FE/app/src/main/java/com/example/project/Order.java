@@ -64,5 +64,28 @@ public class Order {
     public void setStatusColor(String statusColor) {
         this.statusColor = statusColor;
     }
+
+    public static String mapStatusText(String st) {
+        if(st==null) return "";
+        switch(st.toLowerCase()) {
+            case "pending": return "Chờ xác nhận";
+            case "confirmed": return "Đã xác nhận";
+            case "shipped": return "Đang giao hàng";
+            case "delivered": return "✓ Đã giao";
+            case "cancelled": return "Đã hủy";
+            default: return st;
+        }
+    }
+    public static String mapStatusColor(String st) {
+        if(st==null) return "#2196F3";
+        switch(st.toLowerCase()) {
+            case "pending": return "#FFC107";
+            case "confirmed": return "#64B5F6";
+            case "shipped": return "#2196F3";
+            case "delivered": return "#4CAF50";
+            case "cancelled": return "#F44336";
+            default: return "#2196F3";
+        }
+    }
 }
 

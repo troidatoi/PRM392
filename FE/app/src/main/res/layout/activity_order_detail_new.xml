@@ -69,6 +69,16 @@
 
     </androidx.cardview.widget.CardView>
 
+    <ProgressBar
+        android:id="@+id/progressBarLoading"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:indeterminate="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/headerCard"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"/>
+
     <!-- Content -->
     <ScrollView
         android:layout_width="match_parent"
@@ -674,244 +684,98 @@
 
                     </LinearLayout>
 
-                    <!-- Timeline Item 1 - Delivered -->
+                    <!-- Timeline đúng 5 dòng, mỗi dòng 1 LinearLayout + dot + Text -->
                     <LinearLayout
+                        android:id="@+id/timelineLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="20dp">
-
-                        <RelativeLayout
-                            android:layout_width="48dp"
-                            android:layout_height="match_parent">
-
-                            <View
-                                android:id="@+id/timelineDot1"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="4dp"
-                                android:background="@drawable/circle_shape"
-                                android:backgroundTint="#4CAF50" />
-
-                            <View
-                                android:layout_width="3dp"
-                                android:layout_height="match_parent"
-                                android:layout_below="@id/timelineDot1"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="4dp"
-                                android:background="#4CAF50"
-                                android:alpha="0.3" />
-
-                        </RelativeLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp"
-                            android:background="#E8F5E9"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="✓ Đã giao hàng"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                android:textColor="#4CAF50" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="30/10/2025 10:30"
-                                android:textSize="13sp"
-                                android:textColor="#666666"
-                                android:layout_marginTop="4dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Đơn hàng đã được giao thành công. Cảm ơn bạn đã mua hàng!"
-                                android:textSize="13sp"
-                                android:textColor="#666666"
-                                android:layout_marginTop="6dp"
-                                android:lineSpacingExtra="2dp" />
-
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:background="#FFFFFF">
+                        <!-- Pending -->
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                            <View android:id="@+id/dotPending" android:layout_width="16dp" android:layout_height="16dp"
+                                android:layout_gravity="center_vertical" android:background="@drawable/circle_shape"/>
+                            <TextView android:id="@+id/tvStatusPending" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Chờ xác nhận" android:textSize="15sp" android:textStyle="bold"
+                                android:layout_marginStart="16dp" />
                         </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- Timeline Item 2 - Shipping -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="20dp">
-
-                        <RelativeLayout
-                            android:layout_width="48dp"
-                            android:layout_height="match_parent">
-
-                            <View
-                                android:id="@+id/timelineDot2"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="4dp"
-                                android:background="@drawable/circle_shape"
-                                android:backgroundTint="#2196F3" />
-
-                            <View
-                                android:layout_width="3dp"
-                                android:layout_height="match_parent"
-                                android:layout_below="@id/timelineDot2"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="4dp"
-                                android:background="#2196F3"
-                                android:alpha="0.3" />
-
-                        </RelativeLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Đang vận chuyển"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                android:textColor="#000000" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="28/10/2025 08:00"
-                                android:textSize="13sp"
-                                android:textColor="#999999"
-                                android:layout_marginTop="4dp" />
-
+                        <!-- Confirmed -->
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                            <View android:id="@+id/dotConfirmed" android:layout_width="16dp" android:layout_height="16dp"
+                                android:layout_gravity="center_vertical" android:background="@drawable/circle_shape"/>
+                            <TextView android:id="@+id/tvStatusConfirmed" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Đã xác nhận" android:textSize="15sp" android:textStyle="bold"
+                                android:layout_marginStart="16dp" />
                         </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- Timeline Item 3 - Processing -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="20dp">
-
-                        <RelativeLayout
-                            android:layout_width="48dp"
-                            android:layout_height="match_parent">
-
-                            <View
-                                android:id="@+id/timelineDot3"
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="4dp"
-                                android:background="@drawable/circle_shape"
-                                android:backgroundTint="#FF9800" />
-
-                            <View
-                                android:layout_width="3dp"
-                                android:layout_height="match_parent"
-                                android:layout_below="@id/timelineDot3"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="4dp"
-                                android:background="#FF9800"
-                                android:alpha="0.3" />
-
-                        </RelativeLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Đang xử lý"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                android:textColor="#000000" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="26/10/2025 15:00"
-                                android:textSize="13sp"
-                                android:textColor="#999999"
-                                android:layout_marginTop="4dp" />
-
+                        <!-- Shipped -->
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                            <View android:id="@+id/dotShipped" android:layout_width="16dp" android:layout_height="16dp"
+                                android:layout_gravity="center_vertical" android:background="@drawable/circle_shape"/>
+                            <TextView android:id="@+id/tvStatusShipped" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Đang giao hàng" android:textSize="15sp" android:textStyle="bold"
+                                android:layout_marginStart="16dp" />
                         </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- Timeline Item 4 - Placed -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <RelativeLayout
-                            android:layout_width="48dp"
-                            android:layout_height="match_parent">
-
-                            <View
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_centerHorizontal="true"
-                                android:layout_marginTop="4dp"
-                                android:background="@drawable/circle_shape"
-                                android:backgroundTint="#9C27B0" />
-
-                        </RelativeLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical"
-                            android:layout_marginStart="12dp"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Đơn hàng đã đặt"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                android:textColor="#000000" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="25/10/2025 14:30"
-                                android:textSize="13sp"
-                                android:textColor="#999999"
-                                android:layout_marginTop="4dp" />
-
+                        <!-- Delivered -->
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                            <View android:id="@+id/dotDelivered" android:layout_width="16dp" android:layout_height="16dp"
+                                android:layout_gravity="center_vertical" android:background="@drawable/circle_shape"/>
+                            <TextView android:id="@+id/tvStatusDelivered" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Đã giao" android:textSize="15sp" android:textStyle="bold"
+                                android:layout_marginStart="16dp" />
                         </LinearLayout>
-
+                        <!-- Cancelled -->
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                            <View android:id="@+id/dotCancelled" android:layout_width="16dp" android:layout_height="16dp"
+                                android:layout_gravity="center_vertical" android:background="@drawable/circle_shape"/>
+                            <TextView android:id="@+id/tvStatusCancelled" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Đã hủy" android:textSize="15sp" android:textStyle="bold"
+                                android:layout_marginStart="16dp" />
+                        </LinearLayout>
                     </LinearLayout>
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btnConfirmOrder"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="Xác nhận đơn hàng"
+                android:textColor="#FFF"
+                android:backgroundTint="#7B6047"
+                android:visibility="gone"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnShipOrder"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="Giao hàng"
+                android:textColor="#FFF"
+                android:backgroundTint="#7B6047"
+                android:visibility="gone"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnDelivered"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Đã nhận được hàng"
+                android:textColor="#FFF"
+                android:backgroundTint="#4CAF50"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
 
         </LinearLayout>
 

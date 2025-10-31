@@ -194,6 +194,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Admin Order List Activity -->
+        <activity
+            android:name=".AdminOrderListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
     </application>
 
 </manifest>
