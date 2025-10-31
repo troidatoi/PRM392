@@ -58,7 +58,18 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ChatMessage message = messages.get(position);
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        String time = sdf.format(new Date(message.getTimestamp()));
+        String time;
+        try {
+            long timestamp = message.getTimestamp();
+            if (timestamp > 0) {
+                time = sdf.format(new Date(timestamp));
+            } else {
+                time = "N/A";
+            }
+        } catch (Exception e) {
+            time = "N/A";
+            e.printStackTrace();
+        }
 
         if (holder instanceof SentMessageViewHolder) {
             ((SentMessageViewHolder) holder).tvMessage.setText(message.getMessage());

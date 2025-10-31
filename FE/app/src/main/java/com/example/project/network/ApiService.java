@@ -6,6 +6,8 @@ import com.example.project.models.LoginRequest;
 import com.example.project.models.RegisterRequest;
 import com.example.project.models.User;
 import com.example.project.Store;
+import com.example.project.ChatMessage;
+import com.example.project.ChatConversation;
 
 import java.util.List;
 import okhttp3.MultipartBody;
@@ -386,6 +388,44 @@ public interface ApiService {
         
         public void setLimit(int limit) {
             this.limit = limit;
+        }
+    }
+    
+    // Chat endpoints
+    @GET("chat/conversations")
+    Call<ApiResponse<ChatConversation[]>> getChatConversations(@Header("Authorization") String token);
+    
+    @GET("chat/messages/{userId}")
+    Call<ApiResponse<ChatMessage[]>> getChatMessages(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("userId") String userId,
+        @retrofit2.http.Query("limit") Integer limit,
+        @retrofit2.http.Query("before") String before
+    );
+    
+    @GET("chat/online-users")
+    Call<ApiResponse<User[]>> getOnlineUsers(@Header("Authorization") String token);
+    
+    @PUT("chat/read-all")
+    Call<ApiResponse<Void>> markAllAsRead(
+        @Header("Authorization") String token,
+        @Body MarkReadRequest request
+    );
+    
+    // Request classes for Chat
+    class MarkReadRequest {
+        private String senderId;
+        
+        public MarkReadRequest(String senderId) {
+            this.senderId = senderId;
+        }
+        
+        public String getSenderId() {
+            return senderId;
+        }
+        
+        public void setSenderId(String senderId) {
+            this.senderId = senderId;
         }
     }
 }
