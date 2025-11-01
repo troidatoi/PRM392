@@ -34,6 +34,12 @@ const bikeSchema = new mongoose.Schema({
     trim: true,
     maxlength: [1000, 'Mô tả không được vượt quá 1000 ký tự']
   },
+  color: {
+    type: String,
+    required: [true, 'Màu sắc là bắt buộc'],
+    trim: true,
+    maxlength: [50, 'Màu sắc không được vượt quá 50 ký tự']
+  },
   specifications: {
     battery: {
       type: String,

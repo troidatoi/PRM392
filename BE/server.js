@@ -55,7 +55,9 @@ app.use(cors({
 app.use(express.static('public'));
 
 // Routes
-app.use('/api/bikes', require('./routes/bikeRoutes'));
+const bikeRoutes = require('./routes/bikeRoutes');
+app.use('/api/bikes', bikeRoutes);
+console.log('✅ Bike routes registered: POST /api/bikes/upload available');
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/stores', require('./routes/storeRoutes')); // Store routes

@@ -195,6 +195,7 @@ const createBike = async (req, res) => {
       model: req.body.model,
       price: parseFloat(req.body.price),
       description: req.body.description,
+      color: req.body.color,
       category: req.body.category,
       status: req.body.status,
       specifications: Object.keys(specifications).length > 0 ? specifications : undefined,
@@ -276,11 +277,63 @@ const updateBike = async (req, res) => {
       allImages = [...allImages, ...newImages];
     }
 
+    // Process specifications
+    const specifications = {};
+    if (req.body.battery) specifications.battery = req.body.battery;
+    if (req.body.motor) specifications.motor = req.body.motor;
+    if (req.body.range) specifications.range = req.body.range;
+    if (req.body.maxSpeed) specifications.maxSpeed = req.body.maxSpeed;
+    if (req.body.weight) specifications.weight = req.body.weight;
+    if (req.body.chargingTime) specifications.chargingTime = req.body.chargingTime;
+
+    // Process features (split by newline)
+    let features = [];
+    if (req.body.features) {
+      features = req.body.features.split('\n').filter(feature => feature.trim() !== '');
+    }
+
+    // Process tags (split by comma)
+    let tags = [];
+    if (req.body.tags) {
+      tags = req.body.tags.split(',').filter(tag => tag.trim() !== '');
+    }
+
+    // Process original price
+    let originalPrice = undefined;
+    if (req.body.originalPrice && req.body.originalPrice !== '0') {
+      originalPrice = parseFloat(req.body.originalPrice);
+      if (isNaN(originalPrice) || originalPrice <= 0) {
+        originalPrice = undefined;
+      }
+    }
+
+    // Process warranty
+    let warranty = req.body.warranty || '12 tháng';
+
     // Create update data
     const updateData = {
-      ...req.body,
-      images: allImages
+      name: req.body.name,
+      brand: req.body.brand,
+      model: req.body.model,
+      price: parseFloat(req.body.price),
+      description: req.body.description,
+      color: req.body.color,
+      category: req.body.category,
+      status: req.body.status,
+      images: allImages,
+      specifications: Object.keys(specifications).length > 0 ? specifications : undefined,
+      features: features.length > 0 ? features : undefined,
+      warranty: warranty,
+      originalPrice: originalPrice,
+      tags: tags.length > 0 ? tags : undefined
     };
+
+    // Remove undefined fields
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
 
     const bike = await Bike.findByIdAndUpdate(
       req.params.id,
@@ -428,6 +481,40 @@ const getCategories = async (req, res) => {
   }
 };
 
+// @desc    Upload images to Cloudinary
+// @route   POST /api/bikes/upload
+// @access  Public
+const uploadImages = async (req, res) => {
+  console.log('uploadImages function called');
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng chọn ít nhất một file ảnh'
+      });
+    }
+
+    console.log(`Uploading ${req.files.length} file(s) to Cloudinary`);
+    const images = await uploadToCloudinary(req.files);
+
+    res.json({
+      success: true,
+      message: `Upload thành công ${images.length} ảnh lên Cloudinary`,
+      data: {
+        count: images.length,
+        images: images
+      }
+    });
+  } catch (error) {
+    console.error('Error testing upload:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi upload ảnh lên Cloudinary',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getBikes,
   getBikeById,
@@ -435,6 +522,7 @@ module.exports = {
   updateBike,
   deleteBike,
   getFeaturedBikes,
-  getCategories
+  getCategories,
+  uploadImages
 };
 

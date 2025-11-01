@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="#F5F5F5"
+    android:fillViewport="true"
+    android:scrollbars="vertical"
+    android:fadeScrollbars="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@drawable/white_rounded_background">
+        android:padding="16dp">
 
         <!-- Header -->
         <LinearLayout
@@ -55,9 +57,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Tên xe"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -78,9 +81,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Thương hiệu"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -101,9 +105,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Model"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -119,38 +124,84 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Price and Original Price Section -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:hint="Giá (VNĐ)"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
-            app:boxBackgroundColor="@color/white"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp">
+            android:text="Giá bán"
+            android:textColor="#333333"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="12dp" />
 
-            <EditText
-                android:id="@+id/etPrice"
-                android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textColorHint="@color/gray"
-                android:inputType="numberDecimal"
-                android:background="@android:color/transparent" />
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:hint="Giá (VNĐ)"
+                app:hintTextColor="@color/white"
+                app:boxStrokeColor="@color/white"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <EditText
+                    android:id="@+id/etPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gray"
+                    android:inputType="numberDecimal"
+                    android:background="@android:color/transparent" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:hint="Giá gốc (tùy chọn)"
+                app:hintTextColor="@color/white"
+                app:boxStrokeColor="@color/white"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <EditText
+                    android:id="@+id/etOriginalPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gray"
+                    android:inputType="numberDecimal"
+                    android:background="@android:color/transparent" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Mô tả"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -168,14 +219,36 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="Màu sắc"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
+            app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp">
+
+            <EditText
+                android:id="@+id/etColor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textColorHint="@color/gray"
+                android:background="@android:color/transparent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Category Spinner -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Danh mục"
-            android:textColor="@color/black"
+            android:textColor="#333333"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -191,7 +264,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Trạng thái"
-            android:textColor="@color/black"
+            android:textColor="#333333"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -207,7 +280,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Thông số kỹ thuật"
-            android:textColor="@color/black"
+            android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -218,9 +291,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Pin"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -241,9 +315,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Động cơ"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -264,9 +339,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Quãng đường"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -287,9 +363,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Tốc độ tối đa"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -310,9 +387,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Trọng lượng"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -333,9 +411,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Thời gian sạc"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -356,7 +435,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Đặc điểm nổi bật"
-            android:textColor="@color/black"
+            android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="12dp" />
@@ -366,9 +445,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:hint="Nhập đặc điểm (mỗi dòng một đặc điểm)"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -391,7 +471,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Bảo hành"
-            android:textColor="@color/black"
+            android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -402,9 +482,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Thời gian bảo hành"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -420,47 +501,12 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Original Price Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Giá gốc (tùy chọn)"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="12dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Giá gốc (để tính giảm giá)"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
-            app:boxBackgroundColor="@color/white"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp">
-
-            <EditText
-                android:id="@+id/etOriginalPrice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textColorHint="@color/gray"
-                android:inputType="numberDecimal"
-                android:background="@android:color/transparent" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
         <!-- Tags Section -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tags (tùy chọn)"
-            android:textColor="@color/black"
+            android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
@@ -471,9 +517,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Nhập tags (cách nhau bằng dấu phẩy)"
-            app:hintTextColor="@color/white"
-            app:boxStrokeColor="@color/white"
+            app:hintTextColor="#666666"
+            app:boxStrokeColor="#E0E0E0"
             app:boxBackgroundColor="@color/white"
+            app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -494,7 +541,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Ảnh sản phẩm"
-            android:textColor="@color/black"
+            android:textColor="#333333"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -512,7 +559,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Đã chọn: 0/5 ảnh"
-            android:textColor="@color/black"
+            android:textColor="#666666"
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 
@@ -545,4 +592,4 @@
 
     </LinearLayout>
 
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
