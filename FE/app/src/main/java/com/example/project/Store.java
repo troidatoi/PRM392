@@ -25,6 +25,9 @@ public class Store {
     private String status;
     private int productCount;
     private String ownerName;
+    
+    // Distance from user location (in km)
+    private Double distance;
 
     public Store() {}
 
@@ -190,9 +193,34 @@ public class Store {
 
     public String getDisplayStatus() {
         if (status != null && !status.isEmpty()) {
+            // If status contains distance (like "1.2 km"), return it
+            if (status.contains("km")) {
+                return status;
+            }
             return status;
         }
         return isActive ? "Hoạt động" : "Đóng cửa";
+    }
+    
+    public Double getDistance() {
+        return distance;
+    }
+    
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+    
+    public String getDistanceText() {
+        if (distance != null) {
+            if (distance < 1) {
+                // Less than 1km, show in meters
+                return String.format("%.0f m", distance * 1000);
+            } else {
+                // Show in km
+                return String.format("%.2f km", distance);
+            }
+        }
+        return null;
     }
 }
 

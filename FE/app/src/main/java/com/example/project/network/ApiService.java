@@ -207,6 +207,19 @@ public interface ApiService {
     
     @POST("stores/nearby")
     Call<ApiResponse<Store[]>> getNearbyStores(@Body NearbyStoreRequest request);
+    
+    // Store locations/map endpoints (for displaying all stores)
+    @GET("locations/map")
+    Call<MapStoresResponse> getStoresForMap(
+        @retrofit2.http.Query("lat") Double lat,
+        @retrofit2.http.Query("lng") Double lng,
+        @retrofit2.http.Query("address") String address,
+        @retrofit2.http.Query("radius") Double radius
+    );
+    
+    // Geocode endpoint (convert address to coordinates)
+    @POST("locations/geocode")
+    Call<ApiResponse<Object>> geocodeAddress(@Body java.util.Map<String, String> body);
 
     // Order endpoints
     @POST("orders/create")
@@ -398,6 +411,189 @@ public interface ApiService {
         
         public void setLimit(int limit) {
             this.limit = limit;
+        }
+    }
+    
+    // Map stores response model
+    class MapStoresResponse {
+        private boolean success;
+        private String message;
+        private int count;
+        private UserLocation userLocation;
+        private Double searchRadius;
+        private List<MapStore> data;
+        
+        public MapStoresResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public int getCount() {
+            return count;
+        }
+        
+        public void setCount(int count) {
+            this.count = count;
+        }
+        
+        public UserLocation getUserLocation() {
+            return userLocation;
+        }
+        
+        public void setUserLocation(UserLocation userLocation) {
+            this.userLocation = userLocation;
+        }
+        
+        public Double getSearchRadius() {
+            return searchRadius;
+        }
+        
+        public void setSearchRadius(Double searchRadius) {
+            this.searchRadius = searchRadius;
+        }
+        
+        public List<MapStore> getData() {
+            return data;
+        }
+        
+        public void setData(List<MapStore> data) {
+            this.data = data;
+        }
+        
+        public static class UserLocation {
+            private Double latitude;
+            private Double longitude;
+            private String address;
+            
+            public Double getLatitude() {
+                return latitude;
+            }
+            
+            public void setLatitude(Double latitude) {
+                this.latitude = latitude;
+            }
+            
+            public Double getLongitude() {
+                return longitude;
+            }
+            
+            public void setLongitude(Double longitude) {
+                this.longitude = longitude;
+            }
+            
+            public String getAddress() {
+                return address;
+            }
+            
+            public void setAddress(String address) {
+                this.address = address;
+            }
+        }
+        
+        public static class MapStore {
+            @com.google.gson.annotations.SerializedName("id")
+            private String id;
+            private String name;
+            private double latitude;
+            private double longitude;
+            private String address;
+            private String city;
+            private String phone;
+            @com.google.gson.annotations.SerializedName("isOpenNow")
+            private boolean isOpenNow;
+            private Double distance;
+            
+            public String getId() {
+                return id;
+            }
+            
+            public void setId(String id) {
+                this.id = id;
+            }
+            
+            public String getName() {
+                return name;
+            }
+            
+            public void setName(String name) {
+                this.name = name;
+            }
+            
+            public double getLatitude() {
+                return latitude;
+            }
+            
+            public void setLatitude(double latitude) {
+                this.latitude = latitude;
+            }
+            
+            public double getLongitude() {
+                return longitude;
+            }
+            
+            public void setLongitude(double longitude) {
+                this.longitude = longitude;
+            }
+            
+            public String getAddress() {
+                return address;
+            }
+            
+            public void setAddress(String address) {
+                this.address = address;
+            }
+            
+            public String getCity() {
+                return city;
+            }
+            
+            public void setCity(String city) {
+                this.city = city;
+            }
+            
+            public String getPhone() {
+                return phone;
+            }
+            
+            public void setPhone(String phone) {
+                this.phone = phone;
+            }
+            
+            public boolean isOpenNow() {
+                return isOpenNow;
+            }
+            
+            public void setOpenNow(boolean openNow) {
+                isOpenNow = openNow;
+            }
+            
+            public Double getDistance() {
+                return distance;
+            }
+            
+            public void setDistance(Double distance) {
+                this.distance = distance;
+            }
+            
+            public String getFullAddress() {
+                if (city != null && !city.isEmpty()) {
+                    return address + ", " + city;
+                }
+                return address != null ? address : "";
+            }
         }
     }
     

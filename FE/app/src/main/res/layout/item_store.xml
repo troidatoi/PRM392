@@ -46,12 +46,49 @@
                 android:layout_marginTop="4dp"
                 android:maxLines="1"
                 android:ellipsize="end" />
+                
+            <!-- Distance -->
+            <TextView
+                android:id="@+id/tvStoreDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                android:layout_marginTop="6dp"
+                android:visibility="visible" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="6dp">
+
+                <!-- Nearest Badge -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/nearestBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#2196F3"
+                    android:visibility="gone">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📍 Gần nhất"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp" />
+                        
+                </androidx.cardview.widget.CardView>
 
                 <!-- Status Badge -->
                 <androidx.cardview.widget.CardView
