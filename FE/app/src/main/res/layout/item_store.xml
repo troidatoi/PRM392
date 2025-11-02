@@ -6,12 +6,12 @@
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="20dp"
     app:cardElevation="6dp"
-    app:cardBackgroundColor="@android:color/transparent">
+    app:cardBackgroundColor="@color/card_white">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/liquid_glass_input"
+        android:background="@android:color/transparent"
         android:padding="16dp">
 
         <!-- Store Info -->
@@ -46,12 +46,49 @@
                 android:layout_marginTop="4dp"
                 android:maxLines="1"
                 android:ellipsize="end" />
+                
+            <!-- Distance -->
+            <TextView
+                android:id="@+id/tvStoreDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                android:layout_marginTop="6dp"
+                android:visibility="visible" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="6dp">
+
+                <!-- Nearest Badge -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/nearestBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#2196F3"
+                    android:visibility="gone">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📍 Gần nhất"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp" />
+                        
+                </androidx.cardview.widget.CardView>
 
                 <!-- Status Badge -->
                 <androidx.cardview.widget.CardView
@@ -146,6 +183,39 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Xóa"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Inventory Button -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnInventory"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/liquid_glass_button"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kho"
                         android:textColor="#FFFFFF"
                         android:textSize="12sp"
                         android:textStyle="bold" />

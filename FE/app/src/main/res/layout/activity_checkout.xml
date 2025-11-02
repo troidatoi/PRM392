@@ -16,12 +16,12 @@
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="25dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
+            android:background="#FFFFFF"
             android:orientation="horizontal"
             android:padding="16dp"
             android:gravity="center_vertical">
@@ -31,8 +31,8 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -40,14 +40,13 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
+                    android:background="#FFFFFF"
                     android:gravity="center">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_search"
-                        android:rotation="90"
+                        android:src="@drawable/ic_back"
                         app:tint="#2196F3"
                         android:contentDescription="Back" />
 
@@ -106,13 +105,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="#FFFFFF"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -145,13 +144,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="#FFFFFF"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:gravity="center_vertical">
@@ -201,13 +200,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="#FFFFFF"
                     android:orientation="horizontal"
                     android:padding="20dp"
                     android:gravity="top">
@@ -217,6 +216,30 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Thành phố"
+                            android:textSize="12sp"
+                            android:textColor="#999999"
+                            android:layout_marginBottom="8dp" />
+
+                        <EditText
+                            android:id="@+id/etCity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Nhập tên thành phố (VD: Hà Nội)"
+                            android:textSize="16sp"
+                            android:textColor="#000000"
+                            android:textColorHint="#CCCCCC"
+                            android:background="@android:color/transparent"
+                            android:inputType="textCapWords"
+                            android:importantForAutofill="no" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="12dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -271,13 +294,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
+                    android:background="#FFFFFF"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -307,13 +330,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_input"
+                    android:background="#FFFFFF"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -371,13 +394,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
+                    android:background="#FFFFFF"
                     android:orientation="vertical"
                     android:padding="24dp">
 
@@ -484,8 +507,8 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         app:cardCornerRadius="28dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#FFFFFF"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground">
@@ -493,14 +516,14 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_button"
+            android:background="#FFFFFF"
             android:gravity="center">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Xác Nhận Đặt Hàng"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -509,4 +532,3 @@
     </androidx.cardview.widget.CardView>
 
 </RelativeLayout>
-

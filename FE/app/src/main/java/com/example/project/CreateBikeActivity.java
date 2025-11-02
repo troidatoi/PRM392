@@ -24,6 +24,8 @@ import com.example.project.models.Bike;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
 import com.example.project.utils.AuthManager;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
 
     // Views
     private CardView btnBack;
-    private EditText etName, etBrand, etModel, etPrice, etDescription, etStock;
+    private EditText etName, etBrand, etModel, etPrice, etDescription, etColor;
     private EditText etBattery, etMotor, etRange, etMaxSpeed, etWeight, etChargingTime;
     private EditText etFeatures, etWarranty, etOriginalPrice, etTags;
     private Spinner spinnerCategory, spinnerStatus;
@@ -76,7 +78,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         etModel = findViewById(R.id.etModel);
         etPrice = findViewById(R.id.etPrice);
         etDescription = findViewById(R.id.etDescription);
-        etStock = findViewById(R.id.etStock);
+        etColor = findViewById(R.id.etColor);
         etBattery = findViewById(R.id.etBattery);
         etMotor = findViewById(R.id.etMotor);
         etRange = findViewById(R.id.etRange);
@@ -135,11 +137,33 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivity(Intent.createChooser(intent, "Chọn ảnh"));
+        startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGES_REQUEST);
     }
 
-    // Giao diện hiện tại không cần nhận lại kết quả chọn ảnh theo yêu cầu bài toán,
-    // nên bỏ onActivityResult để tránh API deprecated. Nếu cần, sẽ chuyển sang Activity Result API sau.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK) {
+            if (data != null) {
+                if (data.getClipData() != null) {
+                    // Multiple images selected
+                    int count = data.getClipData().getItemCount();
+                    for (int i = 0; i < count && selectedImages.size() < 5; i++) {
+                        Uri imageUri = data.getClipData().getItemAt(i).getUri();
+                        selectedImages.add(imageUri);
+                    }
+                } else if (data.getData() != null) {
+                    // Single image selected
+                    Uri imageUri = data.getData();
+                    if (selectedImages.size() < 5) {
+                        selectedImages.add(imageUri);
+                    }
+                }
+                updateImageDisplay();
+            }
+        }
+    }
 
     private void updateImageDisplay() {
         tvImageCount.setText("Đã chọn: " + selectedImages.size() + "/5 ảnh");
@@ -188,8 +212,8 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
             showToast("Vui lòng nhập mô tả");
             return;
         }
-        if (etStock.getText().toString().trim().isEmpty()) {
-            showToast("Vui lòng nhập số lượng tồn kho");
+        if (etColor.getText().toString().trim().isEmpty()) {
+            showToast("Vui lòng nhập màu sắc");
             return;
         }
         if (selectedImages.isEmpty()) {
@@ -199,18 +223,13 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
 
         try {
             double price = Double.parseDouble(etPrice.getText().toString());
-            int stock = Integer.parseInt(etStock.getText().toString());
             
             if (price <= 0) {
                 showToast("Giá phải lớn hơn 0");
                 return;
             }
-            if (stock < 0) {
-                showToast("Số lượng tồn kho không được âm");
-                return;
-            }
         } catch (NumberFormatException e) {
-            showToast("Giá và số lượng tồn kho phải là số hợp lệ");
+            showToast("Giá phải là số hợp lệ");
             return;
         }
 
@@ -229,7 +248,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         String model = etModel.getText().toString().trim();
         double price = Double.parseDouble(etPrice.getText().toString());
         String description = etDescription.getText().toString().trim();
-        int stock = Integer.parseInt(etStock.getText().toString());
+        String color = etColor.getText().toString().trim();
         String category = spinnerCategory.getSelectedItem().toString();
         String status = spinnerStatus.getSelectedItem().toString();
         
@@ -328,7 +347,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         RequestBody modelPart = RequestBody.create(model, MediaType.get("text/plain"));
         RequestBody pricePart = RequestBody.create(String.valueOf(price), MediaType.get("text/plain"));
         RequestBody descriptionPart = RequestBody.create(description, MediaType.get("text/plain"));
-        RequestBody stockPart = RequestBody.create(String.valueOf(stock), MediaType.get("text/plain"));
+        RequestBody colorPart = RequestBody.create(color, MediaType.get("text/plain"));
         RequestBody categoryPart = RequestBody.create(category, MediaType.get("text/plain"));
         RequestBody statusPart = RequestBody.create(status, MediaType.get("text/plain"));
         
@@ -358,7 +377,7 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
         String token = "Bearer " + authManager.getToken();
         Call<ApiResponse<Bike>> call = apiService.createBike(
             token, namePart, brandPart, modelPart, pricePart, 
-            descriptionPart, stockPart, categoryPart, statusPart,
+            descriptionPart, colorPart, categoryPart, statusPart,
             batteryPart, motorPart, rangePart, maxSpeedPart, weightPart, chargingTimePart,
             featuresPart, warrantyPart, originalPricePart, tagsPart, imageParts
         );
@@ -374,7 +393,8 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
                     setResult(RESULT_OK);
                     finish();
                 } else {
-                    String errorMessage = "Lỗi tạo xe: " + (response.body() != null ? response.body().getMessage() : response.message());
+                    // Handle error response - parse JSON error message
+                    String errorMessage = parseErrorMessage(response);
                     showToast(errorMessage);
                 }
             }
@@ -383,7 +403,12 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
             public void onFailure(Call<ApiResponse<Bike>> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 btnCreateBike.setEnabled(true);
-                showToast("Lỗi kết nối: " + t.getMessage());
+                String errorMsg = t.getMessage();
+                if (errorMsg != null && errorMsg.contains("File quá lớn")) {
+                    showToast("File quá lớn. Kích thước tối đa 5MB");
+                } else {
+                    showToast("Lỗi kết nối: " + (errorMsg != null ? errorMsg : "Không thể kết nối đến server"));
+                }
             }
         });
     }
@@ -391,7 +416,72 @@ public class CreateBikeActivity extends AppCompatActivity implements SelectedIma
     // Đã bỏ cách lấy đường dẫn file trực tiếp vì sử dụng MediaStore.DATA là API deprecated.
     // Hiện tại ảnh được đọc qua InputStream và gửi dạng byte[] ở createBike(), không cần chuyển sang File.
 
+    private String parseErrorMessage(retrofit2.Response<ApiResponse<Bike>> response) {
+        String defaultMessage = "Lỗi tạo xe";
+        
+        // Try to get message from response body
+        if (response.body() != null) {
+            try {
+                String message = response.body().getMessage();
+                if (message != null && !message.isEmpty()) {
+                    // Check for file size error
+                    if (message.contains("File quá lớn") || message.contains("5MB") || 
+                        message.contains("Kích thước tối đa")) {
+                        return "File quá lớn. Kích thước tối đa 5MB";
+                    }
+                    return message;
+                }
+            } catch (Exception e) {
+                // Continue to try errorBody
+            }
+        }
+        
+        // Try to parse from errorBody JSON
+        try {
+            okhttp3.ResponseBody errorBody = response.errorBody();
+            if (errorBody != null) {
+                String errorString = errorBody.string();
+                if (errorString != null && !errorString.isEmpty()) {
+                    // Check for file size error first
+                    if (errorString.contains("File quá lớn") || errorString.contains("5MB") || 
+                        errorString.contains("Kích thước tối đa")) {
+                        return "File quá lớn. Kích thước tối đa 5MB";
+                    }
+                    
+                    // Try to parse JSON using Gson
+                    try {
+                        Gson gson = new Gson();
+                        JsonObject jsonObject = gson.fromJson(errorString, JsonObject.class);
+                        if (jsonObject.has("message")) {
+                            String message = jsonObject.get("message").getAsString();
+                            if (message != null && !message.isEmpty()) {
+                                return message;
+                            }
+                        }
+                    } catch (Exception e) {
+                        // Try manual extraction if Gson fails
+                        if (errorString.contains("\"message\"")) {
+                            int messageIndex = errorString.indexOf("\"message\":\"");
+                            if (messageIndex >= 0) {
+                                int start = messageIndex + 10;
+                                int end = errorString.indexOf("\"", start);
+                                if (end > start) {
+                                    String message = errorString.substring(start, end);
+                                    return message;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Fallback to default
+        }
+        
+        return defaultMessage + " (Mã lỗi: " + response.code() + ")";
+    }
+
     private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

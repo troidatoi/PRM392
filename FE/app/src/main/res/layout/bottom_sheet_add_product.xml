@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_beige_background">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tạo sản phẩm mới"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/admin_text_primary"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tên sản phẩm"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:textColor="@color/admin_text_primary"
+                android:textColorHint="@color/admin_text_hint" />
+
+            <EditText
+                android:id="@+id/etBrand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Thương hiệu"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/admin_text_primary"
+                android:textColorHint="@color/admin_text_hint" />
+
+            <EditText
+                android:id="@+id/etModel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Model"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/admin_text_primary"
+                android:textColorHint="@color/admin_text_hint" />
+
+            <EditText
+                android:id="@+id/etPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Giá (VND)"
+                android:inputType="number"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/admin_text_primary"
+                android:textColorHint="@color/admin_text_hint" />
+
+            <EditText
+                android:id="@+id/etDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Mô tả"
+                android:background="@android:color/white"
+                android:minLines="3"
+                android:gravity="top"
+                android:padding="12dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/admin_text_primary"
+                android:textColorHint="@color/admin_text_hint" />
+
+            <!-- Category and Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <Spinner
+                    android:id="@+id/spCategory"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:entries="@array/admin_product_categories" />
+
+                <Spinner
+                    android:id="@+id/spStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:entries="@array/admin_product_statuses" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etStock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tồn kho"
+                android:inputType="number"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/admin_text_primary"
+                android:textColorHint="@color/admin_text_hint" />
+
+            <!-- Specifications -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thông số kỹ thuật"
+                android:textStyle="bold"
+                android:textColor="@color/admin_text_primary"
+                android:layout_marginTop="14dp" />
+
+            <EditText android:id="@+id/etBattery" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Pin" android:background="@android:color/white" android:padding="12dp" android:layout_marginTop="8dp" />
+            <EditText android:id="@+id/etMotor" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Động cơ" android:background="@android:color/white" android:padding="12dp" android:layout_marginTop="8dp" />
+            <EditText android:id="@+id/etRange" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Quãng đường" android:background="@android:color/white" android:padding="12dp" android:layout_marginTop="8dp" />
+            <EditText android:id="@+id/etMaxSpeed" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Tốc độ tối đa" android:background="@android:color/white" android:padding="12dp" android:layout_marginTop="8dp" />
+            <EditText android:id="@+id/etWeight" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Khối lượng" android:background="@android:color/white" android:padding="12dp" android:layout_marginTop="8dp" />
+            <EditText android:id="@+id/etChargingTime" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Thời gian sạc" android:background="@android:color/white" android:padding="12dp" android:layout_marginTop="8dp" />
+
+            <!-- Features, Warranty, Original Price, Tags -->
+            <EditText
+                android:id="@+id/etFeatures"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tính năng (mỗi dòng 1 mục)"
+                android:background="@android:color/white"
+                android:minLines="3"
+                android:gravity="top"
+                android:padding="12dp"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/etWarranty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Bảo hành (ví dụ: 12 tháng)"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/etOriginalPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Giá gốc (tuỳ chọn)"
+                android:inputType="number"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/etTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tags (ngăn cách bởi dấu phẩy)"
+                android:background="@android:color/white"
+                android:padding="12dp"
+                android:layout_marginTop="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/btnCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Hủy"
+                    android:textColor="@color/admin_text_primary" />
+
+                <TextView
+                    android:id="@+id/btnSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Lưu"
+                    android:layout_marginStart="8dp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/action_button_background" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

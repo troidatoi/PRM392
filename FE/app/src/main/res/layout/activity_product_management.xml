@@ -3,180 +3,147 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/modern_gradient_background">
+    android:background="@drawable/admin_dashboard_background">
 
     <!-- Header -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/headerCard"
+    <LinearLayout
+        android:id="@+id/headerSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:paddingTop="48dp">
 
+        <!-- Top Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
             android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBack"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_back"
-                        app:tint="#2196F3"
-                        android:contentDescription="Back" />
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Quản Lý Sản Phẩm"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="center"
-                android:layout_marginEnd="45dp" />
+                android:text="Product Management"
+                android:textColor="@color/admin_text_primary"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_notifications"
+                android:tint="@color/admin_text_secondary" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+        <!-- Total Count -->
+        <TextView
+            android:id="@+id/tvBikeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: 0"
+            android:textColor="@color/admin_text_secondary"
+            android:textSize="12sp"
+            android:layout_marginBottom="12dp" />
 
-    <!-- Add Product Button -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/btnAddProduct"
+        <!-- Filter Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/btnCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/filter_button_background"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Category"
+                android:textColor="@color/admin_text_primary"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/btnPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/filter_button_background"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Price"
+                android:textColor="@color/admin_text_primary"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/btnStock"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/filter_button_background"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Stock"
+                android:textColor="@color/admin_text_primary"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/btnEditDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/primary_button_background"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Edit Delete"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Product Grid -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/headerCard"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?attr/selectableItemBackground">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/headerSection"
+        android:layout_above="@+id/bottomNavBar"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_button"
-            android:orientation="horizontal"
-            android:padding="20dp"
-            android:gravity="center">
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingTop="0dp">
 
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_add_cart"
-                app:tint="#FFFFFF"
-                android:contentDescription="Add" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thêm Sản Phẩm Mới"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginStart="12dp" />
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <!-- Product List -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/btnAddProduct"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/liquid_glass_background"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/tvProductListTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Danh Sách Xe"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#000000" />
-
-                <TextView
-                    android:id="@+id/tvBikeCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tổng số xe: 0"
-                    android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:background="@drawable/liquid_glass_small"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp" />
-
-            </LinearLayout>
-
-            <!-- Progress Bar -->
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tvProductListTitle"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
-                android:visibility="gone" />
-
+            <!-- Product Grid -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvProducts"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/tvProductListTitle"
-                android:layout_marginTop="16dp"
+                android:layout_height="wrap_content"
+                android:numColumns="3"
+                android:columnWidth="0dp"
+                android:stretchMode="columnWidth"
                 android:clipToPadding="false"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp" />
@@ -184,35 +151,53 @@
             <!-- Empty State -->
             <LinearLayout
                 android:id="@+id/emptyState"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
                 android:orientation="vertical"
                 android:gravity="center"
+                android:padding="32dp"
                 android:visibility="gone">
 
                 <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/ic_products"
-                    app:tint="#CCCCCC"
-                    android:alpha="0.5"
-                    android:contentDescription="Empty" />
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_modern_products"
+                    android:tint="@color/admin_text_hint" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chưa có xe nào"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#999999"
+                    android:text="No products found"
+                    android:textColor="@color/admin_text_secondary"
+                    android:textSize="16sp"
                     android:layout_marginTop="16dp" />
 
             </LinearLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </ScrollView>
+
+    <!-- Add Product FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddProduct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/bottomNavBar"
+        android:layout_margin="24dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/admin_beige"
+        app:tint="#FFFFFF"
+        app:fabSize="normal" />
+
+    <!-- Bottom Navigation -->
+    <include
+        layout="@layout/view_admin_bottom_nav"
+        android:id="@+id/bottomNavBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
-

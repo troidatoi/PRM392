@@ -9,7 +9,15 @@ const Bike = require('../models/Bike');
 const createOrders = async (req, res) => {
   try {
     const { userId, shippingAddress, paymentMethod, notes } = req.body;
-    
+
+    // Validate payment method: VNPay only
+    if (paymentMethod !== 'vnpay') {
+      return res.status(400).json({
+        success: false,
+        message: 'Chỉ hỗ trợ thanh toán VNPay'
+      });
+    }
+
     // Get cart with items for user
     const cart = await Cart.findOne({ 
       user: userId, 
@@ -64,6 +72,31 @@ const createOrders = async (req, res) => {
       itemsByStore[storeId].items.push(cartItem);
     });
     
+    // Pre-check inventory shortages before creating orders
+    const shortages = [];
+    for (const [storeId, storeData] of Object.entries(itemsByStore)) {
+      for (const cartItem of storeData.items) {
+        const inv = await Inventory.findOne({ product: cartItem.product._id, store: storeId });
+        const available = inv ? inv.quantity : 0;
+        if (available < cartItem.quantity) {
+          shortages.push({
+            productId: cartItem.product._id,
+            productName: cartItem.product.name,
+            storeId,
+            requested: cartItem.quantity,
+            available
+          });
+        }
+      }
+    }
+    if (shortages.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Thiếu tồn kho',
+        data: { shortages }
+      });
+    }
+
     // Create ONE order for EACH store
     const createdOrders = [];
     
@@ -83,7 +116,7 @@ const createOrders = async (req, res) => {
         store: storeData.store._id, // Mỗi order chỉ thuộc 1 cửa hàng
         shippingAddress,
         paymentMethod,
-        notes: `${notes || ''} - Đơn hàng từ ${storeData.store.name}`.trim(),
+        notes: `${notes || ''}`.trim(),
         totalAmount: storeTotal,
         shippingFee: 0,
         discountAmount: 0,
@@ -115,14 +148,8 @@ const createOrders = async (req, res) => {
         orderDetails.push(orderDetail);
         
         // Reduce inventory stock for THIS store only
-        const inventory = await Inventory.findOne({
-          product: cartItem.product._id,
-          store: storeId
-        });
-        
-        if (inventory) {
-          await inventory.reduceStock(cartItem.quantity);
-        }
+        const inventory = await Inventory.findOne({ product: cartItem.product._id, store: storeId });
+        if (inventory) { await inventory.reduceStock(cartItem.quantity); }
       }
       
       // Update order with details
@@ -359,11 +386,42 @@ const getOrdersByStore = async (req, res) => {
   }
 };
 
+// Get all orders (admin)
+const getAllOrders = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, status } = req.query;
+    const query = {};
+    if (status) query.orderStatus = status;
+    const skip = (page - 1) * limit;
+    const orders = await Order.find(query)
+      .populate('user', 'username email')
+      .populate('store', 'name')
+      .populate('orderDetails', 'product quantity price totalPrice')
+      .sort({ orderDate: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    const total = await Order.countDocuments(query);
+    res.json({
+      success: true,
+      data: orders,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
+  }
+};
+
 module.exports = {
   createOrders,
   getUserOrders,
   getOrderDetails,
   updateOrderStatus,
   cancelOrder,
-  getOrdersByStore
+  getOrdersByStore,
+  getAllOrders
 };

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/google_ai_studio_1">
+    android:background="@color/category_inactive_new">
 
     <!-- Header -->
     <androidx.cardview.widget.CardView
@@ -16,12 +16,12 @@
         android:layout_marginEnd="16dp"
         app:cardCornerRadius="25dp"
         app:cardElevation="8dp"
-        app:cardBackgroundColor="@android:color/transparent">
+        app:cardBackgroundColor="@color/card_white">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_header"
+            android:background="@android:color/transparent"
             android:orientation="horizontal"
             android:padding="16dp"
             android:gravity="center_vertical">
@@ -40,7 +40,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_small"
+                    android:background="@android:color/transparent"
                     android:gravity="center">
 
                     <ImageView
@@ -105,12 +105,12 @@
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="25dp"
                     app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    app:cardBackgroundColor="@color/card_white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
+                        android:background="@android:color/transparent"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:padding="16dp">
@@ -144,12 +144,12 @@
                     android:layout_marginStart="8dp"
                     app:cardCornerRadius="25dp"
                     app:cardElevation="8dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    app:cardBackgroundColor="@color/card_white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@drawable/liquid_glass_background"
+                        android:background="@android:color/transparent"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:padding="16dp">
@@ -216,12 +216,12 @@
                 android:layout_marginTop="24dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="@color/card_white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
+                    android:background="@android:color/transparent"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -302,6 +302,14 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone" />
+
+    <!-- Bottom Navigation -->
+    <include
+        layout="@layout/view_admin_bottom_nav"
+        android:id="@+id/bottomNavBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
 

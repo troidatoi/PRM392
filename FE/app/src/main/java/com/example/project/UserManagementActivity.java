@@ -3,6 +3,8 @@ package com.example.project;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +35,10 @@ public class UserManagementActivity extends AppCompatActivity {
     private RecyclerView recyclerViewUsers;
     private ProgressBar progressBar;
     private TextView tvEmptyState;
+    private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
+    private ImageView iconUserManagement;
+    private TextView tvUserManagement;
+    private TextView tabAll, tabCustomers, tabAdmins;
 
     private UserAdapter userAdapter;
     private List<User> userList;
@@ -57,6 +63,28 @@ public class UserManagementActivity extends AppCompatActivity {
         recyclerViewUsers = findViewById(R.id.recyclerViewUsers);
         progressBar = findViewById(R.id.progressBar);
         tvEmptyState = findViewById(R.id.tvEmptyState);
+
+        // Bottom nav (may be null depending on layout version)
+        navDashboard = findViewById(R.id.navDashboard);
+        navUserManagement = findViewById(R.id.navUserManagement);
+        navProductManagement = findViewById(R.id.navProductManagement);
+        navStoreManagement = findViewById(R.id.navStoreManagement);
+        navOrderManagement = findViewById(R.id.navOrderManagement);
+        navChatManagement = findViewById(R.id.navChatManagement);
+        iconUserManagement = findViewById(R.id.iconUserManagement);
+        tvUserManagement = findViewById(R.id.tvUserManagement);
+        
+        // Set User Management tab as active
+        if (iconUserManagement != null) {
+            iconUserManagement.setColorFilter(0xFF2196F3); // active blue
+        }
+        if (tvUserManagement != null) {
+            tvUserManagement.setTextColor(0xFF2196F3); // active blue
+        }
+
+        tabAll = findViewById(R.id.tabAll);
+        tabCustomers = findViewById(R.id.tabCustomers);
+        tabAdmins = findViewById(R.id.tabAdmins);
     }
 
     private void initData() {
@@ -129,10 +157,44 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        btnBack.setOnClickListener(v -> finish());
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+
+        // Bottom navigation
+        if (navDashboard != null) navDashboard.setOnClickListener(v -> startActivity(new Intent(this, AdminManagementActivity.class)));
+        if (navProductManagement != null) navProductManagement.setOnClickListener(v -> startActivity(new Intent(this, ProductManagementActivity.class)));
+        if (navStoreManagement != null) navStoreManagement.setOnClickListener(v -> startActivity(new Intent(this, StoreManagementActivity.class)));
+        if (navOrderManagement != null) navOrderManagement.setOnClickListener(v -> Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show());
+        if (navChatManagement != null) navChatManagement.setOnClickListener(v -> startActivity(new Intent(this, AdminChatListActivity.class)));
+
+        // Tabs (UI highlight only)
+        if (tabAll != null && tabCustomers != null && tabAdmins != null) {
+            View.OnClickListener reset = x -> {
+                tabAll.setTextColor(0xFF6B7280);
+                tabCustomers.setTextColor(0xFF6B7280);
+                tabAdmins.setTextColor(0xFF6B7280);
+            };
+            tabAll.setOnClickListener(v -> { reset.onClick(v); tabAll.setTextColor(0xFF2196F3); });
+            tabCustomers.setOnClickListener(v -> { reset.onClick(v); tabCustomers.setTextColor(0xFF2196F3); });
+            tabAdmins.setOnClickListener(v -> { reset.onClick(v); tabAdmins.setTextColor(0xFF2196F3); });
+        }
     }
 
     private void onUserClick(User user) {
+        // Guard: require admin/staff and valid token before navigating
+        if (authManager == null) authManager = AuthManager.getInstance(this);
+        if (!authManager.isStaff()) {
+            Toast.makeText(this, "Bạn không có quyền xem chi tiết người dùng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String header = authManager.getAuthHeader();
+        if (header == null) {
+            Toast.makeText(this, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (user == null || user.getId() == null) {
+            Toast.makeText(this, "Không xác định được người dùng", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = new Intent(this, UserDetailActivity.class);
         intent.putExtra("userId", user.getId());
         startActivity(intent);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="admin_product_categories">
+        <item>city</item>
+        <item>mountain</item>
+        <item>folding</item>
+        <item>cargo</item>
+        <item>sport</item>
+        <item>other</item>
+    </string-array>
+    <string-array name="admin_product_statuses">
+        <item>available</item>
+        <item>out_of_stock</item>
+        <item>draft</item>
+        <item>featured</item>
+    </string-array>
+</resources>

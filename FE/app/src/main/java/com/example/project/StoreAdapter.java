@@ -17,6 +17,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
     private List<Store> storeList;
     private OnStoreActionListener listener;
     private OnStoreClickListener clickListener;
+    private OnInventoryClickListener inventoryClickListener;
 
     public interface OnStoreActionListener {
         void onEditStore(Store store);
@@ -27,6 +28,10 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         void onStoreClick(Store store);
     }
 
+    public interface OnInventoryClickListener {
+        void onInventoryClick(Store store);
+    }
+
     public StoreAdapter(List<Store> storeList, OnStoreActionListener listener) {
         this.storeList = storeList;
         this.listener = listener;
@@ -34,6 +39,10 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     public void setOnStoreClickListener(OnStoreClickListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    public void setOnInventoryClickListener(OnInventoryClickListener listener) {
+        this.inventoryClickListener = listener;
     }
 
     @NonNull
@@ -50,7 +59,37 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
         holder.tvStoreName.setText(store.getName());
         holder.tvStoreAddress.setText(store.getFullAddress());
-        holder.tvStoreStatus.setText(store.getDisplayStatus());
+        
+        // Show distance if available
+        if (holder.tvStoreDistance != null) {
+            String distanceText = store.getDistanceText();
+            if (distanceText != null && !distanceText.isEmpty()) {
+                holder.tvStoreDistance.setText("📍 " + distanceText + " từ vị trí của bạn");
+                holder.tvStoreDistance.setVisibility(View.VISIBLE);
+                // Debug log
+                android.util.Log.d("StoreAdapter", "Showing distance for " + store.getName() + ": " + distanceText);
+            } else {
+                holder.tvStoreDistance.setVisibility(View.GONE);
+                // Debug log
+                android.util.Log.d("StoreAdapter", "No distance for " + store.getName() + ", distance=" + store.getDistance());
+            }
+        }
+        
+        // Show status (Hoạt động/Đóng cửa) - only if no distance
+        String statusText = store.getDisplayStatus();
+        if (statusText != null && statusText.contains("km")) {
+            // If status contains distance, show only "Hoạt động" or "Đóng cửa"
+            holder.tvStoreStatus.setText(store.isActive() ? "Hoạt động" : "Đóng cửa");
+        } else {
+            holder.tvStoreStatus.setText(statusText);
+        }
+
+        // Show "Gần nhất" badge for first item if enabled
+        if (holder.nearestBadge != null) {
+            holder.nearestBadge.setVisibility(
+                (showNearestBadge && position == 0) ? View.VISIBLE : View.GONE
+            );
+        }
 
         // Set status badge color
         if (store.isActive()) {
@@ -59,19 +98,35 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             holder.statusBadge.setCardBackgroundColor(Color.parseColor("#FF5252")); // Red
         }
 
-        // Edit button
-        holder.btnEditStore.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEditStore(store);
-            }
-        });
+        // Edit button - only show if listener is available
+        if (holder.btnEditStore != null) {
+            holder.btnEditStore.setVisibility(listener != null ? View.VISIBLE : View.GONE);
+            holder.btnEditStore.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onEditStore(store);
+                }
+            });
+        }
 
-        // Delete button
-        holder.btnDeleteStore.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onDeleteStore(store);
-            }
-        });
+        // Delete button - only show if listener is available
+        if (holder.btnDeleteStore != null) {
+            holder.btnDeleteStore.setVisibility(listener != null ? View.VISIBLE : View.GONE);
+            holder.btnDeleteStore.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onDeleteStore(store);
+                }
+            });
+        }
+
+        // Inventory button - only show if listener is available
+        if (holder.btnInventory != null) {
+            holder.btnInventory.setVisibility(inventoryClickListener != null ? View.VISIBLE : View.GONE);
+            holder.btnInventory.setOnClickListener(v -> {
+                if (inventoryClickListener != null) {
+                    inventoryClickListener.onInventoryClick(store);
+                }
+            });
+        }
 
         // Store item click
         holder.itemView.setOnClickListener(v -> {
@@ -91,18 +146,27 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         notifyDataSetChanged();
     }
 
+    private boolean showNearestBadge = false;
+
+    public void setShowNearestBadge(boolean show) {
+        this.showNearestBadge = show;
+    }
+
     static class StoreViewHolder extends RecyclerView.ViewHolder {
-        TextView tvStoreName, tvStoreAddress, tvStoreStatus;
-        CardView statusBadge, btnEditStore, btnDeleteStore;
+        TextView tvStoreName, tvStoreAddress, tvStoreStatus, tvStoreDistance;
+        CardView statusBadge, nearestBadge, btnEditStore, btnDeleteStore, btnInventory;
 
         public StoreViewHolder(@NonNull View itemView) {
             super(itemView);
             tvStoreName = itemView.findViewById(R.id.tvStoreName);
             tvStoreAddress = itemView.findViewById(R.id.tvStoreAddress);
             tvStoreStatus = itemView.findViewById(R.id.tvStoreStatus);
+            tvStoreDistance = itemView.findViewById(R.id.tvStoreDistance);
             statusBadge = itemView.findViewById(R.id.statusBadge);
+            nearestBadge = itemView.findViewById(R.id.nearestBadge);
             btnEditStore = itemView.findViewById(R.id.btnEditStore);
             btnDeleteStore = itemView.findViewById(R.id.btnDeleteStore);
+            btnInventory = itemView.findViewById(R.id.btnInventory);
         }
     }
 }

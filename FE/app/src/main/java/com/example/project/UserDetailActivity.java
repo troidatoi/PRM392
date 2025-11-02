@@ -76,6 +76,11 @@ public class UserDetailActivity extends AppCompatActivity {
         imgStatus = findViewById(R.id.imgStatus);
         progressBar = findViewById(R.id.progressBar);
         cardViewUserInfo = findViewById(R.id.cardViewUserInfo);
+
+        // Policy: Admin cannot delete users, only disable → hide Delete button
+        if (btnDeleteUser != null) {
+            btnDeleteUser.setVisibility(View.GONE);
+        }
     }
 
     private void initData() {
@@ -138,6 +143,7 @@ public class UserDetailActivity extends AppCompatActivity {
             tvPhoneNumber.setText(user.getPhoneNumber());
             tvPhoneNumber.setVisibility(View.VISIBLE);
         } else {
+            tvPhoneNumber.setText("");
             tvPhoneNumber.setVisibility(View.GONE);
         }
 
@@ -146,6 +152,7 @@ public class UserDetailActivity extends AppCompatActivity {
             tvAddress.setText(user.getAddress());
             tvAddress.setVisibility(View.VISIBLE);
         } else {
+            tvAddress.setText("");
             tvAddress.setVisibility(View.GONE);
         }
 
@@ -192,10 +199,7 @@ public class UserDetailActivity extends AppCompatActivity {
             showEditUserDialog();
         });
         
-        btnDeleteUser.setOnClickListener(v -> {
-            Toast.makeText(this, "Đang mở dialog xác nhận xóa...", Toast.LENGTH_SHORT).show();
-            showDeleteConfirmationDialog();
-        });
+        // Delete disabled by policy
     }
 
     private void showLoading(boolean show) {
@@ -309,6 +313,12 @@ public class UserDetailActivity extends AppCompatActivity {
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         btnSave.setOnClickListener(v -> {
+            // Clear previous errors
+            etUsername.setError(null);
+            etEmail.setError(null);
+            etPhoneNumber.setError(null);
+            etAddress.setError(null);
+
             String username = etUsername.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
             String phoneNumber = etPhoneNumber.getText().toString().trim();
@@ -316,13 +326,113 @@ public class UserDetailActivity extends AppCompatActivity {
             String role = roles[spinnerRole.getSelectedItemPosition()];
             boolean isActive = spinnerStatus.getSelectedItemPosition() == 0;
 
-            if (username.isEmpty() || email.isEmpty()) {
-                Toast.makeText(this, "Tên đăng nhập và email không được để trống", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            if (username.isEmpty()) { etUsername.setError("Không được để trống"); return; }
+            if (email.isEmpty()) { etEmail.setError("Không được để trống"); return; }
 
-            updateUser(username, email, phoneNumber, address, role, isActive);
-            dialog.dismiss();
+            // Build body here to show field-level errors on failure
+            String token = authManager.getAuthHeader();
+            if (token == null) { Toast.makeText(this, "Hết phiên đăng nhập", Toast.LENGTH_SHORT).show(); return; }
+
+            java.util.Map<String, Object> body = new java.util.HashMap<>();
+            body.put("username", username);
+            body.put("email", email);
+            if (!phoneNumber.isEmpty()) {
+                String normalized = phoneNumber.replaceAll("[^0-9]", "");
+                if (normalized.startsWith("84") && normalized.length() >= 11) normalized = "0" + normalized.substring(2);
+                body.put("phoneNumber", normalized);
+            }
+            if (!address.isEmpty()) body.put("address", address);
+            body.put("role", role);
+            body.put("isActive", isActive);
+
+            showLoading(true);
+            apiService.updateUser(token, userId, body).enqueue(new retrofit2.Callback<ApiResponse<User>>() {
+                @Override
+                public void onResponse(retrofit2.Call<ApiResponse<User>> call, retrofit2.Response<ApiResponse<User>> response) {
+                    showLoading(false);
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        Toast.makeText(UserDetailActivity.this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        loadUserDetail();
+                        return;
+                    }
+                    // Parse body errors even when HTTP 200 but success=false
+                    if (response.isSuccessful() && response.body() != null && !response.body().isSuccess()) {
+                        try {
+                            java.lang.reflect.Field f = response.body().getClass().getDeclaredField("errors");
+                            f.setAccessible(true);
+                            Object errs = f.get(response.body());
+                            if (errs instanceof java.util.List) {
+                                for (Object eo : (java.util.List) errs) {
+                                    try {
+                                        java.lang.reflect.Field fp = eo.getClass().getDeclaredField("param");
+                                        fp.setAccessible(true);
+                                        String param = String.valueOf(fp.get(eo));
+                                        java.lang.reflect.Field fm = eo.getClass().getDeclaredField("msg");
+                                        fm.setAccessible(true);
+                                        String msg = String.valueOf(fm.get(eo));
+                                        if ("email".equals(param)) etEmail.setError(msg);
+                                        else if ("phoneNumber".equals(param)) etPhoneNumber.setError(msg);
+                                        else if ("username".equals(param)) etUsername.setError(msg);
+                                        else if ("address".equals(param)) etAddress.setError(msg);
+                                    } catch (Exception ignored2) {}
+                                }
+                                return;
+                            }
+                        } catch (Exception ignored1) {}
+                    }
+                    // Parse error and map to fields (HTTP 4xx)
+                    try {
+                        String eb = response.errorBody() != null ? response.errorBody().string() : null;
+                        if (eb != null) {
+                            org.json.JSONObject obj = new org.json.JSONObject(eb);
+                            if (obj.has("errors") && obj.get("errors") instanceof org.json.JSONArray) {
+                                org.json.JSONArray arr = obj.getJSONArray("errors");
+                                for (int i = 0; i < arr.length(); i++) {
+                                    org.json.JSONObject e = arr.getJSONObject(i);
+                                    String param = e.has("param") ? e.optString("param") : (e.has("path") ? e.optString("path") : e.optString("field"));
+                                    String msg = e.has("msg") ? e.optString("msg") : e.optString("message", "Không hợp lệ");
+                                    if ("email".equals(param)) etEmail.setError(msg);
+                                    else if ("phoneNumber".equals(param)) etPhoneNumber.setError(msg);
+                                    else if ("username".equals(param)) etUsername.setError(msg);
+                                    else if ("address".equals(param)) etAddress.setError(msg);
+                                }
+                                return;
+                            }
+                            // Mongoose ValidationError shape: { errors: { field: { message: '...', path: 'field', value: '...' } } }
+                            if (obj.has("errors") && obj.get("errors") instanceof org.json.JSONObject) {
+                                org.json.JSONObject errs = obj.getJSONObject("errors");
+                                java.util.Iterator<String> keys = errs.keys();
+                                boolean mapped = false;
+                                while (keys.hasNext()) {
+                                    String field = keys.next();
+                                    org.json.JSONObject e = errs.optJSONObject(field);
+                                    if (e != null) {
+                                        String msg = e.optString("message", "Không hợp lệ");
+                                        if ("email".equals(field)) { etEmail.setError(msg); mapped = true; }
+                                        else if ("phoneNumber".equals(field)) { etPhoneNumber.setError(msg); mapped = true; }
+                                        else if ("username".equals(field)) { etUsername.setError(msg); mapped = true; }
+                                        else if ("address".equals(field)) { etAddress.setError(msg); mapped = true; }
+                                    }
+                                }
+                                if (mapped) return;
+                            }
+                            String message = obj.optString("message");
+                            if (message != null && message.contains("duplicate key") ) {
+                                if (message.contains("email")) etEmail.setError("Email đã tồn tại");
+                                if (message.contains("username")) etUsername.setError("Tên đăng nhập đã tồn tại");
+                                return;
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    Toast.makeText(UserDetailActivity.this, "Cập nhật thất bại ("+response.code()+")", Toast.LENGTH_SHORT).show();
+                }
+                @Override
+                public void onFailure(retrofit2.Call<ApiResponse<User>> call, Throwable t) {
+                    showLoading(false);
+                    Toast.makeText(UserDetailActivity.this, "Lỗi mạng: "+t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 
@@ -335,15 +445,22 @@ public class UserDetailActivity extends AppCompatActivity {
             return;
         }
 
-        User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPhoneNumber(phoneNumber.isEmpty() ? null : phoneNumber);
-        user.setAddress(address.isEmpty() ? null : address);
-        user.setRole(role);
-        user.setActive(isActive);
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        if (username != null && !username.trim().isEmpty()) body.put("username", username.trim());
+        if (email != null && !email.trim().isEmpty()) body.put("email", email.trim());
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+            String normalized = phoneNumber.replaceAll("[^0-9]", "");
+            // Convert +84xxxxxxxxx -> 0xxxxxxxxx when applicable
+            if (normalized.startsWith("84") && normalized.length() >= 11) {
+                normalized = "0" + normalized.substring(2);
+            }
+            body.put("phoneNumber", normalized);
+        }
+        if (address != null && !address.trim().isEmpty()) body.put("address", address.trim());
+        if (role != null && !role.trim().isEmpty()) body.put("role", role.trim());
+        body.put("isActive", isActive);
 
-        Call<ApiResponse<User>> call = apiService.updateUser(authHeader, userId, user);
+        Call<ApiResponse<User>> call = apiService.updateUser(authHeader, userId, body);
         call.enqueue(new Callback<ApiResponse<User>>() {
             @Override
             public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {
@@ -358,7 +475,14 @@ public class UserDetailActivity extends AppCompatActivity {
                         Toast.makeText(UserDetailActivity.this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(UserDetailActivity.this, "Lỗi kết nối: " + response.code(), Toast.LENGTH_SHORT).show();
+                    String detail = String.valueOf(response.code());
+                    try {
+                        if (response.errorBody() != null) {
+                            String eb = response.errorBody().string();
+                            detail = detail + " - " + eb;
+                        }
+                    } catch (Exception ignored) {}
+                    Toast.makeText(UserDetailActivity.this, "Lỗi cập nhật: " + detail, Toast.LENGTH_LONG).show();
                 }
             }
 

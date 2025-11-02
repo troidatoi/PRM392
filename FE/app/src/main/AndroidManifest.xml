@@ -7,6 +7,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    
+    <!-- Location permissions (for future use) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
+    <!-- OpenStreetMap (OSMDroid) permissions -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -133,6 +142,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Order Detail Activity -->
+        <activity
+            android:name=".OrderDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Add Product Activity -->
         <activity
             android:name=".AddProductActivity"
@@ -155,6 +170,12 @@
         <!-- User Detail Activity -->
         <activity
             android:name=".UserDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Order Detail Activity -->
+        <activity
+            android:name=".OrderDetailActivity_new"
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
@@ -182,22 +203,23 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
-        <!-- Reset Password Activity with Deep Link -->
+        <!-- Store Inventory Activity -->
         <activity
-            android:name=".ResetPasswordActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Project">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="http"
-                    android:host="localhost"
-                    android:port="5001"
-                    android:pathPrefix="/reset-password" />
-            </intent-filter>
-        </activity>
+            android:name=".StoreInventoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Admin Order List Activity -->
+        <activity
+            android:name=".AdminOrderListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Store List Activity -->
+        <activity
+            android:name=".StoreListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
 
     </application>
 

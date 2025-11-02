@@ -6,12 +6,12 @@
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="15dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="@android:color/transparent">
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/liquid_glass_input"
+        android:background="#FFFFFF"
         android:orientation="horizontal"
         android:padding="12dp">
 
@@ -69,6 +69,16 @@
                 android:text="Số lượng: 1"
                 android:textSize="13sp"
                 android:textColor="#666666"
+                android:layout_marginTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvProductTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thành tiền: 29.990.000 VNĐ"
+                android:textSize="14sp"
+                android:textColor="#4CAF50"
+                android:textStyle="bold"
                 android:layout_marginTop="4dp" />
 
         </LinearLayout>

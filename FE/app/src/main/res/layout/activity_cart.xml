@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E0E0E0">
+    android:background="@drawable/light_gray_background">
 
     <!-- Main Content -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/checkoutSection"
+        android:layout_above="@+id/bottomNavBar"
         android:fillViewport="true"
-        android:paddingBottom="16dp"
+        android:paddingBottom="24dp"
         android:clipToPadding="false">
 
         <LinearLayout
@@ -20,21 +20,20 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp"
-            android:paddingBottom="100dp">
+            android:paddingBottom="200dp">
 
-            <!-- Cart Header with Liquid Glass -->
+            <!-- Cart Header -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                app:cardCornerRadius="25dp"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_header"
                     android:orientation="horizontal"
                     android:padding="24dp"
                     android:gravity="center_vertical">
@@ -73,13 +72,12 @@
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             app:cardCornerRadius="30dp"
-                            app:cardElevation="6dp"
-                            app:cardBackgroundColor="@android:color/transparent">
+                            app:cardElevation="4dp"
+                            app:cardBackgroundColor="#F5F5F5">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="@drawable/liquid_glass_small"
                                 android:gravity="center">
 
                                 <ImageView
@@ -94,17 +92,25 @@
                         </androidx.cardview.widget.CardView>
 
                         <!-- Badge -->
-                        <TextView
-                            android:id="@+id/tvBadge"
+                        <androidx.cardview.widget.CardView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="top|end"
-                            android:background="@drawable/liquid_glass_small"
-                            android:text="5"
-                            android:textColor="#FF5722"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:gravity="center" />
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="#FFFFFF">
+
+                            <TextView
+                                android:id="@+id/tvBadge"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="5"
+                                android:textColor="#FF5722"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:gravity="center" />
+
+                        </androidx.cardview.widget.CardView>
 
                     </FrameLayout>
 
@@ -121,12 +127,11 @@
                 android:visibility="gone"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
                     android:padding="40dp"
                     android:gravity="center">
@@ -165,9 +170,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                android:paddingBottom="16dp" />
 
-            <!-- Coupon Section with Liquid Glass -->
+            <!-- Coupon Section with Liquid Glass - HIDDEN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -175,20 +182,21 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
-                android:layout_marginTop="24dp" />
+                android:layout_marginTop="24dp"
+                android:visibility="gone" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="30dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#F5F5F5"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_search"
                     android:padding="8dp">
 
                     <EditText
@@ -200,8 +208,8 @@
                         android:layout_marginEnd="8dp"
                         android:background="@android:color/transparent"
                         android:hint="Nhập mã giảm giá"
-                        android:textColorHint="#8B9DC3"
-                        android:textColor="#3D5A80"
+                        android:textColorHint="#999999"
+                        android:textColor="#333333"
                         android:textSize="16sp"
                         android:inputType="text"
                         android:imeOptions="actionDone"
@@ -216,7 +224,7 @@
                         android:layout_marginEnd="8dp"
                         app:cardCornerRadius="22dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -224,14 +232,13 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@drawable/liquid_glass_button"
                             android:gravity="center">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Áp dụng"
-                                android:textColor="#FFFFFF"
+                                android:textColor="#000000"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
@@ -243,7 +250,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Order Summary with Liquid Glass -->
+            <!-- Order Summary with Liquid Glass - HIDDEN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -251,7 +258,8 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
-                android:layout_marginTop="24dp" />
+                android:layout_marginTop="24dp"
+                android:visibility="gone" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -259,12 +267,12 @@
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent">
+                app:cardBackgroundColor="#FFFFFF"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/liquid_glass_background"
                     android:orientation="vertical"
                     android:padding="20dp">
 
@@ -385,278 +393,180 @@
 
             </androidx.cardview.widget.CardView>
 
-        </LinearLayout>
-
-    </ScrollView>
-
-    <!-- Checkout Section with Liquid Glass (Fixed at Bottom) -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/checkoutSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="100dp"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="@android:color/transparent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/liquid_glass_background"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <!-- Checkout Button -->
+            <!-- Checkout Section moved INSIDE scroll -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/btnCheckout"
+                android:id="@+id/checkoutSection"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@android:color/transparent"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="12dp"
+                app:cardBackgroundColor="#FFFFFF">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/liquid_glass_button"
-                    android:gravity="center">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                    <ImageView
-                        android:id="@+id/iconCheckout"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="24dp"
-                        android:src="@drawable/ic_cart"
-                        app:tint="#FFFFFF"
-                        android:contentDescription="Checkout" />
+                    <!-- Checkout Button -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btnCheckout"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        app:cardCornerRadius="28dp"
+                        app:cardElevation="8dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:text="Thanh Toán"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.02" />
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center">
 
-                </RelativeLayout>
+                            <ImageView
+                                android:id="@+id/iconCheckout"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="24dp"
+                                android:src="@drawable/ic_cart"
+                                app:tint="#000000"
+                                android:contentDescription="Checkout" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:text="Thanh Toán"
+                                android:textColor="#000000"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.02" />
+
+                        </RelativeLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </ScrollView>
 
-    <!-- Liquid Glass Bottom Navigation Bar - Floating Style -->
-    <androidx.cardview.widget.CardView
+    <!-- removed fixed checkout section -->
+
+    <!-- Bottom Navigation Bar - Floating Style -->
+    <LinearLayout
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="72dp"
         android:layout_alignParentBottom="true"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="12dp"
-        android:backgroundTint="#FFFFFF">
-
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="12dp">
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
-
-            <!-- Home Tab -->
-            <LinearLayout
-                android:id="@+id/navHome"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurHome"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconHome"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_home"
-                        app:tint="#1A1A1A"
-                        android:contentDescription="Home" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvHome"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Trang chủ"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A" />
-
-            </LinearLayout>
-
-            <!-- Products -->
-            <LinearLayout
-                android:id="@+id/navProducts"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurProducts"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconProducts"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_products"
-                        app:tint="#1A1A1A"
-                        android:contentDescription="Products" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvProducts"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sản phẩm"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A" />
-
-            </LinearLayout>
-
-            <!-- Cart -->
-            <LinearLayout
-                android:id="@+id/navCart"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurCart"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="visible" />
-
-                    <ImageView
-                        android:id="@+id/iconCart"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_cart"
-                        app:tint="#1A1A1A"
-                        android:contentDescription="Cart" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvCart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Giỏ hàng"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- Account -->
-            <LinearLayout
-                android:id="@+id/navAccount"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurAccount"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconAccount"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_account"
-                        app:tint="#1A1A1A"
-                        android:contentDescription="Account" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvAccount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tài khoản"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A" />
-
-            </LinearLayout>
-
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:id="@+id/iconHome"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home"
+                app:tint="#1A1A1A"
+                android:contentDescription="Home" />
+            <TextView
+                android:id="@+id/tvHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trang chủ"
+                android:textSize="11sp"
+                android:textColor="#1A1A1A" />
         </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+        <LinearLayout
+            android:id="@+id/navProducts"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:id="@+id/iconProducts"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_products"
+                app:tint="#1A1A1A"
+                android:contentDescription="Products" />
+            <TextView
+                android:id="@+id/tvProducts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sản phẩm"
+                android:textSize="11sp"
+                android:textColor="#1A1A1A" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/navCart"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:id="@+id/iconCart"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_cart"
+                app:tint="#1A1A1A"
+                android:contentDescription="Cart" />
+            <TextView
+                android:id="@+id/tvCart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giỏ hàng"
+                android:textSize="11sp"
+                android:textColor="#1A1A1A" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/navAccount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+            <ImageView
+                android:id="@+id/iconAccount"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_account"
+                app:tint="#1A1A1A"
+                android:contentDescription="Account" />
+            <TextView
+                android:id="@+id/tvAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tài khoản"
+                android:textSize="11sp"
+                android:textColor="#1A1A1A" />
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
 

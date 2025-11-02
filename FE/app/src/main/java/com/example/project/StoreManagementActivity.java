@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,11 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     private ApiService apiService;
     private AuthManager authManager;
     
+    // Bottom navigation
+    private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
+    private ImageView iconStoreManagement;
+    private TextView tvStoreManagement;
+    
     // Pagination
     private int currentPage = 1;
     private int totalPages = 1;
@@ -75,6 +81,7 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         setupRecyclerView();
         setupSwipeRefresh();
         loadStores();
+        setupBottomNavigation();
     }
 
     private void initViews() {
@@ -86,6 +93,16 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         emptyState = findViewById(R.id.emptyState);
         progressBar = findViewById(R.id.progressBar);
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        
+        // Bottom navigation
+        navDashboard = findViewById(R.id.navDashboard);
+        navUserManagement = findViewById(R.id.navUserManagement);
+        navProductManagement = findViewById(R.id.navProductManagement);
+        navStoreManagement = findViewById(R.id.navStoreManagement);
+        navOrderManagement = findViewById(R.id.navOrderManagement);
+        navChatManagement = findViewById(R.id.navChatManagement);
+        iconStoreManagement = findViewById(R.id.iconStoreManagement);
+        tvStoreManagement = findViewById(R.id.tvStoreManagement);
 
         // Back button
         btnBack.setOnClickListener(v -> finish());
@@ -100,6 +117,12 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         storeList = new ArrayList<>();
         storeAdapter = new StoreAdapter(storeList, this);
         storeAdapter.setOnStoreClickListener(this);
+        storeAdapter.setOnInventoryClickListener(store -> {
+            Intent intent = new Intent(StoreManagementActivity.this, StoreInventoryActivity.class);
+            intent.putExtra("storeId", store.getId());
+            intent.putExtra("storeName", store.getName());
+            startActivity(intent);
+        });
         rvStores.setLayoutManager(new LinearLayoutManager(this));
         rvStores.setAdapter(storeAdapter);
     }
@@ -320,5 +343,46 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         Intent intent = new Intent(this, StoreDetailActivity.class);
         intent.putExtra("storeId", store.getId());
         startActivity(intent);
+    }
+    
+    private void setupBottomNavigation() {
+        // Set Store Management tab as active
+        if (iconStoreManagement != null) {
+            iconStoreManagement.setColorFilter(0xFF2196F3); // active blue
+        }
+        if (tvStoreManagement != null) {
+            tvStoreManagement.setTextColor(0xFF2196F3); // active blue
+        }
+        
+        // Bottom navigation click listeners
+        if (navDashboard != null) {
+            navDashboard.setOnClickListener(v -> {
+                Intent intent = new Intent(StoreManagementActivity.this, AdminManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (navUserManagement != null) {
+            navUserManagement.setOnClickListener(v -> {
+                Intent intent = new Intent(StoreManagementActivity.this, UserManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (navProductManagement != null) {
+            navProductManagement.setOnClickListener(v -> {
+                Intent intent = new Intent(StoreManagementActivity.this, ProductManagementActivity.class);
+                startActivity(intent);
+            });
+        }
+        if (navOrderManagement != null) {
+            navOrderManagement.setOnClickListener(v -> {
+                Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+            });
+        }
+        if (navChatManagement != null) {
+            navChatManagement.setOnClickListener(v -> {
+                Intent intent = new Intent(StoreManagementActivity.this, AdminChatListActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 }

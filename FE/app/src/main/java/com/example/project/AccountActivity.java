@@ -16,11 +16,10 @@ import com.example.project.utils.AuthManager;
 public class AccountActivity extends AppCompatActivity {
 
     private TextView tvUserName, tvUserEmail, tvPhone, tvAddress;
-    private CardView btnEditProfile, btnOrders, btnFavorites, btnSettings, btnLogout;
+    private CardView btnEditProfile, btnOrders, btnStores, btnFavorites, btnSettings, btnLogout;
     private ImageView ivAvatar;
 
     private View navHome, navProducts, navCart, navAccount;
-    private View blurHome, blurProducts, blurCart, blurAccount;
     private ImageView iconHome, iconProducts, iconCart, iconAccount;
     private TextView tvHome, tvProducts, tvCart, tvAccountNav;
 
@@ -53,6 +52,7 @@ public class AccountActivity extends AppCompatActivity {
 
         btnEditProfile = findViewById(R.id.btnEditProfile);
         btnOrders = findViewById(R.id.btnOrders);
+        btnStores = findViewById(R.id.btnStores);
         btnFavorites = findViewById(R.id.btnFavorites);
         btnSettings = findViewById(R.id.btnSettings);
         btnLogout = findViewById(R.id.btnLogout);
@@ -62,10 +62,6 @@ public class AccountActivity extends AppCompatActivity {
         navCart = findViewById(R.id.navCart);
         navAccount = findViewById(R.id.navAccount);
 
-        blurHome = findViewById(R.id.blurHome);
-        blurProducts = findViewById(R.id.blurProducts);
-        blurCart = findViewById(R.id.blurCart);
-        blurAccount = findViewById(R.id.blurAccount);
 
         iconHome = findViewById(R.id.iconHome);
         iconProducts = findViewById(R.id.iconProducts);
@@ -79,23 +75,67 @@ public class AccountActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
+        // Set Account as selected by default
         selectNavItem(blurAccount, iconAccount, tvAccountNav);
-        navHome.setOnClickListener(v -> startActivity(new Intent(AccountActivity.this, HomeActivity.class)));
-        navProducts.setOnClickListener(v -> startActivity(new Intent(AccountActivity.this, ShopActivity.class)));
-        navCart.setOnClickListener(v -> startActivity(new Intent(AccountActivity.this, CartActivity.class)));
+
+        navHome.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        });
+
+        navProducts.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, ShopActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        });
+
+        navCart.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, CartActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        });
+
+        navAccount.setOnClickListener(v -> {
+            selectNavItem(blurAccount, iconAccount, tvAccountNav);
+            deselectNavItem(blurHome, iconHome, tvHome);
+            deselectNavItem(blurProducts, iconProducts, tvProducts);
+            deselectNavItem(blurCart, iconCart, tvCart);
+        });
     }
 
-    private void selectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.VISIBLE);
+    private void selectNavItem(ImageView icon, TextView text) {
         icon.setColorFilter(Color.parseColor("#2196F3"));
         text.setTextColor(Color.parseColor("#2196F3"));
     }
 
+    private void deselectNavItem(View blur, ImageView icon, TextView text) {
+        blur.setVisibility(View.GONE);
+        icon.setColorFilter(Color.parseColor("#666666"));
+        text.setTextColor(Color.parseColor("#666666"));
+    }
+
     private void setupClickListeners() {
-        btnEditProfile.setOnClickListener(v -> startActivity(new Intent(AccountActivity.this, ProfileEditActivity.class)));
-        btnOrders.setOnClickListener(v -> startActivity(new Intent(AccountActivity.this, OrderHistoryActivity.class)));
-        btnFavorites.setOnClickListener(v -> Toast.makeText(this, "Chức năng đang phát triển", Toast.LENGTH_SHORT).show());
-        btnSettings.setOnClickListener(v -> Toast.makeText(this, "Chức năng đang phát triển", Toast.LENGTH_SHORT).show());
+        btnEditProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, EditProfileActivity.class);
+            startActivity(intent);
+        });
+
+        btnOrders.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, OrderHistoryActivity.class);
+            startActivity(intent);
+        });
+
+        btnFavorites.setOnClickListener(v -> {
+            Toast.makeText(this, "Sản phẩm yêu thích", Toast.LENGTH_SHORT).show();
+        });
+
+        btnSettings.setOnClickListener(v -> {
+            Toast.makeText(this, "Cài đặt", Toast.LENGTH_SHORT).show();
+        });
 
         btnLogout.setOnClickListener(v -> {
             authManager.clearAuthData();
