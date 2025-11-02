@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const passport = require('passport');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -11,6 +12,10 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Passport config
+app.use(passport.initialize());
+require('./config/passport')(passport);
 
 // Body parser
 app.use(express.json({ limit: '10mb' }));
@@ -24,6 +29,9 @@ app.use(cors({
   credentials: true
 }));
 
+// Serve static files from public directory
+app.use(express.static('public'));
+
 // Routes
 app.use('/api/bikes', require('./routes/bikeRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -32,6 +40,7 @@ app.use('/api/stores', require('./routes/storeRoutes')); // Store routes
 app.use('/api/cart', require('./routes/cartRoutes')); // Cart routes
 app.use('/api/orders', require('./routes/orderRoutes')); // Order routes
 app.use('/api/inventory', require('./routes/inventoryRoutes')); // Inventory routes
+app.use('/api/locations', require('./routes/locationRoutes')); // Location data routes
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -41,6 +50,11 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
   });
+});
+
+// Reset password page route
+app.get('/reset-password/:token', (req, res) => {
+  res.sendFile(__dirname + '/public/reset-password.html');
 });
 
 // 404 handler

@@ -35,10 +35,16 @@ public interface ApiService {
     Call<ApiResponse<User>> getMe(@Header("Authorization") String token);
     
     @PUT("auth/me")
-    Call<ApiResponse<User>> updateProfile(@Header("Authorization") String token, @Body User user);
+    Call<ApiResponse<User>> updateProfile(@Header("Authorization") String token, @Body java.util.Map<String, Object> body);
     
     @PUT("auth/me/change-password")
     Call<ApiResponse<Void>> changePassword(@Header("Authorization") String token, @Body ChangePasswordRequest request);
+
+    @POST("auth/forgot-password")
+    Call<ApiResponse<Void>> forgotPassword(@Body java.util.Map<String, String> body);
+
+    @PUT("auth/reset-password/{token}")
+    Call<ApiResponse<User>> resetPassword(@retrofit2.http.Path("token") String token, @Body java.util.Map<String, String> body);
     
     // User management endpoints (Admin/Staff only)
     @GET("users")
@@ -144,6 +150,9 @@ public interface ApiService {
     @retrofit2.http.DELETE("stores/{id}")
     Call<ApiResponse<Void>> deleteStore(@Header("Authorization") String token, 
                                       @retrofit2.http.Path("id") String storeId);
+
+    @GET("locations")
+    Call<ApiResponse<java.util.List<com.example.project.models.Location>>> getLocations();
     
     @POST("stores/nearby")
     Call<ApiResponse<Store[]>> getNearbyStores(@Body NearbyStoreRequest request);

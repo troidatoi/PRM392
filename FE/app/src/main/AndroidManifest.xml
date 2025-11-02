@@ -182,6 +182,23 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Reset Password Activity with Deep Link -->
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Project">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="http"
+                    android:host="localhost"
+                    android:port="5001"
+                    android:pathPrefix="/reset-password" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

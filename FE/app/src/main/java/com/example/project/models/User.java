@@ -17,6 +17,12 @@ public class User {
     
     @SerializedName("address")
     private String address;
+
+    @SerializedName("city")
+    private String city;
+
+    @SerializedName("district")
+    private String district;
     
     @SerializedName("role")
     private String role;
@@ -82,6 +88,22 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 
     public String getRole() {

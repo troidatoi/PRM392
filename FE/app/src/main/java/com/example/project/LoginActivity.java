@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         apiService = RetrofitClient.getInstance().getApiService();
         
         // Test network connection
-        NetworkTest.testConnection("http://10.0.2.2:5000/api/health");
+        NetworkTest.testConnection("http://10.0.2.2:5001/api/health");
 
         // Initialize views
         tilEmail = findViewById(R.id.tilEmail);
@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Forgot password click
         findViewById(R.id.tvForgotPassword).setOnClickListener(v -> {
-            Toast.makeText(LoginActivity.this, "Chức năng đang phát triển", Toast.LENGTH_SHORT).show();
+            showForgotPasswordDialog();
         });
     }
 
@@ -165,6 +165,56 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showForgotPasswordDialog() {
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle("Quên Mật Khẩu");
+
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        input.setHint("Nhập email của bạn");
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        android.widget.FrameLayout.LayoutParams params = new  android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
+
+        builder.setPositiveButton("Gửi", (dialog, which) -> {
+            String email = input.getText().toString().trim();
+            if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(LoginActivity.this, "Vui lòng nhập email hợp lệ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            // Show loading
+            android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+            progressDialog.setMessage("Đang gửi yêu cầu...");
+            progressDialog.show();
+
+            java.util.Map<String, String> body = new java.util.HashMap<>();
+            body.put("email", email);
+
+            apiService.forgotPassword(body).enqueue(new Callback<ApiResponse<Void>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                    progressDialog.dismiss();
+                    // Backend is designed to always return a positive message for security reasons
+                    Toast.makeText(LoginActivity.this, "Yêu cầu đã được gửi. Nếu email tồn tại, bạn sẽ nhận được link reset.", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                    progressDialog.dismiss();
+                    Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
 
 }
