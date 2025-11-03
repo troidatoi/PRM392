@@ -77,6 +77,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         // Click on product card to view details
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), ProductDetailActivity.class);
+            
+            // Pass bikeId if available for API call
+            if (product.getBikeId() != null && !product.getBikeId().isEmpty()) {
+                intent.putExtra("bikeId", product.getBikeId());
+            }
+            
+            // Also pass basic info as fallback
             intent.putExtra("productName", product.getName() != null ? product.getName() : "Tên không xác định");
             intent.putExtra("productDescription", product.getDescription() != null ? product.getDescription() : "Mô tả không có");
             intent.putExtra("productPrice", product.getPrice() != null ? product.getPrice() : "0 ₫");

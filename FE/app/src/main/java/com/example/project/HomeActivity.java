@@ -617,8 +617,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadBikes() {
-        // Call API to get featured bikes
-        apiService.getFeaturedBikes(10).enqueue(new Callback<ApiResponse<Bike[]>>() {
+        // Call API to get all bikes
+        apiService.getBikes(1, 100, null, null, null, null, null, null, null).enqueue(new Callback<ApiResponse<Bike[]>>() {
             @Override
             public void onResponse(Call<ApiResponse<Bike[]>> call, Response<ApiResponse<Bike[]>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
@@ -629,12 +629,19 @@ public class HomeActivity extends AppCompatActivity {
                         // Convert bikes to products
                         for (Bike bike : bikes) {
                             String priceText = String.format("%.0f ₫", bike.getPrice());
-                            productList.add(new Product(
+                            String imageUrl = (bike.getImages() != null && !bike.getImages().isEmpty()) 
+                                ? bike.getImages().get(0).getUrl() 
+                                : null;
+                            
+                            Product product = new Product(
                                 bike.getName(),
                                 bike.getDescription(),
                                 priceText,
-                                R.drawable.splash_bike_background
-                            ));
+                                R.drawable.splash_bike_background,
+                                imageUrl
+                            );
+                            product.setBikeId(bike.getId());
+                            productList.add(product);
                         }
                         
                         productAdapter.notifyDataSetChanged();

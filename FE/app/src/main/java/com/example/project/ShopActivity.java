@@ -274,8 +274,15 @@ public class ShopActivity extends AppCompatActivity {
         bikeList = new ArrayList<>();
         bikeAdapter = new BikeAdapter(bikeList);
         bikeAdapter.setOnBikeClickListener(bike -> {
-            Intent intent = new Intent(ShopActivity.this, BikeDetailActivity.class);
-            intent.putExtra("bike_id", bike.getId());
+            Intent intent = new Intent(ShopActivity.this, ProductDetailActivity.class);
+            intent.putExtra("bikeId", bike.getId());
+            // Pass basic info as fallback
+            intent.putExtra("productName", bike.getName());
+            intent.putExtra("productDescription", bike.getDescription());
+            intent.putExtra("productPrice", String.format("%.0f ₫", bike.getPrice()));
+            if (bike.getImages() != null && !bike.getImages().isEmpty()) {
+                intent.putExtra("productImageUrl", bike.getImages().get(0).getUrl());
+            }
             startActivity(intent);
         });
 
