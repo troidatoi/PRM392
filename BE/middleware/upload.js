@@ -1,10 +1,18 @@
 const multer = require('multer');
 const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs');
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Configure storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, uploadsDir);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -64,8 +72,61 @@ const handleUploadError = (err, req, res, next) => {
   next(err);
 };
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Upload files to Cloudinary
+const uploadToCloudinary = async (files) => {
+  try {
+    const uploadPromises = files.map(file => {
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload(
+          file.path,
+          {
+            folder: 'bikes',
+            resource_type: 'image',
+            transformation: [
+              { width: 1000, height: 1000, crop: 'limit' },
+              { quality: 'auto' }
+            ]
+          },
+          (error, result) => {
+            // Delete local file after upload
+            fs.unlinkSync(file.path);
+            
+            if (error) {
+              reject(error);
+            } else {
+              resolve({
+                url: result.secure_url,
+                alt: file.originalname || 'Bike image'
+              });
+            }
+          }
+        );
+      });
+    });
+
+    const uploadResults = await Promise.all(uploadPromises);
+    return uploadResults;
+  } catch (error) {
+    // Clean up remaining files if any error occurs
+    files.forEach(file => {
+      if (fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
+    });
+    throw error;
+  }
+};
+
 module.exports = {
   uploadSingle,
   uploadMultiple,
-  handleUploadError
+  handleUploadError,
+  uploadToCloudinary
 };

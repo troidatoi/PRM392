@@ -69,32 +69,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Status / Action -->
+        <!-- Status Indicator -->
         <View
             android:id="@+id/statusIndicator"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/status_indicator_blue"
+            android:background="@drawable/status_indicator_green"
             app:layout_constraintTop_toBottomOf="@id/tvProductValue"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <!-- Edit Button - placed on separate row to avoid overlapping -->
         <TextView
             android:id="@+id/btnAction"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/action_button_background"
             android:gravity="center"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
             android:text="Edit"
             android:textColor="#FFFFFF"
-            android:textSize="10sp"
+            android:textSize="12sp"
+            android:textStyle="bold"
             android:visibility="gone"
-            app:layout_constraintStart_toEndOf="@id/statusIndicator"
-            app:layout_constraintTop_toTopOf="@id/statusIndicator"
-            app:layout_constraintBottom_toBottomOf="@id/statusIndicator" />
+            app:layout_constraintTop_toBottomOf="@id/statusIndicator"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

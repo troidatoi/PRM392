@@ -6,18 +6,24 @@ const {
   createStore,
   updateStore,
   deleteStore,
-  getNearbyStores
+  getNearbyStores,
+  geocodeLocation,
+  reverseGeocodeLocation,
+  getStoresForMap
 } = require('../controllers/storeController');
 
 // Public routes
 router.get('/', getAllStores);
-router.post('/nearby', getNearbyStores); // Must be before /:id route
-router.get('/nearby', (req, res) => {
-  res.status(405).json({
-    success: false,
-    message: 'Method not allowed. Use POST instead.'
-  });
-});
+
+// Geocoding routes (must be before /:id route)
+router.post('/geocode', geocodeLocation);
+router.post('/reverse-geocode', reverseGeocodeLocation);
+
+// Map and nearby stores routes (must be before /:id route)
+router.get('/map', getStoresForMap);
+router.get('/nearby', getNearbyStores); // Support GET with query params
+router.post('/nearby', getNearbyStores); // Support POST with body
+
 router.get('/:id', getStoreById);
 
 // Protected routes (require authentication)

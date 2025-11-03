@@ -3,18 +3,14 @@ package com.example.project;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import com.example.project.adapters.ProductCardAdapter;
 import com.example.project.models.ApiResponse;
@@ -99,7 +95,7 @@ public class ProductManagementActivity extends AppCompatActivity {
             public void onProductClick(Bike product) {
                 // Open product detail
                 Intent intent = new Intent(ProductManagementActivity.this, BikeDetailActivity.class);
-                intent.putExtra("bikeId", product.getId());
+                intent.putExtra("bike_id", product.getId());
                 startActivity(intent);
             }
 
@@ -107,7 +103,7 @@ public class ProductManagementActivity extends AppCompatActivity {
             public void onProductEdit(Bike product) {
                 // Open edit product
                 Intent intent = new Intent(ProductManagementActivity.this, UpdateBikeActivity.class);
-                intent.putExtra("bikeId", product.getId());
+                intent.putExtra("bike_id", product.getId());
                 startActivity(intent);
             }
 
@@ -202,36 +198,11 @@ public class ProductManagementActivity extends AppCompatActivity {
             Toast.makeText(this, "Edit/Delete mode", Toast.LENGTH_SHORT).show();
         });
 
-        // FAB -> open bottom sheet to add product
-        fabAddProduct.setOnClickListener(v -> showAddProductSheet());
-    }
-
-    private void showAddProductSheet() {
-        BottomSheetDialog dialog = new BottomSheetDialog(this);
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View sheet = inflater.inflate(R.layout.bottom_sheet_add_product, null);
-        dialog.setContentView(sheet);
-
-        EditText etName = sheet.findViewById(R.id.etName);
-        EditText etBrand = sheet.findViewById(R.id.etBrand);
-        EditText etPrice = sheet.findViewById(R.id.etPrice);
-        EditText etStock = sheet.findViewById(R.id.etStock);
-        TextView btnCancel = sheet.findViewById(R.id.btnCancel);
-        TextView btnSave = sheet.findViewById(R.id.btnSave);
-
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-        btnSave.setOnClickListener(v -> {
-            String name = etName.getText().toString().trim();
-            if (name.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập tên sản phẩm", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            // TODO: Gọi API tạo sản phẩm thực tế
-            Toast.makeText(this, "Đã tạo sản phẩm: " + name, Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
+        // FAB -> navigate to CreateBikeActivity (full screen)
+        fabAddProduct.setOnClickListener(v -> {
+            Intent intent = new Intent(ProductManagementActivity.this, CreateBikeActivity.class);
+            startActivity(intent);
         });
-
-        dialog.show();
     }
     
     private void setupBottomNavigation() {

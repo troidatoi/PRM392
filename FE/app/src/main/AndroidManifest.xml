@@ -7,6 +7,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    
+    <!-- Location permissions (for future use) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
+    <!-- OpenStreetMap (OSMDroid) permissions -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -158,6 +167,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- User Detail Activity -->
+        <activity
+            android:name=".UserDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Order Detail Activity -->
         <activity
             android:name=".OrderDetailActivity_new"
@@ -197,6 +212,12 @@
         <!-- Admin Order List Activity -->
         <activity
             android:name=".AdminOrderListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Store List Activity -->
+        <activity
+            android:name=".StoreListActivity"
             android:exported="false"
             android:theme="@style/Theme.Project" />
 

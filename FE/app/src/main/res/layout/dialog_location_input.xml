@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vui lòng chọn địa chỉ của bạn để tìm cửa hàng gần nhất"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Province/City Spinner -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tỉnh/Thành phố *"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#1A1A1A"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spinnerProvince"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@android:drawable/edit_text"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- District Spinner -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quận/Huyện *"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#1A1A1A"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spinnerDistrict"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@android:drawable/edit_text"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Street/Ward (Optional) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đường/Phường (Tùy chọn)"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#1A1A1A"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etStreet"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Ví dụ: 123 Đường ABC"
+        android:padding="12dp"
+        android:background="@android:drawable/edit_text"
+        android:inputType="text"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Info Text -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="* Bắt buộc"
+        android:textSize="12sp"
+        android:textColor="#999999"
+        android:layout_marginBottom="8dp" />
+
+</LinearLayout>
+

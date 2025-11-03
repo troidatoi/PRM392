@@ -10,14 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="@drawable/splash_bike_background"
+        android:src="@drawable/start_background"
         android:contentDescription="@string/app_name" />
 
     <!-- Dark overlay for better text visibility -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/google_ai_studio" />
+    <!-- Removed dark overlay to display provided splash image as-is -->
 
     <!-- Content Container -->
     <LinearLayout

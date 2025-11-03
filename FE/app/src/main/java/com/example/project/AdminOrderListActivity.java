@@ -91,6 +91,8 @@ public class AdminOrderListActivity extends AppCompatActivity {
                         if (!(o instanceof java.util.Map)) continue;
                         java.util.Map m = (java.util.Map) o;
                         String id = m.get("_id")+"";
+                        String orderNumber = m.get("orderNumber") == null ? "" : String.valueOf(m.get("orderNumber"));
+                        if (orderNumber.isEmpty()) orderNumber = m.get("orderNo") == null ? "" : String.valueOf(m.get("orderNo"));
                         String status = m.get("orderStatus")+"";
                         String date = m.get("orderDate")+"";
                         String summary = "";
@@ -102,7 +104,7 @@ public class AdminOrderListActivity extends AppCompatActivity {
                             else if (amt instanceof String) amountNum = (long) Double.parseDouble((String)amt);
                         } catch(Exception ignored){}
                         String amountFormatted = fmt.format(amountNum) + " ₫";
-                        orders.add(new Order(id, date, status, summary, amountFormatted, Order.mapStatusColor(status)));
+                        orders.add(new Order(id, orderNumber, date, status, summary, amountFormatted, Order.mapStatusColor(status)));
                     }
                     orderAdapter.notifyDataSetChanged();
                     rvOrders.setVisibility(orders.isEmpty()?View.GONE:View.VISIBLE);

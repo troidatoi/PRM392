@@ -1,4 +1,5 @@
 const Store = require('../models/Store');
+const { geocodeAddress, reverseGeocode } = require('../utils/geocoding');
 
 // @desc    Create new store
 // @route   POST /api/locations
@@ -192,13 +193,40 @@ const deleteStore = async (req, res) => {
   }
 };
 
-// @desc    Get stores near a location
-// @route   GET /api/locations/nearby
+// @desc    Geocode address to coordinates
+// @route   POST /api/locations/geocode
 // @access  Public
-const getNearbyStores = async (req, res) => {
+const geocodeLocation = async (req, res) => {
   try {
-    // Only accept request body
-    const { lat, lng, radius = 10, limit = 10 } = req.body;
+    const { address } = req.body;
+
+    if (!address || typeof address !== 'string' || address.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Địa chỉ là bắt buộc'
+      });
+    }
+
+    const geocodeResult = await geocodeAddress(address.trim());
+
+    res.status(200).json({
+      success: true,
+      data: geocodeResult
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Không thể geocode địa chỉ'
+    });
+  }
+};
+
+// @desc    Reverse geocode coordinates to address
+// @route   POST /api/locations/reverse-geocode
+// @access  Public
+const reverseGeocodeLocation = async (req, res) => {
+  try {
+    const { lat, lng } = req.body;
 
     if (!lat || !lng) {
       return res.status(400).json({
@@ -209,13 +237,88 @@ const getNearbyStores = async (req, res) => {
 
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lng);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tọa độ không hợp lệ'
+      });
+    }
+
+    const addressResult = await reverseGeocode(latitude, longitude);
+
+    res.status(200).json({
+      success: true,
+      data: addressResult
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Không thể reverse geocode tọa độ'
+    });
+  }
+};
+
+// @desc    Get stores near a location (supports both coordinates and address)
+// @route   GET /api/locations/nearby
+// @route   POST /api/locations/nearby
+// @access  Public
+const getNearbyStores = async (req, res) => {
+  try {
+    // Support both query params (GET) and body (POST)
+    const { lat, lng, address, radius = 10, limit = 20 } = req.method === 'GET' ? req.query : req.body;
+
+    let latitude, longitude, userAddress = null;
+
+    // If address is provided, geocode it first
+    if (address && (!lat || !lng)) {
+      try {
+        const geocodeResult = await geocodeAddress(address.trim());
+        latitude = geocodeResult.latitude;
+        longitude = geocodeResult.longitude;
+        userAddress = geocodeResult.formattedAddress;
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: error.message || 'Không thể tìm địa chỉ'
+        });
+      }
+    } 
+    // Otherwise use coordinates
+    else if (lat && lng) {
+      latitude = parseFloat(lat);
+      longitude = parseFloat(lng);
+
+      if (isNaN(latitude) || isNaN(longitude)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Tọa độ không hợp lệ'
+        });
+      }
+
+      // Try to get address from coordinates
+      try {
+        const addressResult = await reverseGeocode(latitude, longitude);
+        userAddress = addressResult.formattedAddress;
+      } catch (error) {
+        // If reverse geocode fails, continue without address
+        console.log('Reverse geocode failed:', error.message);
+      }
+    } 
+    else {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng cung cấp địa chỉ hoặc tọa độ (lat, lng)'
+      });
+    }
+
     const radiusKm = parseFloat(radius);
     const limitNum = parseInt(limit);
 
-    if (isNaN(latitude) || isNaN(longitude) || isNaN(radiusKm)) {
+    if (isNaN(radiusKm) || radiusKm <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'Tọa độ và bán kính không hợp lệ'
+        message: 'Bán kính tìm kiếm không hợp lệ'
       });
     }
 
@@ -240,10 +343,106 @@ const getNearbyStores = async (req, res) => {
       count: storesWithDistance.length,
       userLocation: {
         latitude,
-        longitude
+        longitude,
+        address: userAddress
       },
-      searchRadius: radius,
+      searchRadius: radiusKm,
       data: storesWithDistance
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server Error'
+    });
+  }
+};
+
+// @desc    Get stores optimized for map display
+// @route   GET /api/locations/map
+// @access  Public
+const getStoresForMap = async (req, res) => {
+  try {
+    const { lat, lng, address, radius = 50 } = req.query;
+
+    let latitude, longitude;
+
+    // If address is provided, geocode it
+    if (address && (!lat || !lng)) {
+      try {
+        const geocodeResult = await geocodeAddress(address.trim());
+        latitude = geocodeResult.latitude;
+        longitude = geocodeResult.longitude;
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: error.message || 'Không thể tìm địa chỉ'
+        });
+      }
+    } 
+    // Use coordinates if provided
+    else if (lat && lng) {
+      latitude = parseFloat(lat);
+      longitude = parseFloat(lng);
+
+      if (isNaN(latitude) || isNaN(longitude)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Tọa độ không hợp lệ'
+        });
+      }
+    }
+
+    // Get all active stores
+    let allStores = await Store.find({ isActive: true })
+      .select('name latitude longitude address city phone isOpenNow')
+      .lean();
+
+    // If location provided, calculate distances and filter by radius
+    if (latitude && longitude) {
+      const radiusKm = parseFloat(radius);
+      // Helper function to calculate distance (same logic as Store model)
+      const calculateDistance = (storeLat, storeLng, userLat, userLng) => {
+        const R = 6371; // Earth's radius in kilometers
+        const dLat = (userLat - storeLat) * Math.PI / 180;
+        const dLng = (userLng - storeLng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(storeLat * Math.PI / 180) * Math.cos(userLat * Math.PI / 180) *
+          Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c; // Distance in kilometers
+      };
+
+      allStores = allStores
+        .map(store => {
+          const distance = calculateDistance(store.latitude, store.longitude, latitude, longitude);
+          return {
+            ...store,
+            distance: Math.round(distance * 100) / 100
+          };
+        })
+        .filter(store => store.distance <= radiusKm)
+        .sort((a, b) => a.distance - b.distance);
+    }
+
+    // Format response for map markers
+    const storesForMap = allStores.map(store => ({
+      id: store._id,
+      name: store.name,
+      latitude: store.latitude,
+      longitude: store.longitude,
+      address: store.address,
+      city: store.city,
+      phone: store.phone,
+      isOpenNow: store.isOpenNow,
+      distance: store.distance || null
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: storesForMap.length,
+      userLocation: latitude && longitude ? { latitude, longitude } : null,
+      searchRadius: latitude && longitude ? parseFloat(radius) : null,
+      data: storesForMap
     });
   } catch (error) {
     res.status(500).json({
@@ -259,5 +458,8 @@ module.exports = {
   getAllStores,
   getStoreById,
   deleteStore,
-  getNearbyStores
+  getNearbyStores,
+  geocodeLocation,
+  reverseGeocodeLocation,
+  getStoresForMap
 };

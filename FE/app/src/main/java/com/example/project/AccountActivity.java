@@ -14,7 +14,7 @@ import androidx.cardview.widget.CardView;
 public class AccountActivity extends AppCompatActivity {
 
     private TextView tvUserName, tvUserEmail, tvPhone, tvAddress;
-    private CardView btnEditProfile, btnOrders, btnFavorites, btnSettings, btnLogout;
+    private CardView btnEditProfile, btnOrders, btnStores, btnFavorites, btnSettings, btnLogout;
 
     // Bottom Navigation
     private View navHome, navProducts, navCart, navAccount;
@@ -42,6 +42,7 @@ public class AccountActivity extends AppCompatActivity {
         // Buttons
         btnEditProfile = findViewById(R.id.btnEditProfile);
         btnOrders = findViewById(R.id.btnOrders);
+        btnStores = findViewById(R.id.btnStores);
         btnFavorites = findViewById(R.id.btnFavorites);
         btnSettings = findViewById(R.id.btnSettings);
         btnLogout = findViewById(R.id.btnLogout);
@@ -121,6 +122,11 @@ public class AccountActivity extends AppCompatActivity {
 
         btnOrders.setOnClickListener(v -> {
             Intent intent = new Intent(AccountActivity.this, OrderHistoryActivity.class);
+            startActivity(intent);
+        });
+
+        btnStores.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, StoreListActivity.class);
             startActivity(intent);
         });
 

@@ -103,6 +103,8 @@ public class OrderHistoryActivity extends AppCompatActivity {
                                     java.util.Map m = (java.util.Map) o;
 
                                     String id = safeString(m.get("_id"));
+                                    String orderNumber = safeString(m.get("orderNumber"));
+                                    if (orderNumber == null || orderNumber.isEmpty()) orderNumber = safeString(m.get("orderNo"));
                                     String status = safeString(m.get("orderStatus"));
                                     String date = formatDate(safeString(m.get("orderDate")));
 
@@ -114,7 +116,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
 
                                     String color = Order.mapStatusColor(status);
                                     String displayStatus = Order.mapStatusText(status);
-                                    orders.add(new Order(id, date, displayStatus, itemsSummary, amountText, color));
+                                    orders.add(new Order(id, orderNumber, date, displayStatus, itemsSummary, amountText, color));
                                     added++;
                                 }
                             }

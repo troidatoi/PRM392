@@ -26,10 +26,14 @@ import com.example.project.models.Bike;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
 import com.example.project.utils.AuthManager;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -44,7 +48,9 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
 
     // Views
     private CardView btnBack;
-    private EditText etName, etBrand, etModel, etPrice, etDescription, etStock;
+    private EditText etName, etBrand, etModel, etPrice, etDescription, etColor;
+    private EditText etBattery, etMotor, etRange, etMaxSpeed, etWeight, etChargingTime;
+    private EditText etFeatures, etWarranty, etOriginalPrice, etTags;
     private Spinner spinnerCategory, spinnerStatus;
     private Button btnSelectImages, btnUpdateBike;
     private TextView tvImageCount;
@@ -88,7 +94,19 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         etModel = findViewById(R.id.etModel);
         etPrice = findViewById(R.id.etPrice);
         etDescription = findViewById(R.id.etDescription);
-        etStock = findViewById(R.id.etStock);
+        etColor = findViewById(R.id.etColor);
+        // Specifications fields
+        etBattery = findViewById(R.id.etBattery);
+        etMotor = findViewById(R.id.etMotor);
+        etRange = findViewById(R.id.etRange);
+        etMaxSpeed = findViewById(R.id.etMaxSpeed);
+        etWeight = findViewById(R.id.etWeight);
+        etChargingTime = findViewById(R.id.etChargingTime);
+        // Additional fields
+        etFeatures = findViewById(R.id.etFeatures);
+        etWarranty = findViewById(R.id.etWarranty);
+        etOriginalPrice = findViewById(R.id.etOriginalPrice);
+        etTags = findViewById(R.id.etTags);
         spinnerCategory = findViewById(R.id.spinnerCategory);
         spinnerStatus = findViewById(R.id.spinnerStatus);
         btnSelectImages = findViewById(R.id.btnSelectImages);
@@ -171,9 +189,50 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         etName.setText(originalBike.getName());
         etBrand.setText(originalBike.getBrand());
         etModel.setText(originalBike.getModel());
-        etPrice.setText(String.valueOf(originalBike.getPrice()));
+        // Format price to avoid scientific notation
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.getDefault());
+        formatter.setGroupingUsed(false); // Remove commas for EditText input
+        etPrice.setText(formatter.format(originalBike.getPrice()));
         etDescription.setText(originalBike.getDescription());
-        etStock.setText(String.valueOf(originalBike.getStock()));
+        
+        // Fill color
+        if (originalBike.getColor() != null && !originalBike.getColor().isEmpty()) {
+            etColor.setText(originalBike.getColor());
+        }
+
+        // Fill specifications
+        if (originalBike.getSpecifications() != null) {
+            Bike.Specifications specs = originalBike.getSpecifications();
+            if (specs.getBattery() != null) etBattery.setText(specs.getBattery());
+            if (specs.getMotor() != null) etMotor.setText(specs.getMotor());
+            if (specs.getRange() != null) etRange.setText(specs.getRange());
+            if (specs.getMaxSpeed() != null) etMaxSpeed.setText(specs.getMaxSpeed());
+            if (specs.getWeight() != null) etWeight.setText(specs.getWeight());
+            if (specs.getChargingTime() != null) etChargingTime.setText(specs.getChargingTime());
+        }
+
+        // Fill features (join with newline)
+        if (originalBike.getFeatures() != null && !originalBike.getFeatures().isEmpty()) {
+            etFeatures.setText(String.join("\n", originalBike.getFeatures()));
+        }
+
+        // Fill warranty
+        if (originalBike.getWarranty() != null) {
+            etWarranty.setText(originalBike.getWarranty());
+        } else {
+            etWarranty.setText("12 tháng");
+        }
+
+        // Fill original price (format to avoid scientific notation)
+        if (originalBike.getOriginalPrice() > 0) {
+            formatter.setGroupingUsed(false); // Remove commas for EditText input
+            etOriginalPrice.setText(formatter.format(originalBike.getOriginalPrice()));
+        }
+
+        // Fill tags (join with comma)
+        if (originalBike.getTags() != null && !originalBike.getTags().isEmpty()) {
+            etTags.setText(String.join(", ", originalBike.getTags()));
+        }
 
         // Set spinner selections
         String[] categories = {"city", "mountain", "folding", "cargo", "sport", "other"};
@@ -198,6 +257,8 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
             for (Bike.BikeImage image : originalBike.getImages()) {
                 existingImageUrls.add(image.getUrl());
             }
+            // Add existing image URLs to adapter
+            imageAdapter.addImageUrls(existingImageUrls);
             updateImageDisplay();
         }
     }
@@ -206,10 +267,35 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivity(Intent.createChooser(intent, "Chọn ảnh"));
+        startActivityForResult(Intent.createChooser(intent, "Chọn ảnh"), PICK_IMAGES_REQUEST);
     }
 
-    // Bỏ onActivityResult để tránh API deprecated. Khi cần chọn ảnh đa luồng, sẽ dùng Activity Result API.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK) {
+            if (data != null) {
+                if (data.getClipData() != null) {
+                    // Multiple images selected
+                    int count = data.getClipData().getItemCount();
+                    for (int i = 0; i < count && selectedImages.size() + existingImageUrls.size() < 5; i++) {
+                        Uri imageUri = data.getClipData().getItemAt(i).getUri();
+                        selectedImages.add(imageUri);
+                        imageAdapter.addImageUri(imageUri);
+                    }
+                } else if (data.getData() != null) {
+                    // Single image selected
+                    Uri imageUri = data.getData();
+                    if (selectedImages.size() + existingImageUrls.size() < 5) {
+                        selectedImages.add(imageUri);
+                        imageAdapter.addImageUri(imageUri);
+                    }
+                }
+                updateImageDisplay();
+            }
+        }
+    }
 
     private void updateImageDisplay() {
         int totalImages = existingImageUrls.size() + selectedImages.size();
@@ -233,15 +319,20 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
 
     @Override
     public void onRemoveImage(int position) {
-        if (position < selectedImages.size()) {
-            selectedImages.remove(position);
+        // Check if it's a new selected image or existing image
+        // Existing images come first, then new selected images
+        if (position < existingImageUrls.size()) {
+            // Remove existing image
+            existingImageUrls.remove(position);
         } else {
-            // Remove from existing images
-            int existingIndex = position - selectedImages.size();
-            if (existingIndex < existingImageUrls.size()) {
-                existingImageUrls.remove(existingIndex);
+            // Remove new selected image
+            int selectedIndex = position - existingImageUrls.size();
+            if (selectedIndex >= 0 && selectedIndex < selectedImages.size()) {
+                selectedImages.remove(selectedIndex);
             }
         }
+        // Remove from adapter
+        imageAdapter.removeItem(position);
         updateImageDisplay();
     }
 
@@ -267,25 +358,21 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
             showToast("Vui lòng nhập mô tả");
             return;
         }
-        if (etStock.getText().toString().trim().isEmpty()) {
-            showToast("Vui lòng nhập số lượng tồn kho");
+
+        if (etColor.getText().toString().trim().isEmpty()) {
+            showToast("Vui lòng nhập màu sắc");
             return;
         }
 
         try {
             double price = Double.parseDouble(etPrice.getText().toString());
-            int stock = Integer.parseInt(etStock.getText().toString());
             
             if (price <= 0) {
                 showToast("Giá phải lớn hơn 0");
                 return;
             }
-            if (stock < 0) {
-                showToast("Số lượng tồn kho không được âm");
-                return;
-            }
         } catch (NumberFormatException e) {
-            showToast("Giá và số lượng tồn kho phải là số hợp lệ");
+            showToast("Giá phải là số hợp lệ");
             return;
         }
 
@@ -302,11 +389,76 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         String name = etName.getText().toString().trim();
         String brand = etBrand.getText().toString().trim();
         String model = etModel.getText().toString().trim();
-        double price = Double.parseDouble(etPrice.getText().toString());
+        
+        // Parse and format price to avoid scientific notation
+        double price;
+        try {
+            String priceText = etPrice.getText().toString().trim().replaceAll(",", "");
+            price = Double.parseDouble(priceText);
+        } catch (NumberFormatException e) {
+            showToast("Giá không hợp lệ");
+            progressBar.setVisibility(View.GONE);
+            btnUpdateBike.setEnabled(true);
+            return;
+        }
+        
         String description = etDescription.getText().toString().trim();
-        int stock = Integer.parseInt(etStock.getText().toString());
+        String color = etColor.getText().toString().trim();
         String category = spinnerCategory.getSelectedItem().toString();
         String status = spinnerStatus.getSelectedItem().toString();
+
+        // Specifications
+        String battery = etBattery.getText().toString().trim();
+        String motor = etMotor.getText().toString().trim();
+        String range = etRange.getText().toString().trim();
+        String maxSpeed = etMaxSpeed.getText().toString().trim();
+        String weight = etWeight.getText().toString().trim();
+        String chargingTime = etChargingTime.getText().toString().trim();
+
+        // Features (split by newline)
+        String featuresText = etFeatures.getText().toString().trim();
+        List<String> features = new ArrayList<>();
+        if (!featuresText.isEmpty()) {
+            String[] featureArray = featuresText.split("\n");
+            for (String feature : featureArray) {
+                if (!feature.trim().isEmpty()) {
+                    features.add(feature.trim());
+                }
+            }
+        }
+
+        // Warranty
+        String warranty = etWarranty.getText().toString().trim();
+        if (warranty.isEmpty()) {
+            warranty = "12 tháng";
+        }
+
+        // Original price (parse and format to avoid scientific notation)
+        double originalPrice = 0;
+        String originalPriceText = etOriginalPrice.getText().toString().trim();
+        if (!originalPriceText.isEmpty()) {
+            try {
+                originalPriceText = originalPriceText.replaceAll(",", "");
+                originalPrice = Double.parseDouble(originalPriceText);
+            } catch (NumberFormatException e) {
+                showToast("Giá gốc không hợp lệ");
+                progressBar.setVisibility(View.GONE);
+                btnUpdateBike.setEnabled(true);
+                return;
+            }
+        }
+
+        // Tags (split by comma)
+        String tagsText = etTags.getText().toString().trim();
+        List<String> tags = new ArrayList<>();
+        if (!tagsText.isEmpty()) {
+            String[] tagArray = tagsText.split(",");
+            for (String tag : tagArray) {
+                if (!tag.trim().isEmpty()) {
+                    tags.add(tag.trim());
+                }
+            }
+        }
 
         // Convert new images to MultipartBody.Part
         List<MultipartBody.Part> imageParts = new ArrayList<>();
@@ -348,17 +500,55 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
         RequestBody namePart = RequestBody.create(name, MediaType.get("text/plain"));
         RequestBody brandPart = RequestBody.create(brand, MediaType.get("text/plain"));
         RequestBody modelPart = RequestBody.create(model, MediaType.get("text/plain"));
-        RequestBody pricePart = RequestBody.create(String.valueOf(price), MediaType.get("text/plain"));
+        
+        // Format price as string without scientific notation
+        NumberFormat priceFormatter = NumberFormat.getNumberInstance(Locale.US);
+        priceFormatter.setGroupingUsed(false);
+        priceFormatter.setMaximumFractionDigits(0);
+        String priceString = priceFormatter.format(price);
+        RequestBody pricePart = RequestBody.create(priceString, MediaType.get("text/plain"));
+        
         RequestBody descriptionPart = RequestBody.create(description, MediaType.get("text/plain"));
-        RequestBody stockPart = RequestBody.create(String.valueOf(stock), MediaType.get("text/plain"));
+        RequestBody colorPart = RequestBody.create(color, MediaType.get("text/plain"));
         RequestBody categoryPart = RequestBody.create(category, MediaType.get("text/plain"));
         RequestBody statusPart = RequestBody.create(status, MediaType.get("text/plain"));
+
+        // Specifications
+        RequestBody batteryPart = RequestBody.create(battery, MediaType.get("text/plain"));
+        RequestBody motorPart = RequestBody.create(motor, MediaType.get("text/plain"));
+        RequestBody rangePart = RequestBody.create(range, MediaType.get("text/plain"));
+        RequestBody maxSpeedPart = RequestBody.create(maxSpeed, MediaType.get("text/plain"));
+        RequestBody weightPart = RequestBody.create(weight, MediaType.get("text/plain"));
+        RequestBody chargingTimePart = RequestBody.create(chargingTime, MediaType.get("text/plain"));
+
+        // Features (join with newline)
+        String featuresString = String.join("\n", features);
+        RequestBody featuresPart = RequestBody.create(featuresString, MediaType.get("text/plain"));
+
+        // Warranty
+        RequestBody warrantyPart = RequestBody.create(warranty, MediaType.get("text/plain"));
+
+        // Original price (format without scientific notation)
+        String originalPriceString = "0";
+        if (originalPrice > 0) {
+            NumberFormat originalPriceFormatter = NumberFormat.getNumberInstance(Locale.US);
+            originalPriceFormatter.setGroupingUsed(false);
+            originalPriceFormatter.setMaximumFractionDigits(0);
+            originalPriceString = originalPriceFormatter.format(originalPrice);
+        }
+        RequestBody originalPricePart = RequestBody.create(originalPriceString, MediaType.get("text/plain"));
+
+        // Tags (join with comma)
+        String tagsString = String.join(",", tags);
+        RequestBody tagsPart = RequestBody.create(tagsString, MediaType.get("text/plain"));
 
         // Make API call
         String token = "Bearer " + authManager.getToken();
         Call<ApiResponse<Bike>> call = apiService.updateBike(
             token, bikeId, namePart, brandPart, modelPart, pricePart, 
-            descriptionPart, stockPart, categoryPart, statusPart, imageParts
+            descriptionPart, colorPart, categoryPart, statusPart,
+            batteryPart, motorPart, rangePart, maxSpeedPart, weightPart, chargingTimePart,
+            featuresPart, warrantyPart, originalPricePart, tagsPart, imageParts
         );
 
         call.enqueue(new Callback<ApiResponse<Bike>>() {
@@ -372,7 +562,8 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
                     setResult(RESULT_OK);
                     finish();
                 } else {
-                    String errorMessage = "Lỗi cập nhật xe: " + (response.body() != null ? response.body().getMessage() : response.message());
+                    // Handle error response - parse JSON error message
+                    String errorMessage = parseErrorMessage(response);
                     showToast(errorMessage);
                 }
             }
@@ -381,12 +572,65 @@ public class UpdateBikeActivity extends AppCompatActivity implements SelectedIma
             public void onFailure(Call<ApiResponse<Bike>> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 btnUpdateBike.setEnabled(true);
-                showToast("Lỗi kết nối: " + t.getMessage());
+                String errorMsg = t.getMessage();
+                if (errorMsg != null && (errorMsg.contains("File quá lớn") || errorMsg.contains("5MB"))) {
+                    showToast("File quá lớn. Kích thước tối đa 5MB");
+                } else {
+                    showToast("Lỗi kết nối: " + (errorMsg != null ? errorMsg : "Không thể kết nối đến server"));
+                }
             }
         });
     }
 
+    private String parseErrorMessage(retrofit2.Response<ApiResponse<Bike>> response) {
+        String defaultMessage = "Lỗi cập nhật xe";
+        
+        // Try to get message from response body
+        if (response.body() != null) {
+            try {
+                String message = response.body().getMessage();
+                if (message != null && !message.isEmpty()) {
+                    return message;
+                }
+            } catch (Exception e) {
+                // Continue to try errorBody
+            }
+        }
+        
+        // Try to parse from errorBody JSON
+        try {
+            okhttp3.ResponseBody errorBody = response.errorBody();
+            if (errorBody != null) {
+                String errorString = errorBody.string();
+                if (errorString != null && !errorString.isEmpty()) {
+                    // Check for file size error
+                    if (errorString.contains("File quá lớn") || errorString.contains("5MB") || 
+                        errorString.contains("Kích thước tối đa")) {
+                        return "File quá lớn. Kích thước tối đa 5MB";
+                    }
+                    
+                    // Try to extract message from JSON: {"message":"..."}
+                    if (errorString.contains("\"message\"")) {
+                        int messageIndex = errorString.indexOf("\"message\":\"");
+                        if (messageIndex >= 0) {
+                            int start = messageIndex + 10;
+                            int end = errorString.indexOf("\"", start);
+                            if (end > start) {
+                                String message = errorString.substring(start, end);
+                                return message;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Fallback to default
+        }
+        
+        return defaultMessage + " (Mã lỗi: " + response.code() + ")";
+    }
+
     private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
