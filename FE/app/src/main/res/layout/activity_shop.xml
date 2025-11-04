@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@drawable/light_gray_background">
 
     <!-- Search Bar -->
@@ -254,201 +255,126 @@
         android:nestedScrollingEnabled="false" />
 
     <!-- Bottom Navigation Bar -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="68dp"
         android:layout_alignParentBottom="true"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="12dp"
-        android:backgroundTint="#FFFFFF">
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
-
-            <!-- Home -->
-            <LinearLayout
-                android:id="@+id/navHome"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurHome"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconHome"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_home"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvHome"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Trang chủ"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A" />
-
-            </LinearLayout>
-
-            <!-- Products -->
-            <LinearLayout
-                android:id="@+id/navProducts"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurProducts"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="visible" />
-
-                    <ImageView
-                        android:id="@+id/iconProducts"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_products"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvProducts"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sản phẩm"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- Cart -->
-            <LinearLayout
-                android:id="@+id/navCart"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurCart"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconCart"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_cart"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvCart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Giỏ hàng"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A" />
-
-            </LinearLayout>
-
-            <!-- Account -->
-            <LinearLayout
-                android:id="@+id/navAccount"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <View
-                        android:id="@+id/blurAccount"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/nav_item_blur"
-                        android:visibility="gone" />
-
-                    <ImageView
-                        android:id="@+id/iconAccount"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_account"
-                        app:tint="#1A1A1A" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvAccount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tài khoản"
-                    android:textSize="11sp"
-                    android:textColor="#1A1A1A" />
-
-            </LinearLayout>
-
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:id="@+id/iconHome"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_home"
+                app:tint="#666666"
+                android:contentDescription="Home" />
+            <TextView
+                android:id="@+id/tvHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trang chủ"
+                android:textSize="11sp"
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+        <LinearLayout
+            android:id="@+id/navProducts"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:id="@+id/iconProducts"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_products"
+                app:tint="#2196F3"
+                android:contentDescription="Products" />
+            <TextView
+                android:id="@+id/tvProducts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sản phẩm"
+                android:textSize="11sp"
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navCart"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:id="@+id/iconCart"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_cart"
+                app:tint="#666666"
+                android:contentDescription="Cart" />
+            <TextView
+                android:id="@+id/tvCart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giỏ hàng"
+                android:textSize="11sp"
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navAccount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+            <ImageView
+                android:id="@+id/iconAccount"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_account"
+                app:tint="#666666"
+                android:contentDescription="Account" />
+            <TextView
+                android:id="@+id/tvAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tài khoản"
+                android:textSize="11sp"
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
 
 </RelativeLayout>

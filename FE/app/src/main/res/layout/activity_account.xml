@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@drawable/light_gray_background">
 
     <!-- Main Content -->
@@ -581,14 +582,18 @@
 
     </ScrollView>
 
+    <!-- Bottom Navigation Bar -->
     <LinearLayout
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="68dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:background="#FFFFFF"
-        android:elevation="12dp">
+        android:elevation="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -597,13 +602,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconHome"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_home"
-                app:tint="#1A1A1A"
+                app:tint="#666666"
                 android:contentDescription="Home" />
             <TextView
                 android:id="@+id/tvHome"
@@ -611,8 +617,10 @@
                 android:layout_height="wrap_content"
                 android:text="Trang chủ"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/navProducts"
             android:layout_width="0dp"
@@ -621,13 +629,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconProducts"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_products"
-                app:tint="#1A1A1A"
+                app:tint="#666666"
                 android:contentDescription="Products" />
             <TextView
                 android:id="@+id/tvProducts"
@@ -635,8 +644,10 @@
                 android:layout_height="wrap_content"
                 android:text="Sản phẩm"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/navCart"
             android:layout_width="0dp"
@@ -645,13 +656,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconCart"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_cart"
-                app:tint="#1A1A1A"
+                app:tint="#666666"
                 android:contentDescription="Cart" />
             <TextView
                 android:id="@+id/tvCart"
@@ -659,8 +671,10 @@
                 android:layout_height="wrap_content"
                 android:text="Giỏ hàng"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/navAccount"
             android:layout_width="0dp"
@@ -669,13 +683,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconAccount"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_account"
-                app:tint="#1A1A1A"
+                app:tint="#2196F3"
                 android:contentDescription="Account" />
             <TextView
                 android:id="@+id/tvAccount"
@@ -683,7 +698,9 @@
                 android:layout_height="wrap_content"
                 android:text="Tài khoản"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
     </LinearLayout>
 
