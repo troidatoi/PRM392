@@ -221,6 +221,29 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Change Password Activity -->
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Reset Password Activity with Deep Link -->
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Project">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="-"
+                    android:pathPrefix="/reset-password"
+                    android:scheme="bikeshopapp" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

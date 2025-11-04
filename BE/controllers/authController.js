@@ -24,20 +24,27 @@ const sendTokenResponse = (user, statusCode, res) => {
     options.secure = true;
   }
 
+  // Ensure all relevant fields are returned
+  const userToReturn = {
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    isActive: user.isActive,
+    googleId: user.googleId ? true : false,
+    profile: user.profile,
+    phoneNumber: user.phoneNumber,
+    address: user.address,
+    city: user.city,
+    district: user.district
+  };
+
   res.status(statusCode)
     .cookie('token', token, options)
     .json({
       success: true,
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        isActive: user.isActive,
-        googleId: user.googleId ? true : false, // Chỉ trả về boolean để bảo mật
-        profile: user.profile
-      }
+      user: userToReturn
     });
 };
 
@@ -111,24 +118,77 @@ exports.getMe = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res, next) => {
-  try {
-    const updates = {};
-    const allowed = ['phoneNumber', 'address', 'city', 'district'];
-    allowed.forEach((k) => {
-      if (typeof req.body[k] !== 'undefined') updates[k] = req.body[k];
-    });
+  console.log('[BE DEBUG] Attempting to update profile for user:', req.user._id);
+  console.log('[BE DEBUG] Received update data:', req.body);
 
-    const profileAllowed = ['firstName', 'lastName', 'avatar', 'dateOfBirth'];
-    profileAllowed.forEach((k) => {
-      if (typeof req.body[k] !== 'undefined') {
-        if (!updates.profile) updates.profile = {};
-        updates.profile[k] = req.body[k];
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Update root-level fields
+    const rootKeys = ['phoneNumber', 'address', 'city', 'district'];
+    rootKeys.forEach(key => {
+      if (req.body[key] !== undefined) {
+        user[key] = req.body[key];
       }
     });
 
-    const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true, runValidators: true }).select('-passwordHash');
-    res.json({ success: true, user });
+    // Initialize profile object if it doesn't exist
+    if (!user.profile) {
+      user.profile = {};
+    }
+
+    // Update nested profile fields
+    const profileKeys = ['firstName', 'lastName', 'avatar'];
+    profileKeys.forEach(key => {
+      if (req.body[key] !== undefined) {
+        user.profile[key] = req.body[key];
+      }
+    });
+
+    // Special handling for dateOfBirth
+    if (req.body.dateOfBirth) {
+      // Expected format from FE: dd/MM/yyyy
+      const parts = req.body.dateOfBirth.split('/');
+      if (parts.length === 3) {
+        const [day, month, year] = parts;
+        const date = new Date(`${year}-${month}-${day}`);
+        // Check if date is valid before assigning
+        if (!isNaN(date.getTime())) {
+          user.profile.dateOfBirth = date;
+        }
+      }
+    }
+
+    const updatedUser = await user.save();
+    
+    // Manually construct the user object to be returned, excluding sensitive fields
+    const userToReturn = {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        isActive: updatedUser.isActive,
+        googleId: updatedUser.googleId ? true : false,
+        profile: updatedUser.profile,
+        phoneNumber: updatedUser.phoneNumber,
+        address: updatedUser.address,
+        city: updatedUser.city,
+        district: updatedUser.district
+    };
+
+    console.log('[BE DEBUG] Profile updated and saved successfully.');
+    res.json({ success: true, user: userToReturn });
+
   } catch (err) {
+    console.error('[BE DEBUG] Error during profile update process:', err);
+    // Provide more detailed error response in development
+    if (process.env.NODE_ENV !== 'production') {
+        return res.status(500).json({ success: false, message: err.message, stack: err.stack });
+    }
     next(err);
   }
 };
@@ -216,7 +276,7 @@ exports.forgotPassword = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     // Create reset url
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/open-app?token=${resetToken}`;
     
     const message = `
 Bạn đã yêu cầu reset mật khẩu. Vui lòng click vào link bên dưới để đặt lại mật khẩu:

@@ -58,8 +58,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
     private void handleIntent(Intent intent) {
         Uri data = intent.getData();
-        if (data != null && data.getPathSegments() != null && data.getPathSegments().size() > 0) {
-            resetToken = data.getLastPathSegment();
+        if (data != null) {
+            resetToken = data.getQueryParameter("token"); // Use query parameter
             if (resetToken == null || resetToken.isEmpty()) {
                 Toast.makeText(this, "Token không hợp lệ.", Toast.LENGTH_LONG).show();
                 finish();

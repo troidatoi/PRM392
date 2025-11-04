@@ -16,12 +16,13 @@ import com.example.project.utils.AuthManager;
 public class AccountActivity extends AppCompatActivity {
 
     private TextView tvUserName, tvUserEmail, tvPhone, tvAddress;
-    private CardView btnEditProfile, btnOrders, btnStores, btnFavorites, btnSettings, btnLogout;
+    private CardView btnEditProfile, btnOrders, btnStores, btnFavorites, btnSettings, btnChangePassword, btnLogout;
     private ImageView ivAvatar;
 
     private View navHome, navProducts, navCart, navAccount;
     private ImageView iconHome, iconProducts, iconCart, iconAccount;
     private TextView tvHome, tvProducts, tvCart, tvAccountNav;
+    private View blurHome, blurProducts, blurCart, blurAccount;
 
     private AuthManager authManager;
 
@@ -55,6 +56,7 @@ public class AccountActivity extends AppCompatActivity {
         btnStores = findViewById(R.id.btnStores);
         btnFavorites = findViewById(R.id.btnFavorites);
         btnSettings = findViewById(R.id.btnSettings);
+        btnChangePassword = findViewById(R.id.btnChangePassword);
         btnLogout = findViewById(R.id.btnLogout);
 
         navHome = findViewById(R.id.navHome);
@@ -72,6 +74,11 @@ public class AccountActivity extends AppCompatActivity {
         tvProducts = findViewById(R.id.tvProducts);
         tvCart = findViewById(R.id.tvCart);
         tvAccountNav = findViewById(R.id.tvAccount);
+
+        blurHome = findViewById(R.id.blurHome);
+        blurProducts = findViewById(R.id.blurProducts);
+        blurCart = findViewById(R.id.blurCart);
+        blurAccount = findViewById(R.id.blurAccount);
     }
 
     private void setupBottomNavigation() {
@@ -107,7 +114,8 @@ public class AccountActivity extends AppCompatActivity {
         });
     }
 
-    private void selectNavItem(ImageView icon, TextView text) {
+    private void selectNavItem(View blur, ImageView icon, TextView text) {
+        blur.setVisibility(View.VISIBLE);
         icon.setColorFilter(Color.parseColor("#2196F3"));
         text.setTextColor(Color.parseColor("#2196F3"));
     }
@@ -120,7 +128,12 @@ public class AccountActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnEditProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountActivity.this, EditProfileActivity.class);
+            Intent intent = new Intent(AccountActivity.this, ProfileEditActivity.class);
+            startActivity(intent);
+        });
+
+        btnChangePassword.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, ChangePasswordActivity.class);
             startActivity(intent);
         });
 
@@ -149,6 +162,7 @@ public class AccountActivity extends AppCompatActivity {
 
     private void loadUserData() {
         User currentUser = authManager.getCurrentUser();
+        android.util.Log.d("DATA_SYNC", "[FE DEBUG] AccountActivity.onResume: Loading user data. Current user: " + new com.google.gson.Gson().toJson(currentUser));
         if (currentUser != null) {
             String fullName = "";
             if (currentUser.getProfile() != null) {

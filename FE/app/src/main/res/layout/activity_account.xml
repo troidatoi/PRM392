@@ -67,7 +67,6 @@
                         android:id="@+id/tvUserName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nguyễn Văn A"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="#000000"
@@ -77,7 +76,6 @@
                         android:id="@+id/tvUserEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="nguyenvana@gmail.com"
                         android:textSize="14sp"
                         android:textColor="#666666"
                         android:layout_marginTop="4dp" />
@@ -184,7 +182,6 @@
                             android:id="@+id/tvPhone"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0123 456 789"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="#000000"
@@ -253,7 +250,6 @@
                             android:id="@+id/tvAddress"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="123 Đường ABC, Quận 1, TP.HCM"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="#000000"
@@ -535,6 +531,71 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Change Password -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="#FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="20dp"
+                    android:gravity="center_vertical">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        app:cardCornerRadius="25dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#F5F5F5">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_account"
+                                app:tint="#F44336"
+                                android:contentDescription="Password" />
+
+                        </RelativeLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Đổi mật khẩu"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:layout_marginStart="16dp" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_search"
+                        app:tint="#CCCCCC"
+                        android:contentDescription="Arrow"
+                        android:rotation="270" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
             <!-- Logout -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnLogout"
@@ -589,102 +650,167 @@
         android:orientation="horizontal"
         android:background="#FFFFFF"
         android:elevation="12dp">
-        <LinearLayout
+
+        <!-- Home Nav Item -->
+        <RelativeLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true">
-            <ImageView
-                android:id="@+id/iconHome"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_home"
-                app:tint="#1A1A1A"
-                android:contentDescription="Home" />
-            <TextView
-                android:id="@+id/tvHome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Trang chủ"
-                android:textSize="11sp"
-                android:textColor="#1A1A1A" />
-        </LinearLayout>
-        <LinearLayout
+
+            <View
+                android:id="@+id/blurHome"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E3F2FD"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iconHome"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_home"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Home" />
+
+                <TextView
+                    android:id="@+id/tvHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Trang chủ"
+                    android:textSize="11sp"
+                    android:textColor="#1A1A1A" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Products Nav Item -->
+        <RelativeLayout
             android:id="@+id/navProducts"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true">
-            <ImageView
-                android:id="@+id/iconProducts"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_products"
-                app:tint="#1A1A1A"
-                android:contentDescription="Products" />
-            <TextView
-                android:id="@+id/tvProducts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sản phẩm"
-                android:textSize="11sp"
-                android:textColor="#1A1A1A" />
-        </LinearLayout>
-        <LinearLayout
+
+            <View
+                android:id="@+id/blurProducts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E3F2FD"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iconProducts"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_products"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Products" />
+
+                <TextView
+                    android:id="@+id/tvProducts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sản phẩm"
+                    android:textSize="11sp"
+                    android:textColor="#1A1A1A" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Cart Nav Item -->
+        <RelativeLayout
             android:id="@+id/navCart"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true">
-            <ImageView
-                android:id="@+id/iconCart"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_cart"
-                app:tint="#1A1A1A"
-                android:contentDescription="Cart" />
-            <TextView
-                android:id="@+id/tvCart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Giỏ hàng"
-                android:textSize="11sp"
-                android:textColor="#1A1A1A" />
-        </LinearLayout>
-        <LinearLayout
+
+            <View
+                android:id="@+id/blurCart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E3F2FD"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iconCart"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_cart"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Cart" />
+
+                <TextView
+                    android:id="@+id/tvCart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Giỏ hàng"
+                    android:textSize="11sp"
+                    android:textColor="#1A1A1A" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Account Nav Item -->
+        <RelativeLayout
             android:id="@+id/navAccount"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:clickable="true"
             android:focusable="true">
-            <ImageView
-                android:id="@+id/iconAccount"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_account"
-                app:tint="#1A1A1A"
-                android:contentDescription="Account" />
-            <TextView
-                android:id="@+id/tvAccount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tài khoản"
-                android:textSize="11sp"
-                android:textColor="#1A1A1A" />
-        </LinearLayout>
+
+            <View
+                android:id="@+id/blurAccount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E3F2FD"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iconAccount"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_account"
+                    app:tint="#1A1A1A"
+                    android:contentDescription="Account" />
+
+                <TextView
+                    android:id="@+id/tvAccount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tài khoản"
+                    android:textSize="11sp"
+                    android:textColor="#1A1A1A" />
+            </LinearLayout>
+        </RelativeLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

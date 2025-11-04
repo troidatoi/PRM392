@@ -151,7 +151,7 @@ Trong `SocketManager.java`, cập nhật server URL:
 
 ```java
 // For Android Emulator
-String serverUrl = "http://10.0.2.2:5000";
+String serverUrl = "http://10.0.2.2:5001";
 
 // For Real Device (thay YOUR_SERVER_IP)
 String serverUrl = "http://YOUR_SERVER_IP:5000";

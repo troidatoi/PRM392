@@ -2,6 +2,7 @@ package com.example.project.network;
 
 import com.example.project.models.ApiResponse;
 import com.example.project.models.Bike;
+import com.example.project.models.ChangePasswordRequest;
 import com.example.project.models.LoginRequest;
 import com.example.project.models.RegisterRequest;
 import com.example.project.models.User;
@@ -267,34 +268,7 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
     
-    // Change password request model
-    class ChangePasswordRequest {
-        private String currentPassword;
-        private String newPassword;
-        
-        public ChangePasswordRequest() {}
-        
-        public ChangePasswordRequest(String currentPassword, String newPassword) {
-            this.currentPassword = currentPassword;
-            this.newPassword = newPassword;
-        }
-        
-        public String getCurrentPassword() {
-            return currentPassword;
-        }
-        
-        public void setCurrentPassword(String currentPassword) {
-            this.currentPassword = currentPassword;
-        }
-        
-        public String getNewPassword() {
-            return newPassword;
-        }
-        
-        public void setNewPassword(String newPassword) {
-            this.newPassword = newPassword;
-        }
-    }
+
     
     // Store response model for pagination
     class StoreResponse {

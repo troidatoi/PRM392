@@ -30,7 +30,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Edit Profile"
+                android:text="Chỉnh sửa hồ sơ"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:layout_gravity="center" />
@@ -99,8 +99,10 @@
                     android:id="@+id/actvCity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Tỉnh/Thành phố"
                     android:inputType="none"
-                    android:hint="City" />
+                    android:focusable="false"
+                    android:clickable="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -113,8 +115,11 @@
                     android:id="@+id/actvDistrict"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Quận/Huyện"
                     android:inputType="none"
-                    android:hint="District" />
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:enabled="false" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -164,12 +169,7 @@
                 android:text="Save Profile"
                 android:layout_marginBottom="8dp"/>
 
-            <Button
-                android:id="@+id/btnChangePassword"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Change Password" />
+
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

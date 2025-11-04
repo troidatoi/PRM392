@@ -1,63 +1,52 @@
-/**
- * Quick script để lấy reset token mới nhất từ database
- * Dùng cho testing khi không muốn check email
- */
-
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const User = require('./BE/models/User');
+const User = require('./models/User'); // Corrected path
 
-dotenv.config({ path: './BE/.env' });
+// Load .env file from the root
+dotenv.config();
 
-async function getLatestResetToken() {
+async function getResetTokenForUser() {
+  const email = process.argv[2];
+
+  if (!email) {
+    console.log('\nUsage: node get-reset-token.js <user_email@example.com>\n');
+    process.exit(1);
+  }
+
   try {
+    if (!process.env.MONGO_URI) {
+        throw new Error('MONGO_URI not found in .env file');
+    }
     await mongoose.connect(process.env.MONGO_URI);
     console.log('🔗 Connected to MongoDB');
     
-    // Find user by email
-    const user = await User.findOne({ email: 'sktkctman2@gmail.com' });
+    const user = await User.findOne({ email });
     
     if (!user) {
-      console.log('❌ User not found');
+      console.log(`❌ User with email "${email}" not found.`);
       return;
     }
     
     console.log('👤 User found:', user.email);
     
-    if (!user.passwordResetToken || !user.passwordResetExpire) {
-      console.log('❌ No reset token found. Please request forgot password first.');
-      return;
-    }
-    
-    // Check if token is still valid
-    const now = new Date();
-    const isExpired = user.passwordResetExpire < now;
-    
-    if (isExpired) {
-      console.log('❌ Reset token has expired');
-      console.log('Expired at:', user.passwordResetExpire.toISOString());
-      console.log('Current time:', now.toISOString());
-      return;
-    }
-    
-    // Generate a new token for testing (this will give us the plain token)
+    // Generate a new reset token
     const plainToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
     
+    const now = new Date();
     console.log('\n🔑 FRESH RESET TOKEN GENERATED:');
-    console.log('Plain Token:', plainToken);
-    console.log('Expires at:', user.passwordResetExpire.toISOString());
+    console.log('Token:', plainToken);
+    console.log('Expires:', user.passwordResetExpire.toLocaleString());
     console.log('Time remaining:', Math.round((user.passwordResetExpire - now) / 1000 / 60), 'minutes');
     
-    console.log('\n🔗 TEST URLS:');
-    console.log('Web Page:', `http://localhost:5001/reset-password/${plainToken}`);
-    console.log('API Test:', `curl -X PUT http://localhost:5001/api/auth/reset-password/${plainToken} -H "Content-Type: application/json" -d '{"password": "freshpassword123"}'`);
+    console.log('\n🔗 USE THIS TOKEN TO TEST THE RESET PASSWORD API.');
     
   } catch (error) {
     console.error('❌ Error:', error.message);
   } finally {
-    mongoose.connection.close();
+    await mongoose.connection.close();
+    console.log('\n🔌 Disconnected from MongoDB.');
   }
 }
 
-getLatestResetToken();
+getResetTokenForUser();

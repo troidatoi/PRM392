@@ -22,7 +22,7 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
       ? ['https://yourdomain.com'] 
-      : ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.2:5000'],
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.2:5001'],
     credentials: true,
     methods: ['GET', 'POST']
   },
@@ -60,7 +60,7 @@ app.use('/api/bikes', bikeRoutes);
 console.log('✅ Bike routes registered: POST /api/bikes/upload available');
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/locations', require('./routes/storeRoutes')); // Store/Location routes
+app.use('/api/locations', require('./routes/locationRoutes')); // Location data route
 app.use('/api/stores', require('./routes/storeRoutes')); // Alias for backward compatibility
 app.use('/api/cart', require('./routes/cartRoutes')); // Cart routes
 app.use('/api/orders', require('./routes/orderRoutes')); // Order routes
@@ -75,6 +75,11 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
   });
+});
+
+// Intermediary page for opening the app from email
+app.get('/open-app', (req, res) => {
+  res.sendFile(__dirname + '/public/open-app.html');
 });
 
 // Reset password page route

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.project.models.ApiResponse;
+import com.example.project.models.ChangePasswordRequest;
 import com.example.project.models.Location;
 import com.example.project.models.User;
 import com.example.project.network.ApiService;
@@ -39,7 +40,7 @@ public class ProfileEditActivity extends AppCompatActivity {
 
     private TextInputEditText etFirstName, etLastName, etBirthday, etEmail, etPhone, etAddress;
     private AutoCompleteTextView actvCity, actvDistrict;
-    private Button btnSaveProfile, btnChangePassword;
+    private Button btnSaveProfile;
     private ImageView btnBack;
     private ProgressBar progressBar;
 
@@ -71,7 +72,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         actvCity = findViewById(R.id.actvCity);
         actvDistrict = findViewById(R.id.actvDistrict);
         btnSaveProfile = findViewById(R.id.btnSaveProfile);
-        btnChangePassword = findViewById(R.id.btnChangePassword);
+
         btnBack = findViewById(R.id.btnBack);
         progressBar = findViewById(R.id.progressBar);
     }
@@ -80,7 +81,6 @@ public class ProfileEditActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         etBirthday.setOnClickListener(v -> showDatePicker());
         btnSaveProfile.setOnClickListener(v -> saveProfile());
-        btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
 
         actvCity.setOnItemClickListener((parent, view, position, id) -> {
             String selectedCityName = (String) parent.getItemAtPosition(position);
@@ -116,14 +116,28 @@ public class ProfileEditActivity extends AppCompatActivity {
     }
 
     private void fetchLocations() {
+        android.util.Log.d("ProfileEdit", "Fetching locations from API...");
+        
         apiService.getLocations().enqueue(new Callback<ApiResponse<List<Location>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Location>>> call, Response<ApiResponse<List<Location>>> response) {
+                android.util.Log.d("ProfileEdit", "API Response: " + response.code());
+                
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     allLocations = response.body().getData();
-                    List<String> cityNames = allLocations.stream().map(Location::getName).collect(Collectors.toList());
+                    android.util.Log.d("ProfileEdit", "Loaded " + allLocations.size() + " locations");
+                    
+                    if (allLocations == null || allLocations.isEmpty()) {
+                        android.util.Log.e("ProfileEdit", "Location data is empty!");
+                        handleLocationLoadError("Không có dữ liệu địa chỉ");
+                        return;
+                    }
+                    
+                    List<String> cityNames = allLocations.stream().map(Location::getName).collect(Collectors.toList()); 
                     ArrayAdapter<String> cityAdapter = new ArrayAdapter<>(ProfileEditActivity.this, android.R.layout.simple_dropdown_item_1line, cityNames);
                     actvCity.setAdapter(cityAdapter);
+                    
+                    android.util.Log.d("ProfileEdit", "City adapter set with " + cityNames.size() + " cities");
                     
                     // Now set user's saved city and district
                     if (currentUser.getCity() != null && !currentUser.getCity().isEmpty()) {
@@ -137,15 +151,39 @@ public class ProfileEditActivity extends AppCompatActivity {
                         }
                     }
                 } else {
-                    Toast.makeText(ProfileEditActivity.this, "Không thể tải danh sách địa chỉ", Toast.LENGTH_SHORT).show();
+                    String errorMsg = "API Error - Code: " + response.code();
+                    if (response.body() != null) {
+                        errorMsg += ", Message: " + response.body().getMessage();
+                    }
+                    android.util.Log.e("ProfileEdit", errorMsg);
+                    handleLocationLoadError("Không thể tải danh sách địa chỉ");
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<Location>>> call, Throwable t) {
-                Toast.makeText(ProfileEditActivity.this, "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                android.util.Log.e("ProfileEdit", "Network error: " + t.getMessage(), t);
+                handleLocationLoadError("Lỗi mạng: " + t.getMessage());
             }
         });
+    }
+    
+    private void handleLocationLoadError(String error) {
+        Toast.makeText(this, error + "\nSử dụng chế độ nhập thủ công.", Toast.LENGTH_LONG).show();
+        
+        // Enable manual input mode
+        actvCity.setAdapter(null);
+        actvCity.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        actvCity.setFocusable(true);
+        actvCity.setClickable(true);
+        
+        actvDistrict.setAdapter(null);
+        actvDistrict.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        actvDistrict.setFocusable(true);
+        actvDistrict.setClickable(true);
+        actvDistrict.setEnabled(true);
+        
+        android.util.Log.i("ProfileEdit", "Switched to manual input mode");
     }
 
     private void updateDistrictAdapter(List<Location.District> districts) {
@@ -172,6 +210,7 @@ public class ProfileEditActivity extends AppCompatActivity {
             public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {
                 showLoading(false);
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    android.util.Log.d("DATA_SYNC", "[FE DEBUG] ProfileEditActivity: Update successful. Server responded with user data: " + new com.google.gson.Gson().toJson(response.body().getUser()));
                     authManager.updateUser(response.body().getUser());
                     Toast.makeText(ProfileEditActivity.this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
                     finish();
@@ -188,64 +227,7 @@ public class ProfileEditActivity extends AppCompatActivity {
         });
     }
     
-    private void showChangePasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_change_password, null);
-        builder.setView(dialogView);
 
-        final EditText etCurrentPassword = dialogView.findViewById(R.id.etCurrentPassword);
-        final EditText etNewPasswordDialog = dialogView.findViewById(R.id.etNewPassword);
-        final EditText etConfirmPasswordDialog = dialogView.findViewById(R.id.etConfirmPassword);
-
-        builder.setTitle("Đổi Mật Khẩu");
-        builder.setPositiveButton("Lưu", (dialog, which) -> {
-            // This is overridden below to prevent dialog from closing on validation error
-        });
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
-
-        final AlertDialog dialog = builder.create();
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String currentPassword = etCurrentPassword.getText().toString().trim();
-            String newPassword = etNewPasswordDialog.getText().toString().trim();
-            String confirmPassword = etConfirmPasswordDialog.getText().toString().trim();
-
-            if (TextUtils.isEmpty(currentPassword) || TextUtils.isEmpty(newPassword) || TextUtils.isEmpty(confirmPassword)) {
-                Toast.makeText(this, "Vui lòng điền đầy đủ các trường", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (newPassword.length() < 6) {
-                Toast.makeText(this, "Mật khẩu mới phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (!newPassword.equals(confirmPassword)) {
-                Toast.makeText(this, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            ApiService.ChangePasswordRequest request = new ApiService.ChangePasswordRequest(currentPassword, newPassword);
-            String token = "Bearer " + authManager.getToken();
-
-            apiService.changePassword(token, request).enqueue(new Callback<ApiResponse<Void>>() {
-                @Override
-                public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
-                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        Toast.makeText(ProfileEditActivity.this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(ProfileEditActivity.this, "Mật khẩu hiện tại không đúng.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-                    Toast.makeText(ProfileEditActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-    }
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();

@@ -1,0 +1,94 @@
+# ===== GIT & IDE FILES SHOULD BE IGNORED =====
+# Git repository metadata
+.git/
+
+# IDE files (IntelliJ IDEA, Android Studio, etc.)
+.idea/
+*.iml
+*.iws
+.vscode/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== BACKEND (Node.js) =====
+# Dependencies
+BE/node_modules/
+BE/npm-debug.log*
+BE/yarn-debug.log*
+BE/yarn-error.log*
+
+# Environment variables (IMPORTANT: Never commit sensitive data)
+BE/.env
+BE/.env.local
+BE/.env.development.local
+BE/.env.test.local
+BE/.env.production.local
+
+# Build directories
+BE/dist/
+BE/build/
+
+# Logs
+BE/logs/
+BE/*.log
+
+# Uploads (if storing files locally)
+BE/uploads/
+BE/public/uploads/
+
+# Temporary files
+BE/temp/
+BE/tmp/
+
+# ===== FRONTEND (Android) =====
+# Gradle files
+FE/.gradle/
+FE/build/
+FE/*/build/
+FE/local.properties
+
+# IDE files
+FE/.idea/caches
+FE/.idea/libraries
+FE/.idea/modules.xml
+FE/.idea/workspace.xml
+FE/.idea/navEditor.xml
+FE/.idea/assetWizardSettings.xml
+FE/.idea/shelf/
+
+# Android specific
+FE/captures/
+FE/.externalNativeBuild/
+FE/.cxx/
+FE/*/release/
+
+# ===== DEVELOPMENT TOOLS =====
+# Database files (if using local SQLite)
+*.sqlite
+*.db
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Debug files (temporary - for development only)
+debug-*.js
+temp-*.json
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Editor files
+*.swp
+*.swo
+*~
