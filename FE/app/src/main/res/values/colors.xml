@@ -56,9 +56,16 @@
     <color name="brown">#FF795548</color>
     <color name="blue_grey">#FF607D8B</color>
     
-    <!-- Shop colors -->
+        <!-- Shop colors -->
     <color name="category_inactive">#8B7355</color>
     <color name="category_active">#1A1A1A</color>
     <color name="category_inactive_new">#E0E0E0</color>
     <color name="category_text_inactive">#666666</color>
+    
+    <!-- Dialog colors -->
+    <color name="primary_blue">#3498DB</color>
+    <color name="light_gray">#F8F9FA</color>
+    <color name="light_green">#E8F5E9</color>
+    <color name="light_orange">#FFF3E0</color>
+    <color name="light_red">#FFEBEE</color>
 </resources>

@@ -50,7 +50,6 @@ public class ShopActivity extends AppCompatActivity {
 
     // Bottom Navigation
     private View navHome, navProducts, navCart, navAccount;
-    private View blurHome, blurProducts, blurCart, blurAccount;
     private ImageView iconHome, iconProducts, iconCart, iconAccount;
     private TextView tvHome, tvProducts, tvCart, tvAccount, tvResultsCount;
 
@@ -98,10 +97,6 @@ public class ShopActivity extends AppCompatActivity {
         navCart = findViewById(R.id.navCart);
         navAccount = findViewById(R.id.navAccount);
 
-        blurHome = findViewById(R.id.blurHome);
-        blurProducts = findViewById(R.id.blurProducts);
-        blurCart = findViewById(R.id.blurCart);
-        blurAccount = findViewById(R.id.blurAccount);
 
         iconHome = findViewById(R.id.iconHome);
         iconProducts = findViewById(R.id.iconProducts);
@@ -293,18 +288,15 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        // Set Products as selected by default
-        selectNavItem(blurProducts, iconProducts, tvProducts);
+        // Set Products as selected by default (blue color and bold)
+        selectNavItem(iconProducts, tvProducts);
 
         navHome.setOnClickListener(v -> {
             finish(); // Go back to home
         });
 
         navProducts.setOnClickListener(v -> {
-            selectNavItem(blurProducts, iconProducts, tvProducts);
-            deselectNavItem(blurHome, iconHome, tvHome);
-            deselectNavItem(blurCart, iconCart, tvCart);
-            deselectNavItem(blurAccount, iconAccount, tvAccount);
+            // Already on products page
         });
 
         navCart.setOnClickListener(v -> {
@@ -318,17 +310,18 @@ public class ShopActivity extends AppCompatActivity {
         });
     }
 
-    private void selectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.VISIBLE);
-        icon.setColorFilter(android.graphics.Color.parseColor("#1A1A1A"));
-        text.setTextColor(android.graphics.Color.parseColor("#1A1A1A"));
+    private void selectNavItem(ImageView icon, TextView text) {
+        // Set blue color for selected item
+        icon.setColorFilter(Color.parseColor("#2196F3"));
+        text.setTextColor(Color.parseColor("#2196F3"));
         text.setTypeface(null, android.graphics.Typeface.BOLD);
     }
 
-    private void deselectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.GONE);
-        icon.setColorFilter(android.graphics.Color.parseColor("#1A1A1A"));
-        text.setTextColor(android.graphics.Color.parseColor("#1A1A1A"));
+    private void deselectNavItem(ImageView icon, TextView text) {
+        // Set gray color for unselected items
+        icon.setColorFilter(Color.parseColor("#666666"));
+        text.setTextColor(Color.parseColor("#666666"));
+        text.setTypeface(null, android.graphics.Typeface.NORMAL);
     }
 
     private void loadBikes() {

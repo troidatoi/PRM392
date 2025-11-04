@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@drawable/light_gray_background">
 
     <!-- Main Content -->
@@ -27,8 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
@@ -71,8 +72,8 @@
                         <androidx.cardview.widget.CardView
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            app:cardCornerRadius="30dp"
-                            app:cardElevation="4dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
                             app:cardBackgroundColor="#F5F5F5">
 
                             <RelativeLayout
@@ -97,15 +98,15 @@
                             android:layout_height="24dp"
                             android:layout_gravity="top|end"
                             app:cardCornerRadius="12dp"
-                            app:cardElevation="2dp"
-                            app:cardBackgroundColor="#FFFFFF">
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#FF5722">
 
                             <TextView
                                 android:id="@+id/tvBadge"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:text="5"
-                                android:textColor="#FF5722"
+                                android:textColor="#FFFFFF"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
                                 android:gravity="center" />
@@ -125,8 +126,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:visibility="gone"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
@@ -174,7 +175,7 @@
                 android:overScrollMode="never"
                 android:paddingBottom="16dp" />
 
-            <!-- Coupon Section with Liquid Glass - HIDDEN -->
+            <!-- Coupon Section - HIDDEN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -189,7 +190,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="12dp"
-                app:cardCornerRadius="30dp"
+                app:cardCornerRadius="8dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="#F5F5F5"
                 android:visibility="gone">
@@ -222,9 +223,9 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:layout_marginEnd="8dp"
-                        app:cardCornerRadius="22dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#2196F3"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackground">
@@ -238,7 +239,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Áp dụng"
-                                android:textColor="#000000"
+                                android:textColor="#FFFFFF"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
@@ -250,7 +251,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Order Summary with Liquid Glass - HIDDEN -->
+            <!-- Order Summary - HIDDEN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -265,8 +266,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
                 app:cardBackgroundColor="#FFFFFF"
                 android:visibility="gone">
 
@@ -399,8 +400,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
@@ -414,8 +415,8 @@
                         android:id="@+id/btnCheckout"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        app:cardCornerRadius="28dp"
-                        app:cardElevation="8dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp"
                         app:cardBackgroundColor="#FFFFFF"
                         android:clickable="true"
                         android:focusable="true"
@@ -461,15 +462,18 @@
 
     <!-- removed fixed checkout section -->
 
-    <!-- Bottom Navigation Bar - Floating Style -->
+    <!-- Bottom Navigation Bar -->
     <LinearLayout
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="68dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:background="#FFFFFF"
-        android:elevation="12dp">
+        android:elevation="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
@@ -478,13 +482,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconHome"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_home"
-                app:tint="#1A1A1A"
+                app:tint="#666666"
                 android:contentDescription="Home" />
             <TextView
                 android:id="@+id/tvHome"
@@ -492,8 +497,10 @@
                 android:layout_height="wrap_content"
                 android:text="Trang chủ"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/navProducts"
             android:layout_width="0dp"
@@ -502,13 +509,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconProducts"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_products"
-                app:tint="#1A1A1A"
+                app:tint="#666666"
                 android:contentDescription="Products" />
             <TextView
                 android:id="@+id/tvProducts"
@@ -516,8 +524,10 @@
                 android:layout_height="wrap_content"
                 android:text="Sản phẩm"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/navCart"
             android:layout_width="0dp"
@@ -526,13 +536,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconCart"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_cart"
-                app:tint="#1A1A1A"
+                app:tint="#2196F3"
                 android:contentDescription="Cart" />
             <TextView
                 android:id="@+id/tvCart"
@@ -540,8 +551,11 @@
                 android:layout_height="wrap_content"
                 android:text="Giỏ hàng"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/navAccount"
             android:layout_width="0dp"
@@ -550,13 +564,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
             <ImageView
                 android:id="@+id/iconAccount"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:src="@drawable/ic_account"
-                app:tint="#1A1A1A"
+                app:tint="#666666"
                 android:contentDescription="Account" />
             <TextView
                 android:id="@+id/tvAccount"
@@ -564,7 +579,8 @@
                 android:layout_height="wrap_content"
                 android:text="Tài khoản"
                 android:textSize="11sp"
-                android:textColor="#1A1A1A" />
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
     </LinearLayout>
 

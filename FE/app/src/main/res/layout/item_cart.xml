@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="6dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
     app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
@@ -26,8 +26,8 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="12dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
                 app:cardBackgroundColor="#F5F5F5"
                 android:clickable="true"
                 android:focusable="true"
@@ -54,8 +54,8 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp">
 
                 <ImageView
                     android:id="@+id/ivProductImage"
@@ -110,7 +110,7 @@
             android:layout_marginTop="16dp"
             android:gravity="center_vertical">
 
-            <!-- Quantity Controls with Liquid Glass -->
+            <!-- Quantity Controls -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -130,9 +130,9 @@
                     android:id="@+id/btnDecrease"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#F5F5F5"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -170,9 +170,9 @@
                     android:id="@+id/btnIncrease"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#F5F5F5"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?attr/selectableItemBackground">
@@ -201,9 +201,9 @@
                 android:id="@+id/btnRemove"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FFEBEE"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
