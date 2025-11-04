@@ -26,6 +26,7 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public interface OnCartItemListener {
         void onQuantityChanged(int position, int delta);
         void onItemRemoved(int position);
+        void onItemClicked(CartItem item);
     }
     
     public interface OnCartSelectionListener extends OnCartItemListener {
@@ -154,6 +155,13 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 item.setSelected(isChecked);
                 if (listener != null && listener instanceof OnCartSelectionListener) {
                     ((OnCartSelectionListener) listener).onSelectionChanged();
+                }
+            });
+            
+            // Handle item click to view product details
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemClicked(item);
                 }
             });
 

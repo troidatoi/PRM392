@@ -70,7 +70,6 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         initViews();
         loadProductData();
-        setupStoreStock();
         setupClickListeners();
     }
 
@@ -95,6 +94,12 @@ public class ProductDetailActivity extends AppCompatActivity {
         // Get product data from intent
         Intent intent = getIntent();
         bikeId = intent.getStringExtra("bikeId");
+        
+        // Also check for productId (from Cart)
+        if (bikeId == null || bikeId.isEmpty()) {
+            bikeId = intent.getStringExtra("productId");
+        }
+        
         productName = intent.getStringExtra("productName");
         productDescription = intent.getStringExtra("productDescription");
         productPrice = intent.getStringExtra("productPrice");
@@ -107,6 +112,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         } else {
             // Use fallback data from intent
             displayProductData();
+            setupStoreStock();
         }
     }
 
@@ -132,15 +138,20 @@ public class ProductDetailActivity extends AppCompatActivity {
                         
                         // Display the data
                         displayProductData();
+                        
+                        // Load inventory from API
+                        loadProductInventory(bikeId);
                     } else {
                         // Fallback to intent data
                         displayProductData();
+                        setupStoreStock();
                     }
                 } else {
                     // Fallback to intent data
                     Toast.makeText(ProductDetailActivity.this, 
                         "Không thể tải thông tin sản phẩm", Toast.LENGTH_SHORT).show();
                     displayProductData();
+                    setupStoreStock();
                 }
             }
 
@@ -150,6 +161,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                 Toast.makeText(ProductDetailActivity.this, 
                     "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 displayProductData();
+                setupStoreStock();
             }
         });
     }
@@ -665,5 +677,77 @@ public class ProductDetailActivity extends AppCompatActivity {
         stockAdapter = new ProductStockAdapter(productStockList);
         rvStoreStock.setLayoutManager(new LinearLayoutManager(this));
         rvStoreStock.setAdapter(stockAdapter);
+    }
+    
+    private void loadProductInventory(String productId) {
+        apiService.getProductInventory(productId).enqueue(new Callback<ApiResponse<java.util.List<Object>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<java.util.List<Object>>> call, Response<ApiResponse<java.util.List<Object>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    java.util.List<Object> inventories = response.body().getData();
+                    if (inventories != null && !inventories.isEmpty()) {
+                        productStockList = new ArrayList<>();
+                        
+                        for (int i = 0; i < inventories.size(); i++) {
+                            try {
+                                java.util.Map<String, Object> inventory = (java.util.Map<String, Object>) inventories.get(i);
+                                
+                                // Get store info
+                                String storeName = "Cửa hàng";
+                                String storeAddress = "";
+                                Object storeObj = inventory.get("store");
+                                if (storeObj instanceof java.util.Map) {
+                                    java.util.Map<String, Object> store = (java.util.Map<String, Object>) storeObj;
+                                    Object nameObj = store.get("name");
+                                    if (nameObj != null) storeName = String.valueOf(nameObj);
+                                    Object addressObj = store.get("address");
+                                    if (addressObj != null) storeAddress = String.valueOf(addressObj);
+                                }
+                                
+                                // Get stock info
+                                int stock = 0;
+                                Object stockObj = inventory.get("stock");
+                                if (stockObj instanceof Number) {
+                                    stock = ((Number) stockObj).intValue();
+                                }
+                                
+                                // Determine status
+                                String status;
+                                if (stock == 0) {
+                                    status = "Hết hàng";
+                                } else if (stock < 10) {
+                                    status = "Sắp hết";
+                                } else {
+                                    status = "Còn hàng";
+                                }
+                                
+                                productStockList.add(new ProductStock(i + 1, storeName, storeAddress, stock, status));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        
+                        // Update RecyclerView
+                        stockAdapter = new ProductStockAdapter(productStockList);
+                        rvStoreStock.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this));
+                        rvStoreStock.setAdapter(stockAdapter);
+                    } else {
+                        // No inventory found, use dummy data
+                        setupStoreStock();
+                    }
+                } else {
+                    // Failed to load, use dummy data
+                    setupStoreStock();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<java.util.List<Object>>> call, Throwable t) {
+                // Error loading, use dummy data
+                Toast.makeText(ProductDetailActivity.this, 
+                    "Không thể tải thông tin tồn kho", Toast.LENGTH_SHORT).show();
+                setupStoreStock();
+            }
+        });
     }
 }

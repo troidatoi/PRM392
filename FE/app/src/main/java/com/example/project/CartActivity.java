@@ -224,11 +224,32 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                                                 if (pid == null) pid = product.get("id");
                                                 if (pid != null) productIdStr = String.valueOf(pid);
 
-                                                // Get image URL
+                                                // Get image URL - try multiple fields
                                                 Object imgUrl = product.get("imageUrl");
                                                 if (imgUrl == null) imgUrl = product.get("image");
                                                 if (imgUrl == null) imgUrl = product.get("photo");
-                                                if (imgUrl != null) imageUrl = String.valueOf(imgUrl);
+                                                
+                                                // Check if it's an images array
+                                                if (imgUrl == null) {
+                                                    Object imagesObj = product.get("images");
+                                                    if (imagesObj instanceof java.util.List) {
+                                                        java.util.List imagesList = (java.util.List) imagesObj;
+                                                        if (!imagesList.isEmpty()) {
+                                                            Object firstImage = imagesList.get(0);
+                                                            if (firstImage instanceof java.util.Map) {
+                                                                // Image is an object with url field
+                                                                java.util.Map imageMap = (java.util.Map) firstImage;
+                                                                Object urlObj = imageMap.get("url");
+                                                                if (urlObj != null) imageUrl = String.valueOf(urlObj);
+                                                            } else if (firstImage != null) {
+                                                                // Image is a direct string URL
+                                                                imageUrl = String.valueOf(firstImage);
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (imgUrl != null) {
+                                                    imageUrl = String.valueOf(imgUrl);
+                                                }
                                             } else {
                                                 // Fallback: lấy từ trường trên item
                                                 Object n2 = item.get("productName");
@@ -253,7 +274,11 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                                             if (productIdStr != null) ci.setProductId(productIdStr);
                                             if (outerStoreId != null) ci.setStoreId(outerStoreId);
                                             ci.setUnitPrice((long) price);
-                                            if (imageUrl != null) ci.setImageUrl(imageUrl);
+                                            
+                                            // Set image URL with proper base URL if needed
+                                            if (imageUrl != null) {
+                                                ci.setImageUrl(getFullImageUrl(imageUrl));
+                                            }
 
                                             items.add(ci);
                                             group.items.add(ci);
@@ -647,5 +672,38 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                 loadCartFromApi(); // Reload để đồng bộ
             }
         });
+    }
+    
+    @Override
+    public void onItemClicked(CartItem item) {
+        // Mở ProductDetailActivity khi click vào sản phẩm
+        if (item.getProductId() != null && !item.getProductId().isEmpty()) {
+            Intent intent = new Intent(CartActivity.this, ProductDetailActivity.class);
+            intent.putExtra("productId", item.getProductId());
+            intent.putExtra("productName", item.getName());
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Không tìm thấy thông tin sản phẩm", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    // Helper method to get full image URL
+    private String getFullImageUrl(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return null;
+        }
+        
+        // If URL already starts with http:// or https://, return as is
+        if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+            return imageUrl;
+        }
+        
+        // If URL starts with /, remove it before appending
+        if (imageUrl.startsWith("/")) {
+            imageUrl = imageUrl.substring(1);
+        }
+        
+        // Append to base server URL (without /api/ path)
+        return "http://10.0.2.2:5001/" + imageUrl;
     }
 }
