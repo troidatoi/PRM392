@@ -20,9 +20,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.project.adapters.BikeImageAdapter;
 import com.example.project.models.ApiResponse;
 import com.example.project.models.Bike;
+import com.example.project.models.User;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
 import com.example.project.utils.AuthManager;
+import com.example.project.utils.NotificationHelper;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -301,6 +303,9 @@ public class BikeDetailActivity extends AppCompatActivity {
                                         // Send broadcast to update cart
                                         Intent intent = new Intent("com.example.project.CART_UPDATED");
                                         sendBroadcast(intent);
+                                        
+                                        // Cập nhật badge ngay lập tức
+                                        updateCartBadgeAfterAdd();
                                     } else {
                                         // Show detailed error message from backend
                                         String errorMessage = "Thêm thất bại";
@@ -705,5 +710,43 @@ public class BikeDetailActivity extends AppCompatActivity {
             // Reload bike data when bike is updated successfully
             loadBikeDetail();
         }
+    }
+    
+    /**
+     * Cập nhật badge sau khi thêm sản phẩm vào giỏ hàng
+     */
+    private void updateCartBadgeAfterAdd() {
+        AuthManager auth = AuthManager.getInstance(this);
+        User user = auth.getCurrentUser();
+        if (user == null) return;
+        
+        ApiService api = RetrofitClient.getInstance().getApiService();
+        api.getCartByUser(auth.getAuthHeader(), user.getId())
+            .enqueue(new Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        try {
+                            Object data = response.body().getData();
+                            java.util.Map dataMap = (java.util.Map) data;
+                            java.util.Map cartMap = (java.util.Map) dataMap.get("cart");
+                            
+                            int itemCount = 0;
+                            if (cartMap != null && cartMap.get("itemCount") instanceof Number) {
+                                itemCount = ((Number) cartMap.get("itemCount")).intValue();
+                            }
+                            
+                            NotificationHelper.updateCartBadge(BikeDetailActivity.this, itemCount);
+                        } catch (Exception e) {
+                            // Ignore error, badge will be updated when CartActivity loads
+                        }
+                    }
+                }
+                
+                @Override
+                public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                    // Ignore error, badge will be updated when CartActivity loads
+                }
+            });
     }
 }

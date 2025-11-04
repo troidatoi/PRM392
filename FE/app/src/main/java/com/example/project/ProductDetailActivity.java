@@ -21,9 +21,11 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.bumptech.glide.Glide;
 import com.example.project.models.ApiResponse;
 import com.example.project.models.Bike;
+import com.example.project.models.User;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
 import com.example.project.utils.AuthManager;
+import com.example.project.utils.NotificationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -576,6 +578,10 @@ public class ProductDetailActivity extends AppCompatActivity {
                                         // Send broadcast to update cart
                                         Intent intent = new Intent("com.example.project.CART_UPDATED");
                                         sendBroadcast(intent);
+                                        
+                                        // Cập nhật badge ngay lập tức
+                                        // Lấy số lượng hiện tại từ response hoặc fetch cart
+                                        updateCartBadgeAfterAdd();
                                     } else {
                                         // Show detailed error message from backend
                                         String errorMessage = "Thêm thất bại";
@@ -749,5 +755,43 @@ public class ProductDetailActivity extends AppCompatActivity {
                 setupStoreStock();
             }
         });
+    }
+    
+    /**
+     * Cập nhật badge sau khi thêm sản phẩm vào giỏ hàng
+     */
+    private void updateCartBadgeAfterAdd() {
+        AuthManager auth = AuthManager.getInstance(this);
+        User user = auth.getCurrentUser();
+        if (user == null) return;
+        
+        ApiService api = RetrofitClient.getInstance().getApiService();
+        api.getCartByUser(auth.getAuthHeader(), user.getId())
+            .enqueue(new Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        try {
+                            Object data = response.body().getData();
+                            java.util.Map dataMap = (java.util.Map) data;
+                            java.util.Map cartMap = (java.util.Map) dataMap.get("cart");
+                            
+                            int itemCount = 0;
+                            if (cartMap != null && cartMap.get("itemCount") instanceof Number) {
+                                itemCount = ((Number) cartMap.get("itemCount")).intValue();
+                            }
+                            
+                            NotificationHelper.updateCartBadge(ProductDetailActivity.this, itemCount);
+                        } catch (Exception e) {
+                            // Ignore error, badge will be updated when CartActivity loads
+                        }
+                    }
+                }
+                
+                @Override
+                public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                    // Ignore error, badge will be updated when CartActivity loads
+                }
+            });
     }
 }
