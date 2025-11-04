@@ -221,6 +221,22 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Payment Result Activity -->
+        <activity
+            android:name=".PaymentResultActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Project">
+            <!-- Intent filter để nhận deep link từ PayOS -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                      android:host="folding-html-jeans-probability.trycloudflare.com"
+                      android:pathPrefix="/payment" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

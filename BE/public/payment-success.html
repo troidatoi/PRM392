@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán thành công</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #4CAF50;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success">✓ Thanh toán thành công!</div>
+        <p>Đang chuyển hướng về ứng dụng...</p>
+        <div class="loading">Vui lòng đợi...</div>
+    </div>
+
+    <script>
+        // Lấy orderCode từ URL query (PayOS sẽ redirect với orderCode)
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderCode = urlParams.get('orderCode');
+        
+        if (orderCode) {
+            // Thử mở app với deep link
+            const packageName = 'com.example.project'; // Thay bằng package name thực tế
+            const deepLink = packageName + '://payment/success?orderCode=' + orderCode;
+            
+            // Thử mở app
+            setTimeout(() => {
+                window.location.href = deepLink;
+            }, 1000);
+            
+            // Fallback: Nếu không mở được app, hiển thị thông báo
+            setTimeout(() => {
+                document.querySelector('.container').innerHTML = 
+                    '<div class="success">✓ Thanh toán thành công!</div>' +
+                    '<p>Đơn hàng của bạn đã được xác nhận.</p>' +
+                    '<p>Mã đơn hàng: ' + orderCode + '</p>' +
+                    '<p>Vui lòng quay lại ứng dụng để xem chi tiết.</p>';
+            }, 3000);
+        } else {
+            document.querySelector('.container').innerHTML = 
+                '<div class="success">✓ Thanh toán thành công!</div>' +
+                '<p>Đơn hàng của bạn đã được xác nhận.</p>' +
+                '<p>Vui lòng quay lại ứng dụng để xem chi tiết.</p>';
+        }
+    </script>
+</body>
+</html>
+

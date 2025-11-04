@@ -29,7 +29,7 @@ const paymentSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: [true, 'Phương thức thanh toán là bắt buộc'],
-    enum: ['cash', 'bank_transfer', 'vnpay', 'zalopay', 'paypal', 'credit_card', 'momo']
+    enum: ['cash', 'bank_transfer', 'vnpay', 'zalopay', 'paypal', 'credit_card', 'momo', 'payos']
   },
   paymentGateway: {
     type: String,

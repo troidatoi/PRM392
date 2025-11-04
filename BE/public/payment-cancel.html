@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hủy thanh toán</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .cancel {
+            color: #FF9800;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cancel">⚠ Thanh toán đã bị hủy</div>
+        <p>Bạn đã hủy thanh toán. Đơn hàng vẫn được giữ lại.</p>
+        <p>Vui lòng quay lại ứng dụng để tiếp tục.</p>
+    </div>
+
+    <script>
+        // Thử mở app với deep link
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderCode = urlParams.get('orderCode');
+        
+        if (orderCode) {
+            const packageName = 'com.example.project'; // Thay bằng package name thực tế
+            const deepLink = packageName + '://payment/cancel?orderCode=' + orderCode;
+            
+            setTimeout(() => {
+                window.location.href = deepLink;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
+

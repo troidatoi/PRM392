@@ -1,5 +1,7 @@
 package com.example.project;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -256,7 +258,15 @@ public class CheckoutActivity extends AppCompatActivity {
 
         // Get selected payment method
         int selectedPaymentId = rgPaymentMethod.getCheckedRadioButtonId();
-        String paymentMethod = "vnpay"; // Chỉ dùng VNPay
+        String paymentMethod = "cash"; // Default
+        
+        if (selectedPaymentId == R.id.rbCOD) {
+            paymentMethod = "cash";
+        } else if (selectedPaymentId == R.id.rbBankTransfer) {
+            paymentMethod = "bank_transfer";
+        } else if (selectedPaymentId == R.id.rbPayOS) {
+            paymentMethod = "payos";
+        }
 
         // Show confirmation dialog
         showConfirmationDialog(receiverName, receiverPhone, shippingAddress + "\n" + city, paymentMethod);
@@ -305,31 +315,66 @@ public class CheckoutActivity extends AppCompatActivity {
         shipping.put("address", address);
         shipping.put("city", etCity.getText().toString().trim());
         body.put("shippingAddress", shipping);
-        body.put("paymentMethod", "vnpay");
+        body.put("paymentMethod", paymentMethod);
         body.put("notes", "");
 
         api.createOrders(auth.getAuthHeader(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
             @Override
             public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    String message = "Đơn hàng đã được tạo và đang chờ thanh toán VNPay.";
                     try {
                         Object data = response.body().getData();
                         if (data instanceof java.util.Map) {
                             java.util.Map d = (java.util.Map) data;
-                            Object summaryObj = d.get("summary");
-                            if (summaryObj instanceof java.util.Map) {
-                                java.util.Map summary = (java.util.Map) summaryObj;
-                                Object totalOrders = summary.get("totalOrders");
-                                Object totalAmount = summary.get("totalAmount");
-                                message = "Tạo " + String.valueOf(totalOrders) + " đơn hàng. Tổng: " + formatCurrency(totalAmount) + " VNĐ";
+                            Object ordersObj = d.get("orders");
+                            
+                            if (ordersObj instanceof java.util.List) {
+                                java.util.List orders = (java.util.List) ordersObj;
+                                
+                                // Nếu paymentMethod là payos, tạo payment link và redirect
+                                if ("payos".equals(paymentMethod) && orders.size() > 0) {
+                                    // Lấy order đầu tiên (hoặc có thể xử lý nhiều orders)
+                                    Object firstOrder = orders.get(0);
+                                    if (firstOrder instanceof java.util.Map) {
+                                        java.util.Map orderMap = (java.util.Map) firstOrder;
+                                        Object orderObj = orderMap.get("order");
+                                        if (orderObj instanceof java.util.Map) {
+                                            Object orderId = ((java.util.Map) orderObj).get("_id");
+                                            if (orderId != null) {
+                                                createPaymentLinkAndRedirect(orderId.toString(), name, phone, address);
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                // Nếu không phải payos hoặc lỗi, hiển thị thông báo thông thường
+                                Object summaryObj = d.get("summary");
+                                String message = "Đơn hàng đã được tạo thành công.";
+                                if (summaryObj instanceof java.util.Map) {
+                                    java.util.Map summary = (java.util.Map) summaryObj;
+                                    Object totalOrders = summary.get("totalOrders");
+                                    Object totalAmount = summary.get("totalAmount");
+                                    message = "Tạo " + String.valueOf(totalOrders) + " đơn hàng. Tổng: " + formatCurrency(totalAmount) + " VNĐ";
+                                }
+                                
+                                new AlertDialog.Builder(CheckoutActivity.this)
+                                    .setTitle("Thành công")
+                                    .setMessage(message)
+                                    .setPositiveButton("OK", (dialog, which) -> finish())
+                                    .setCancelable(false)
+                                    .show();
+                                return;
                             }
                         }
-                    } catch (Exception ignored) {}
-
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    
+                    // Fallback message
                     new AlertDialog.Builder(CheckoutActivity.this)
-                        .setTitle("Thanh toán VNPay")
-                        .setMessage(message)
+                        .setTitle("Thành công")
+                        .setMessage("Đơn hàng đã được tạo thành công.")
                         .setPositiveButton("OK", (dialog, which) -> finish())
                         .setCancelable(false)
                         .show();
@@ -359,6 +404,84 @@ public class CheckoutActivity extends AppCompatActivity {
         if (v instanceof Number) val = ((Number) v).longValue();
         NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
         return fmt.format(val);
+    }
+    
+    /**
+     * Tạo payment link và redirect user đến PayOS
+     */
+    private void createPaymentLinkAndRedirect(String orderId, String name, String phone, String address) {
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        
+        // Tạo returnUrl và cancelUrl
+        // Sử dụng BASE_URL từ backend (từ .env) 
+        // Lưu ý: PayOS cần URL công khai (HTTP/HTTPS), không thể dùng localhost
+        // Trong production, cần sử dụng URL thật từ backend (.env FRONTEND_URL hoặc BASE_URL)
+        // PayOS sẽ redirect về returnUrl với query param orderCode
+        String returnUrl = "https://folding-html-jeans-probability.trycloudflare.com/payment/success";
+        String cancelUrl = "https://folding-html-jeans-probability.trycloudflare.com/payment/cancel";
+        
+        // Hoặc sử dụng deep link (cần cấu hình trong AndroidManifest.xml)
+        // String packageName = getPackageName();
+        // returnUrl = packageName + "://payment/success?orderCode={orderCode}";
+        // cancelUrl = packageName + "://payment/cancel?orderCode={orderCode}";
+        
+        java.util.Map<String, Object> paymentBody = new java.util.HashMap<>();
+        paymentBody.put("returnUrl", returnUrl);
+        paymentBody.put("cancelUrl", cancelUrl);
+        
+        // Show loading
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(this);
+        progressDialog.setMessage("Đang tạo link thanh toán...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        
+        api.createPaymentLink(auth.getAuthHeader(), orderId, paymentBody).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+                progressDialog.dismiss();
+                
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    try {
+                        Object data = response.body().getData();
+                        if (data instanceof java.util.Map) {
+                            java.util.Map paymentData = (java.util.Map) data;
+                            Object checkoutUrl = paymentData.get("checkoutUrl");
+                            
+                            if (checkoutUrl != null) {
+                                // Mở browser để thanh toán
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl.toString()));
+                                startActivity(browserIntent);
+                                
+                                // Có thể finish activity này hoặc chờ callback
+                                Toast.makeText(CheckoutActivity.this, "Vui lòng hoàn tất thanh toán trên PayOS", Toast.LENGTH_LONG).show();
+                                finish();
+                                return;
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    
+                    Toast.makeText(CheckoutActivity.this, "Không thể tạo link thanh toán", Toast.LENGTH_SHORT).show();
+                } else {
+                    String err = "Không thể tạo link thanh toán. Vui lòng thử lại!";
+                    try {
+                        if (response.errorBody() != null) {
+                            String eb = response.errorBody().string();
+                            // Parse error message if needed
+                        }
+                    } catch (Exception ignored) {}
+                    Toast.makeText(CheckoutActivity.this, err, Toast.LENGTH_LONG).show();
+                }
+            }
+            
+            @Override
+            public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                progressDialog.dismiss();
+                Toast.makeText(CheckoutActivity.this, "Lỗi kết nối. Vui lòng thử lại!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
 

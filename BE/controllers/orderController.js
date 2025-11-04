@@ -10,11 +10,12 @@ const createOrders = async (req, res) => {
   try {
     const { userId, shippingAddress, paymentMethod, notes } = req.body;
 
-    // Validate payment method: VNPay only
-    if (paymentMethod !== 'vnpay') {
+    // Validate payment method: VNPay or PayOS
+    const validPaymentMethods = ['vnpay', 'payos', 'cash'];
+    if (!validPaymentMethods.includes(paymentMethod)) {
       return res.status(400).json({
         success: false,
-        message: 'Chỉ hỗ trợ thanh toán VNPay'
+        message: 'Phương thức thanh toán không hợp lệ. Chỉ hỗ trợ: VNPay, PayOS, hoặc tiền mặt'
       });
     }
 

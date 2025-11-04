@@ -64,6 +64,7 @@ app.use('/api/locations', require('./routes/storeRoutes')); // Store/Location ro
 app.use('/api/stores', require('./routes/storeRoutes')); // Alias for backward compatibility
 app.use('/api/cart', require('./routes/cartRoutes')); // Cart routes
 app.use('/api/orders', require('./routes/orderRoutes')); // Order routes
+app.use('/api/payments', require('./routes/paymentRoutes')); // Payment routes
 app.use('/api/inventory', require('./routes/inventoryRoutes')); // Inventory routes
 app.use('/api/chat', require('./routes/chatRoutes')); // Chat routes
 
@@ -80,6 +81,15 @@ app.get('/api/health', (req, res) => {
 // Reset password page route
 app.get('/reset-password/:token', (req, res) => {
   res.sendFile(__dirname + '/public/reset-password.html');
+});
+
+// Payment redirect pages
+app.get('/payment/success', (req, res) => {
+  res.sendFile(__dirname + '/public/payment-success.html');
+});
+
+app.get('/payment/cancel', (req, res) => {
+  res.sendFile(__dirname + '/public/payment-cancel.html');
 });
 
 // 404 handler

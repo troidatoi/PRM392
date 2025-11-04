@@ -258,6 +258,32 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
     
+    // Payment endpoints
+    @POST("payments/order/{orderId}/create-link")
+    Call<ApiResponse<Object>> createPaymentLink(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("orderId") String orderId,
+        @Body java.util.Map<String, Object> body
+    );
+    
+    @GET("payments/verify")
+    Call<ApiResponse<Object>> verifyPayment(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("orderCode") String orderCode
+    );
+    
+    @GET("payments/{paymentId}")
+    Call<ApiResponse<Object>> getPaymentInfo(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("paymentId") String paymentId
+    );
+    
+    @GET("payments/order/{orderId}")
+    Call<ApiResponse<Object>> getPaymentByOrder(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("orderId") String orderId
+    );
+    
     // Change password request model
     class ChangePasswordRequest {
         private String currentPassword;

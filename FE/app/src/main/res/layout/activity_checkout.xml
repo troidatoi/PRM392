@@ -365,10 +365,10 @@
                             android:paddingVertical="8dp" />
 
                         <RadioButton
-                            android:id="@+id/rbEWallet"
+                            android:id="@+id/rbPayOS"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Ví điện tử (Momo, ZaloPay)"
+                            android:text="PayOS (Thanh toán trực tuyến)"
                             android:textSize="16sp"
                             android:textColor="#000000"
                             android:paddingVertical="8dp" />
