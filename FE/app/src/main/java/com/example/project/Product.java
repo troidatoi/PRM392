@@ -1,6 +1,7 @@
 package com.example.project;
 
 public class Product {
+    private String bikeId;
     private String name;
     private String description;
     private String price;
@@ -38,6 +39,14 @@ public class Product {
         this.imageUrl = imageUrl;
         this.isBestSeller = isBestSeller;
         this.isSoldOut = isSoldOut;
+    }
+
+    public String getBikeId() {
+        return bikeId;
+    }
+
+    public void setBikeId(String bikeId) {
+        this.bikeId = bikeId;
     }
 
     public String getName() {

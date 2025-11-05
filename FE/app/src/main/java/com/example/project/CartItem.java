@@ -12,6 +12,7 @@ public class CartItem {
     private String productId; // Product ID
     private String storeId; // Store ID
     private long unitPrice; // Unit price for API calls
+    private String imageUrl; // Image URL from API
 
     public CartItem(String name, String description, String price, int imageResId, int quantity) {
         this.name = name;
@@ -121,5 +122,13 @@ public class CartItem {
 
     public void setUnitPrice(long unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

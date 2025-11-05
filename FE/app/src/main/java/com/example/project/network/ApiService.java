@@ -164,6 +164,11 @@ public interface ApiService {
                                             @retrofit2.http.Path("itemId") String itemId);
 
     // Inventory endpoints
+    @GET("inventory/product/{productId}")
+    Call<ApiResponse<java.util.List<Object>>> getProductInventory(
+        @retrofit2.http.Path("productId") String productId
+    );
+    
     @GET("inventory/store/{storeId}")
     Call<ApiResponse<Object>> getInventoryByStore(
         @Header("Authorization") String token,

@@ -305,6 +305,37 @@ const checkStockAvailability = async (req, res) => {
   }
 };
 
+// Get all stores with inventory for a specific product
+const getProductInventory = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    
+    const inventories = await Inventory.find({
+      product: productId
+    })
+    .populate('store', 'name address phone')
+    .populate('product', 'name price');
+    
+    if (!inventories || inventories.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy tồn kho cho sản phẩm này'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: inventories
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getInventory,
   getStoreInventory,
@@ -312,5 +343,6 @@ module.exports = {
   reduceStock,
   getLowStockItems,
   getOutOfStockItems,
-  checkStockAvailability
+  checkStockAvailability,
+  getProductInventory
 };

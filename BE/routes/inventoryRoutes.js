@@ -7,12 +7,16 @@ const {
   reduceStock,
   getLowStockItems,
   getOutOfStockItems,
-  checkStockAvailability
+  checkStockAvailability,
+  getProductInventory
 } = require('../controllers/inventoryController');
 const { protect } = require('../middleware/auth');
 
 // Get inventory for a specific product at a store
 router.get('/product', getInventory);
+
+// Get all stores with inventory for a specific product
+router.get('/product/:productId', getProductInventory);
 
 // Get all inventory for a store
 router.get('/store/:storeId', getStoreInventory);
