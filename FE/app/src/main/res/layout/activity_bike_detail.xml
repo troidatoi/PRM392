@@ -180,27 +180,7 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/tvBikeStatus"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="available"
-                        android:textColor="@color/green"
-                        android:textSize="14sp"
-                        android:background="@drawable/status_background"
-                        android:padding="8dp"
-                        android:gravity="center" />
-
-                    <!-- Stock removed per admin UI request -->
-
-                </LinearLayout>
+                <!-- Status section removed per admin UI request -->
 
             </LinearLayout>
 

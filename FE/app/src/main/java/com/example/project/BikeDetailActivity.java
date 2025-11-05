@@ -42,7 +42,7 @@ public class BikeDetailActivity extends AppCompatActivity {
     private ImageView ivMainImage;
     private RecyclerView rvImageGallery;
     private TextView tvBikeName, tvBikeBrand, tvBikeModel, tvBikePrice, tvOriginalPrice;
-    private TextView tvBikeDescription, tvBikeCategory, tvBikeStatus;
+    private TextView tvBikeDescription, tvBikeCategory;
     private TextView tvBikeWarranty, tvBikeRating, tvBikeFeatures;
     private LinearLayout llSpecifications, llErrorState;
     private ProgressBar progressBar;
@@ -400,7 +400,7 @@ public class BikeDetailActivity extends AppCompatActivity {
         tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
         tvBikeDescription = findViewById(R.id.tvBikeDescription);
         tvBikeCategory = findViewById(R.id.tvBikeCategory);
-        tvBikeStatus = findViewById(R.id.tvBikeStatus);
+        // Status view removed from layout
         // Stock label removed from layout
         tvBikeWarranty = findViewById(R.id.tvBikeWarranty);
         tvBikeRating = findViewById(R.id.tvBikeRating);
@@ -499,7 +499,7 @@ public class BikeDetailActivity extends AppCompatActivity {
         tvBikeModel.setText(bike.getModel());
         tvBikeDescription.setText(bike.getDescription());
         tvBikeCategory.setText(getCategoryDisplayName(bike.getCategory()));
-        tvBikeStatus.setText(bike.getStatus());
+        // Status display removed
         // Stock row removed
         tvBikeWarranty.setText(bike.getWarranty() != null ? bike.getWarranty() : "12 tháng");
 
@@ -538,21 +538,7 @@ public class BikeDetailActivity extends AppCompatActivity {
             tvBikeFeatures.setText("Không có thông tin đặc điểm");
         }
 
-        // Set status color
-        switch (bike.getStatus().toLowerCase()) {
-            case "available":
-                tvBikeStatus.setTextColor(getColor(R.color.green));
-                break;
-            case "out_of_stock":
-                tvBikeStatus.setTextColor(getColor(R.color.red));
-                break;
-            case "discontinued":
-                tvBikeStatus.setTextColor(getColor(R.color.orange));
-                break;
-            default:
-                tvBikeStatus.setTextColor(getColor(R.color.gray));
-                break;
-        }
+        // Status color setting removed
 
         // Load images
         loadBikeImages();

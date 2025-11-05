@@ -81,7 +81,7 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
             ivAddToCart = itemView.findViewById(R.id.ivAddToCart);
             
             // Add strikethrough effect to original price
-            tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            tvBikeOriginalPrice.setPaintFlags(tvBikeOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
 
         public void bind(Bike bike) {

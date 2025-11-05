@@ -45,6 +45,10 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     private ApiService apiService;
     private AuthManager authManager;
     
+    // Statistics
+    private int totalStoresCount = 0;
+    private int activeStoresCount = 0;
+    
     // Bottom navigation
     private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
     private ImageView iconStoreManagement;
@@ -213,6 +217,17 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         totalPages = response.getPages();
         hasMoreData = currentPage < totalPages;
         
+        // Get total count from API response
+        totalStoresCount = response.getTotal();
+        
+        // Count active stores from all loaded stores
+        activeStoresCount = 0;
+        for (Store store : storeList) {
+            if (store.isActive()) {
+                activeStoresCount++;
+            }
+        }
+        
         storeAdapter.notifyDataSetChanged();
         updateStatistics();
         updateEmptyState();
@@ -241,17 +256,9 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     }
 
     private void updateStatistics() {
-        int totalStores = storeList.size();
-        int activeStores = 0;
-
-        for (Store store : storeList) {
-            if (store.isActive()) {
-                activeStores++;
-            }
-        }
-
-        tvTotalStores.setText(String.valueOf(totalStores));
-        tvActiveStores.setText(String.valueOf(activeStores));
+        // Use total count from API response instead of counting from loaded list
+        tvTotalStores.setText(String.valueOf(totalStoresCount));
+        tvActiveStores.setText(String.valueOf(activeStoresCount));
     }
 
     private void showAddStoreDialog() {
