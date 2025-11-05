@@ -4,34 +4,33 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="6dp"
-    app:cardBackgroundColor="@android:color/transparent">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/liquid_glass_input"
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical">
 
+        <!-- Store Icon -->
         <androidx.cardview.widget.CardView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            app:cardCornerRadius="25dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="@android:color/transparent">
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#F5F9FF">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/liquid_glass_small"
                 android:gravity="center">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:src="@drawable/ic_home"
                     app:tint="#2196F3"
                     android:contentDescription="Store" />
@@ -40,11 +39,13 @@
 
         </androidx.cardview.widget.CardView>
 
+        <!-- Store Info -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="12dp"
             android:orientation="vertical">
 
             <TextView
@@ -54,48 +55,59 @@
                 android:text="Chi nhánh Quận 1"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                android:textColor="#1A1A1A"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/tvStoreAddress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="123 Nguyễn Huệ, Q.1, TP.HCM"
-                android:textSize="12sp"
-                android:textColor="#666666"
+                android:textSize="13sp"
+                android:textColor="#757575"
                 android:layout_marginTop="4dp"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:ellipsize="end" />
 
         </LinearLayout>
 
+        <!-- Stock Info -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="end">
+            android:gravity="end"
+            android:minWidth="80dp">
 
             <TextView
                 android:id="@+id/tvStockQuantity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="24"
-                android:textSize="20sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="#4CAF50" />
+                android:textColor="#4CAF50"
+                android:layout_gravity="end" />
 
             <TextView
                 android:id="@+id/tvStockStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Còn hàng"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textColor="#4CAF50"
-                android:layout_marginTop="2dp" />
+                android:textStyle="bold"
+                android:layout_marginTop="2dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@drawable/stock_status_background"
+                android:layout_gravity="end" />
 
         </LinearLayout>
 
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
-

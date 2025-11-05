@@ -60,16 +60,60 @@
                 android:textColor="@color/gray"
                 android:textSize="14sp" />
 
-            <!-- Price -->
-            <TextView
-                android:id="@+id/tvBikePrice"
+            <!-- Price Section with Original Price and Discount -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="29.990.000 ₫"
-                android:textColor="@color/primary"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:orientation="vertical"
+                android:layout_marginBottom="4dp">
+
+                <!-- Original Price (strikethrough) -->
+                <TextView
+                    android:id="@+id/tvOriginalPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="35.990.000 ₫"
+                    android:textColor="#999999"
+                    android:textSize="13sp"
+                    android:alpha="0.7"
+                    android:layout_marginBottom="2dp"
+                    android:visibility="gone" />
+
+                <!-- Current Price with Discount Badge -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvBikePrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="29.990.000 ₫"
+                        android:textColor="@color/primary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvDiscountBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/discount_badge_background"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:text="-20%"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
             <!-- Stock and Status Row -->
             <LinearLayout

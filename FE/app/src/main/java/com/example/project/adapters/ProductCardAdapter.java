@@ -91,9 +91,24 @@ public class ProductCardAdapter extends RecyclerView.Adapter<ProductCardAdapter.
                     (brand.isEmpty() ? model : (model.isEmpty() ? brand : brand + " • " + model));
             tvProductId.setText(secondary);
 
-            // Price formatted and stock suffix
+            // Price formatted with discount info if available
             String priceText = formatCurrency(product.getPrice());
-            tvProductValue.setText(priceText);
+            
+            // Add original price with strikethrough and discount percentage if available
+            if (product.getOriginalPrice() > 0 && product.getOriginalPrice() > product.getPrice()) {
+                String originalPriceText = formatCurrency(product.getOriginalPrice());
+                double discountPercentage = ((product.getOriginalPrice() - product.getPrice()) / product.getOriginalPrice()) * 100;
+                
+                // Use HTML for strikethrough on original price
+                android.text.Spanned formattedText = android.text.Html.fromHtml(
+                    "<small><font color='#999999'><strike>" + originalPriceText + "</strike></font></small><br/>" +
+                    priceText + " <font color='#FF3B30'><b>(-" + String.format("%.0f", discountPercentage) + "%)</b></font>",
+                    android.text.Html.FROM_HTML_MODE_LEGACY
+                );
+                tvProductValue.setText(formattedText);
+            } else {
+                tvProductValue.setText(priceText);
+            }
 
             // Image: first image url if available
             if (product.getImages() != null && !product.getImages().isEmpty() && product.getImages().get(0) != null) {
