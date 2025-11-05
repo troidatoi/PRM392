@@ -23,6 +23,16 @@
         android:textSize="13sp"
         android:textColor="#666666" />
 
+    <TextView
+        android:id="@+id/tvStoreTotal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:textColor="#2196F3"
+        android:visibility="gone" />
+
 </LinearLayout>
 
 

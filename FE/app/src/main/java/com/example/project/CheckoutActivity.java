@@ -203,9 +203,11 @@ public class CheckoutActivity extends AppCompatActivity {
 									}
 
 									android.util.Log.d("CheckoutActivity", "Adding store header: " + sname + " (ID: " + sid + ")");
-									rows.add(CheckoutRow.header(sid, sname));
+									CheckoutRow headerRow = CheckoutRow.header(sid, sname);
+									rows.add(headerRow);
 									
-									// Get items for this store
+									// Get items for this store and calculate store total
+									long storeTotalValue = 0;
 									java.util.List storeItems = (java.util.List) storeGroup.get("items");
 									if (storeItems != null && !storeItems.isEmpty()) {
 										android.util.Log.d("CheckoutActivity", "Store " + sname + " has " + storeItems.size() + " items");
@@ -222,6 +224,10 @@ public class CheckoutActivity extends AppCompatActivity {
 												double price = product.get("price") instanceof Number ? ((Number) product.get("price")).doubleValue() : 0;
 												String priceText = formatPrice((long) price) + " VNĐ";
 												int quantity = item.get("quantity") instanceof Number ? ((Number) item.get("quantity")).intValue() : 1;
+												
+												// Calculate total for this item and add to store total
+												long itemTotal = (long)(price * quantity);
+												storeTotalValue += itemTotal;
 												
 												CartItem ci = new CartItem(name, "", priceText, R.drawable.splash_bike_background, quantity);
 												ci.setStoreId(sid);
@@ -252,6 +258,9 @@ public class CheckoutActivity extends AppCompatActivity {
 									} else {
 										android.util.Log.w("CheckoutActivity", "Store " + sname + " has no items");
 									}
+									
+									// Set store total to header row
+									headerRow.setStoreTotal(storeTotalValue);
 									idx++;
 								} catch (Exception storeEx) {
 									android.util.Log.e("CheckoutActivity", "Error parsing store at index " + idx + ": " + storeEx.getMessage(), storeEx);
@@ -641,12 +650,16 @@ public class CheckoutActivity extends AppCompatActivity {
 
 	private void showConfirmationDialog(String name, String phone, String address, String paymentMethod) {
 		NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
-		String formattedTotal = formatter.format(totalAmount) + " VNĐ";
+		String formattedSubtotal = formatter.format(totalAmount) + " VNĐ";
+		String formattedShipping = formatter.format(estimatedShippingFee) + " VNĐ";
+		String formattedTotal = formatter.format(totalAmount + estimatedShippingFee) + " VNĐ";
 
 		String message = "Người nhận: " + name + "\n" +
 				"Số điện thoại: " + phone + "\n" +
 				"Địa chỉ: " + address + "\n" +
 				"Phương thức thanh toán: " + paymentMethod + "\n" +
+				"Tạm tính: " + formattedSubtotal + "\n" +
+				"Phí vận chuyển: " + formattedShipping + "\n" +
 				"Tổng tiền: " + formattedTotal + "\n\n" +
 				"Xác nhận đặt hàng?";
 

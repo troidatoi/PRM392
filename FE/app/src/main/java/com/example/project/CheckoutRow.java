@@ -8,6 +8,7 @@ public class CheckoutRow {
     private String storeName;
     private Double distanceKm; // nullable
     private Long shippingFee;  // nullable
+    private Long storeTotal;   // Tổng tiền sản phẩm của store (nullable, for header)
     private CartItem item;     // when type == ITEM
 
     public static CheckoutRow header(String storeId, String storeName) {
@@ -17,6 +18,9 @@ public class CheckoutRow {
         r.storeName = storeName;
         return r;
     }
+    
+    public void setStoreTotal(Long storeTotal) { this.storeTotal = storeTotal; }
+    public Long getStoreTotal() { return storeTotal; }
 
     public static CheckoutRow item(CartItem item) {
         CheckoutRow r = new CheckoutRow();

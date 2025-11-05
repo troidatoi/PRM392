@@ -58,6 +58,18 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } else {
                 h.tvStoreShipping.setText("Phí ship: đang tính...");
             }
+            
+            // Hiển thị tổng cho store (tổng sản phẩm + phí ship)
+            if (row.getStoreTotal() != null && row.getShippingFee() != null) {
+                long storeTotalValue = row.getStoreTotal();
+                long shippingFeeValue = row.getShippingFee();
+                long totalForStore = storeTotalValue + shippingFeeValue;
+                java.text.NumberFormat fmt = java.text.NumberFormat.getInstance(new java.util.Locale("vi", "VN"));
+                h.tvStoreTotal.setText("Tổng đơn: " + fmt.format(totalForStore) + " VNĐ");
+                h.tvStoreTotal.setVisibility(View.VISIBLE);
+            } else {
+                h.tvStoreTotal.setVisibility(View.GONE);
+            }
         } else if (holder instanceof ItemHolder) {
             CartItem item = row.getItem();
             ItemHolder it = (ItemHolder) holder;
@@ -85,6 +97,7 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         for (CheckoutRow r : rows) {
             if (r.getType() == CheckoutRow.Type.HEADER && storeId != null && storeId.equals(r.getStoreId())) {
                 r.setShipping(distanceKm, shippingFee);
+                // Trigger update for total display when shipping fee is updated
             }
         }
         notifyDataSetChanged();
@@ -105,11 +118,12 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     static class HeaderHolder extends RecyclerView.ViewHolder {
-        TextView tvStoreName, tvStoreShipping;
+        TextView tvStoreName, tvStoreShipping, tvStoreTotal;
         HeaderHolder(View itemView) {
             super(itemView);
             tvStoreName = itemView.findViewById(R.id.tvStoreName);
             tvStoreShipping = itemView.findViewById(R.id.tvStoreShipping);
+            tvStoreTotal = itemView.findViewById(R.id.tvStoreTotal);
         }
     }
 }
