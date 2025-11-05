@@ -59,6 +59,10 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
         private ImageView ivBikeImage;
         private TextView tvBikeName;
         private TextView tvBikePrice;
+        private TextView tvBikeOriginalPrice;
+        private TextView tvDiscountPercent;
+        private TextView tvDiscountPercentInline;
+        private View discountBadge;
         private ImageView ivDetailIcon;
         private ImageView ivAddToCart;
 
@@ -68,6 +72,10 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
             ivBikeImage = itemView.findViewById(R.id.ivBikeImage);
             tvBikeName = itemView.findViewById(R.id.tvBikeName);
             tvBikePrice = itemView.findViewById(R.id.tvBikePrice);
+            tvBikeOriginalPrice = itemView.findViewById(R.id.tvBikeOriginalPrice);
+            tvDiscountPercent = itemView.findViewById(R.id.tvDiscountPercent);
+            tvDiscountPercentInline = itemView.findViewById(R.id.tvDiscountPercentInline);
+            discountBadge = itemView.findViewById(R.id.discountBadge);
             ivDetailIcon = itemView.findViewById(R.id.ivDetailIcon);
             ivAddToCart = itemView.findViewById(R.id.ivAddToCart);
         }
@@ -95,6 +103,35 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
             NumberFormat formatter = NumberFormat.getNumberInstance(Locale.getDefault());
             String formattedPrice = formatter.format(bike.getPrice()) + " ₫";
             tvBikePrice.setText(formattedPrice);
+
+            // Handle original price and discount
+            if (bike.getOriginalPrice() > 0 && bike.getOriginalPrice() > bike.getPrice()) {
+                String formattedOriginalPrice = formatter.format(bike.getOriginalPrice()) + " ₫";
+                tvBikeOriginalPrice.setText(formattedOriginalPrice);
+                tvBikeOriginalPrice.setVisibility(View.VISIBLE);
+                tvBikeOriginalPrice.setPaintFlags(tvBikeOriginalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+
+                // Calculate discount percentage
+                int discountPercent = (int) Math.round(((bike.getOriginalPrice() - bike.getPrice()) / bike.getOriginalPrice()) * 100);
+                if (discountPercent > 0) {
+                    if (tvDiscountPercent != null && discountBadge != null) {
+                        tvDiscountPercent.setText("-" + discountPercent + "%");
+                        discountBadge.setVisibility(View.VISIBLE);
+                    }
+                    if (tvDiscountPercentInline != null) {
+                        tvDiscountPercentInline.setText("-" + discountPercent + "%");
+                        tvDiscountPercentInline.setVisibility(View.VISIBLE);
+                    }
+                }
+            } else {
+                tvBikeOriginalPrice.setVisibility(View.GONE);
+                if (discountBadge != null) {
+                    discountBadge.setVisibility(View.GONE);
+                }
+                if (tvDiscountPercentInline != null) {
+                    tvDiscountPercentInline.setVisibility(View.GONE);
+                }
+            }
 
 
             // Set click listener

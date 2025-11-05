@@ -629,6 +629,10 @@ public class HomeActivity extends AppCompatActivity {
                         // Convert bikes to products
                         for (Bike bike : bikes) {
                             String priceText = String.format("%.0f ₫", bike.getPrice());
+                            String originalPriceText = null;
+                            if (bike.getOriginalPrice() > 0 && bike.getOriginalPrice() > bike.getPrice()) {
+                                originalPriceText = String.format("%.0f ₫", bike.getOriginalPrice());
+                            }
                             String imageUrl = (bike.getImages() != null && !bike.getImages().isEmpty()) 
                                 ? bike.getImages().get(0).getUrl() 
                                 : null;
@@ -637,8 +641,11 @@ public class HomeActivity extends AppCompatActivity {
                                 bike.getName(),
                                 bike.getDescription(),
                                 priceText,
+                                originalPriceText,
                                 R.drawable.splash_bike_background,
-                                imageUrl
+                                imageUrl,
+                                false,
+                                false
                             );
                             product.setBikeId(bike.getId());
                             productList.add(product);

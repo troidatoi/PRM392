@@ -66,6 +66,7 @@ app.use('/api/cart', require('./routes/cartRoutes')); // Cart routes
 app.use('/api/orders', require('./routes/orderRoutes')); // Order routes
 app.use('/api/inventory', require('./routes/inventoryRoutes')); // Inventory routes
 app.use('/api/chat', require('./routes/chatRoutes')); // Chat routes
+app.use('/api/shipping-rates', require('./routes/shippingRateRoutes')); // Shipping rates routes
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

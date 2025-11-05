@@ -59,6 +59,47 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             holder.tvProductPrice.setText(product.getPrice() != null ? product.getPrice() : "0 ₫");
         }
         
+        // Handle original price and discount
+        if (holder.tvOriginalPrice != null) {
+            String originalPrice = product.getOriginalPrice();
+            if (originalPrice != null && !originalPrice.isEmpty() && !originalPrice.equals(product.getPrice())) {
+                holder.tvOriginalPrice.setText(originalPrice);
+                holder.tvOriginalPrice.setVisibility(View.VISIBLE);
+                holder.tvOriginalPrice.setPaintFlags(holder.tvOriginalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                
+                // Calculate discount percentage
+                try {
+                    long original = parsePrice(originalPrice);
+                    long current = parsePrice(product.getPrice() != null ? product.getPrice() : "0");
+                    if (original > current && original > 0) {
+                        int discountPercent = (int) Math.round(((double)(original - current) / original) * 100);
+                        if (discountPercent > 0) {
+                            if (holder.tvDiscountPercent != null) {
+                                holder.tvDiscountPercent.setText("-" + discountPercent + "%");
+                                if (holder.discountBadge != null) {
+                                    holder.discountBadge.setVisibility(View.VISIBLE);
+                                }
+                            }
+                            if (holder.tvDiscountPercentInline != null) {
+                                holder.tvDiscountPercentInline.setText("-" + discountPercent + "%");
+                                holder.tvDiscountPercentInline.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore parse errors
+                }
+            } else {
+                holder.tvOriginalPrice.setVisibility(View.GONE);
+                if (holder.discountBadge != null) {
+                    holder.discountBadge.setVisibility(View.GONE);
+                }
+                if (holder.tvDiscountPercentInline != null) {
+                    holder.tvDiscountPercentInline.setVisibility(View.GONE);
+                }
+            }
+        }
+        
         // Load image from URL if available, otherwise use default resource
         if (holder.ivProductImage != null) {
             if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
@@ -106,11 +147,26 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         return productList.size();
     }
 
+    private long parsePrice(String priceStr) {
+        if (priceStr == null || priceStr.isEmpty()) return 0;
+        try {
+            // Remove "VNĐ", "₫", spaces, and dots
+            String clean = priceStr.replace("VNĐ", "").replace("₫", "").replace(" ", "").replace(".", "").trim();
+            return Long.parseLong(clean);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProductImage;
         TextView tvProductName;
         TextView tvProductDescription;
         TextView tvProductPrice;
+        TextView tvOriginalPrice;
+        TextView tvDiscountPercent;
+        TextView tvDiscountPercentInline;
+        LinearLayout discountBadge;
         CardView btnAddToCart;
 
         public ProductViewHolder(@NonNull View itemView) {
@@ -119,6 +175,10 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvProductName = itemView.findViewById(R.id.tvProductName);
             tvProductDescription = itemView.findViewById(R.id.tvProductDescription);
             tvProductPrice = itemView.findViewById(R.id.tvProductPrice);
+            tvOriginalPrice = itemView.findViewById(R.id.tvOriginalPrice);
+            tvDiscountPercent = itemView.findViewById(R.id.tvDiscountPercent);
+            tvDiscountPercentInline = itemView.findViewById(R.id.tvDiscountPercentInline);
+            discountBadge = itemView.findViewById(R.id.discountBadge);
             btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
         }
     }
