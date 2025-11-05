@@ -1,0 +1,59 @@
+[
+  {
+    "minDistance": 0,
+    "maxDistance": 3,
+    "pricePerKm": 5000,
+    "note": "Giao gần nội quận",
+    "order": 1,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    }
+  },
+  {
+    "minDistance": 3,
+    "maxDistance": 10,
+    "pricePerKm": 3000,
+    "note": "Giao giữa các quận",
+    "order": 2,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    }
+  },
+  {
+    "minDistance": 10,
+    "maxDistance": 50,
+    "pricePerKm": 2000,
+    "note": "Giao tỉnh lân cận",
+    "order": 3,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    }
+  },
+  {
+    "minDistance": 50,
+    "maxDistance": null,
+    "pricePerKm": 1000,
+    "note": "Giao xa, đi tỉnh khác",
+    "order": 4,
+    "isActive": true,
+    "createdAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2024-01-01T00:00:00.000Z"
+    }
+  }
+]
+

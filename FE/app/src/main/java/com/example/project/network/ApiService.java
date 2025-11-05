@@ -233,6 +233,12 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
     
+    @POST("orders/estimate")
+    Call<ApiResponse<Object>> estimateOrders(
+        @Header("Authorization") String token,
+        @Body java.util.Map<String, Object> body
+    );
+    
     @GET("orders/user/{userId}")
     Call<ApiResponse<Object>> getUserOrders(
         @Header("Authorization") String token,
@@ -622,6 +628,94 @@ public interface ApiService {
         @Header("Authorization") String token,
         @Body MarkReadRequest request
     );
+    
+    // Shipping Rate endpoints
+    @GET("shipping-rates")
+    Call<ApiResponse<ShippingRate[]>> getShippingRates(@retrofit2.http.Query("activeOnly") String activeOnly);
+    
+    @GET("shipping-rates/{id}")
+    Call<ApiResponse<ShippingRate>> getShippingRateById(@retrofit2.http.Path("id") String id);
+    
+    @POST("shipping-rates")
+    Call<ApiResponse<ShippingRate>> createShippingRate(@Header("Authorization") String token, @Body ShippingRate rate);
+    
+    @PUT("shipping-rates/{id}")
+    Call<ApiResponse<ShippingRate>> updateShippingRate(@Header("Authorization") String token, @retrofit2.http.Path("id") String id, @Body ShippingRate rate);
+    
+    @retrofit2.http.DELETE("shipping-rates/{id}")
+    Call<ApiResponse<Void>> deleteShippingRate(@Header("Authorization") String token, @retrofit2.http.Path("id") String id);
+    
+    @POST("shipping-rates/calculate")
+    Call<ApiResponse<CalculateShippingResponse>> calculateShippingFee(@Body java.util.Map<String, Object> body);
+    
+    // ShippingRate model
+    class ShippingRate {
+        @com.google.gson.annotations.SerializedName("_id")
+        private String id;
+        private double minDistance;
+        private Double maxDistance;
+        private double pricePerKm;
+        private String note;
+        private boolean isActive;
+        private int order;
+        
+        // Constructors
+        public ShippingRate() {}
+        
+        public ShippingRate(double minDistance, Double maxDistance, double pricePerKm, String note, int order) {
+            this.minDistance = minDistance;
+            this.maxDistance = maxDistance;
+            this.pricePerKm = pricePerKm;
+            this.note = note;
+            this.order = order;
+            this.isActive = true;
+        }
+        
+        // Getters and Setters
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; }
+        
+        public double getMinDistance() { return minDistance; }
+        public void setMinDistance(double minDistance) { this.minDistance = minDistance; }
+        
+        public Double getMaxDistance() { return maxDistance; }
+        public void setMaxDistance(Double maxDistance) { this.maxDistance = maxDistance; }
+        
+        public double getPricePerKm() { return pricePerKm; }
+        public void setPricePerKm(double pricePerKm) { this.pricePerKm = pricePerKm; }
+        
+        public String getNote() { return note; }
+        public void setNote(String note) { this.note = note; }
+        
+        public boolean isActive() { return isActive; }
+        public void setActive(boolean active) { isActive = active; }
+        
+        public int getOrder() { return order; }
+        public void setOrder(int order) { this.order = order; }
+        
+        public String getDistanceRange() {
+            if (maxDistance == null) {
+                return minDistance + "+ km";
+            }
+            return minDistance + " - " + maxDistance + " km";
+        }
+    }
+    
+    // Calculate shipping response
+    class CalculateShippingResponse {
+        private double distanceKm;
+        private double roundedDistanceKm;
+        private double shippingFee;
+        
+        public double getDistanceKm() { return distanceKm; }
+        public void setDistanceKm(double distanceKm) { this.distanceKm = distanceKm; }
+        
+        public double getRoundedDistanceKm() { return roundedDistanceKm; }
+        public void setRoundedDistanceKm(double roundedDistanceKm) { this.roundedDistanceKm = roundedDistanceKm; }
+        
+        public double getShippingFee() { return shippingFee; }
+        public void setShippingFee(double shippingFee) { this.shippingFee = shippingFee; }
+    }
     
     // Request classes for Chat
     class MarkReadRequest {

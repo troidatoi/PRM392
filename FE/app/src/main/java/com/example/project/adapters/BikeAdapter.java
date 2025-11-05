@@ -60,8 +60,10 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
         private ImageView ivBikeImage;
         private TextView tvBikeName;
         private TextView tvBikePrice;
-        private TextView tvOriginalPrice;
-        private TextView tvDiscountBadge;
+        private TextView tvBikeOriginalPrice;
+        private TextView tvDiscountPercent;
+        private TextView tvDiscountPercentInline;
+        private View discountBadge;
         private ImageView ivDetailIcon;
         private ImageView ivAddToCart;
 
@@ -71,8 +73,10 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
             ivBikeImage = itemView.findViewById(R.id.ivBikeImage);
             tvBikeName = itemView.findViewById(R.id.tvBikeName);
             tvBikePrice = itemView.findViewById(R.id.tvBikePrice);
-            tvOriginalPrice = itemView.findViewById(R.id.tvOriginalPrice);
-            tvDiscountBadge = itemView.findViewById(R.id.tvDiscountBadge);
+            tvBikeOriginalPrice = itemView.findViewById(R.id.tvBikeOriginalPrice);
+            tvDiscountPercent = itemView.findViewById(R.id.tvDiscountPercent);
+            tvDiscountPercentInline = itemView.findViewById(R.id.tvDiscountPercentInline);
+            discountBadge = itemView.findViewById(R.id.discountBadge);
             ivDetailIcon = itemView.findViewById(R.id.ivDetailIcon);
             ivAddToCart = itemView.findViewById(R.id.ivAddToCart);
             
@@ -104,22 +108,35 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
             String formattedPrice = formatter.format(bike.getPrice()) + " ₫";
             tvBikePrice.setText(formattedPrice);
 
-            // Calculate and display discount percentage and original price if available
+            // Handle original price and discount
             if (bike.getOriginalPrice() > 0 && bike.getOriginalPrice() > bike.getPrice()) {
-                // Show original price with strikethrough
                 String formattedOriginalPrice = formatter.format(bike.getOriginalPrice()) + " ₫";
-                tvOriginalPrice.setText(formattedOriginalPrice);
-                tvOriginalPrice.setVisibility(View.VISIBLE);
-                
-                // Calculate and show discount percentage
-                double discountPercentage = ((bike.getOriginalPrice() - bike.getPrice()) / bike.getOriginalPrice()) * 100;
-                tvDiscountBadge.setText(String.format("-%.0f%%", discountPercentage));
-                tvDiscountBadge.setVisibility(View.VISIBLE);
+                tvBikeOriginalPrice.setText(formattedOriginalPrice);
+                tvBikeOriginalPrice.setVisibility(View.VISIBLE);
+                tvBikeOriginalPrice.setPaintFlags(tvBikeOriginalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+
+                // Calculate discount percentage
+                int discountPercent = (int) Math.round(((bike.getOriginalPrice() - bike.getPrice()) / bike.getOriginalPrice()) * 100);
+                if (discountPercent > 0) {
+                    if (tvDiscountPercent != null && discountBadge != null) {
+                        tvDiscountPercent.setText("-" + discountPercent + "%");
+                        discountBadge.setVisibility(View.VISIBLE);
+                    }
+                    if (tvDiscountPercentInline != null) {
+                        tvDiscountPercentInline.setText("-" + discountPercent + "%");
+                        tvDiscountPercentInline.setVisibility(View.VISIBLE);
+                    }
+                }
             } else {
-                // Hide original price and discount badge if no discount
-                tvOriginalPrice.setVisibility(View.GONE);
-                tvDiscountBadge.setVisibility(View.GONE);
+                tvBikeOriginalPrice.setVisibility(View.GONE);
+                if (discountBadge != null) {
+                    discountBadge.setVisibility(View.GONE);
+                }
+                if (tvDiscountPercentInline != null) {
+                    tvDiscountPercentInline.setVisibility(View.GONE);
+                }
             }
+
 
             // Set click listener
             cardViewBike.setOnClickListener(v -> {

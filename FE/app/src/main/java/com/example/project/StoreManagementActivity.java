@@ -31,7 +31,7 @@ import com.example.project.models.ApiResponse;
 
 public class StoreManagementActivity extends AppCompatActivity implements StoreAdapter.OnStoreActionListener, StoreAdapter.OnStoreClickListener {
 
-    private CardView btnBack, btnAddStore;
+    private CardView btnBack, btnAddStore, btnShippingRates;
     private RecyclerView rvStores;
     private TextView tvTotalStores, tvActiveStores;
     private LinearLayout emptyState;
@@ -87,6 +87,7 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         btnAddStore = findViewById(R.id.btnAddStore);
+        btnShippingRates = findViewById(R.id.btnShippingRates);
         rvStores = findViewById(R.id.rvStores);
         tvTotalStores = findViewById(R.id.tvTotalStores);
         tvActiveStores = findViewById(R.id.tvActiveStores);
@@ -111,6 +112,14 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         btnAddStore.setOnClickListener(v -> {
             showAddStoreDialog();
         });
+
+        // Shipping rates button
+        if (btnShippingRates != null) {
+            btnShippingRates.setOnClickListener(v -> {
+                Intent intent = new Intent(StoreManagementActivity.this, ShippingRateManagementActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     private void setupRecyclerView() {

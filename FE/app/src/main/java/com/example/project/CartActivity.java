@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.project.adapters.StoreCartAdapter;
+import com.example.project.utils.NotificationHelper;
 
 @SuppressWarnings("deprecation")
 public class CartActivity extends AppCompatActivity implements StoreCartAdapter.OnCartSelectionListener {
@@ -58,6 +63,18 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         initViews();
         setupRecyclerView();
         setupBottomNavigation();
+        
+        // Yêu cầu quyền notification cho Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, 
+                    android.Manifest.permission.POST_NOTIFICATIONS) 
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                    1001);
+            }
+        }
+        
         loadCartFromApi();
         
         // Register broadcast receiver with Android 13+ compatibility
@@ -74,6 +91,26 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         super.onResume();
         // Reload giỏ hàng sau khi quay lại từ Checkout (cart có thể đã bị xóa)
         loadCartFromApi();
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Cập nhật badge khi app đi vào background
+        // Lấy số lượng từ tvBadge hoặc tính từ cartItems
+        int currentCount = 0;
+        try {
+            String badgeText = tvBadge.getText().toString();
+            if (!badgeText.isEmpty() && !badgeText.equals("0")) {
+                currentCount = Integer.parseInt(badgeText);
+            }
+        } catch (NumberFormatException e) {
+            // Tính từ cartItems nếu không parse được
+            for (CartItem item : cartItems) {
+                currentCount += item.getQuantity();
+            }
+        }
+        NotificationHelper.updateCartBadge(this, currentCount);
     }
     
     @Override
@@ -312,6 +349,9 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                     updateCartSummary();
                     tvItemCount.setText(itemCount + " sản phẩm");
                     tvBadge.setText(String.valueOf(itemCount));
+                    
+                    // Cập nhật badge trên app icon
+                    NotificationHelper.updateCartBadge(CartActivity.this, itemCount);
                 } else {
                     updateCartSummary();
                 }
@@ -427,6 +467,9 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         String formattedSubtotal = formatPrice(subtotal);
         tvSubtotal.setText(formattedSubtotal);
         tvTotal.setText(formattedSubtotal);
+        
+        // Cập nhật badge trên app icon khi cart summary thay đổi
+        NotificationHelper.updateCartBadge(this, totalItems);
     }
 
     private String formatPrice(long price) {
@@ -442,6 +485,8 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
             tvBadge.setText("0");
             btnCheckout.setEnabled(false);
             btnCheckout.setAlpha(0.5f);
+            // Xóa badge khi giỏ hàng trống
+            NotificationHelper.removeCartBadge(this);
         } else {
             emptyCartCard.setVisibility(View.GONE);
             rvCartItems.setVisibility(View.VISIBLE);

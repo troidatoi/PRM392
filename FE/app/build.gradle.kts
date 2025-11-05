@@ -58,6 +58,12 @@ dependencies {
     // Google Play Services Location (for GPS)
     implementation("com.google.android.gms:play-services-location:21.0.1")
     
+    // Notification support
+    implementation("androidx.core:core:1.12.0")
+    
+    // ShortcutBadger for app icon badge support (Samsung, Xiaomi, etc.)
+    implementation("me.leolin:ShortcutBadger:1.1.22")
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

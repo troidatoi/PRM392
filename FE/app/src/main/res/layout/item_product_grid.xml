@@ -32,6 +32,32 @@
                 android:background="#F5F5F5"
                 android:contentDescription="Product Image" />
 
+            <!-- Discount Badge -->
+            <LinearLayout
+                android:id="@+id/discountBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="8dp"
+                android:background="@drawable/discount_badge_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvDiscountPercent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-20%"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+
             <!-- Status Tag Container -->
             <LinearLayout
                 android:id="@+id/statusTagContainer"
@@ -143,15 +169,39 @@
                 android:layout_marginBottom="2dp"
                 android:visibility="gone" />
 
-            <!-- Current Price -->
-            <TextView
-                android:id="@+id/tvProductPrice"
-                android:layout_width="wrap_content"
+            <!-- Price Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="0 ₫"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#1A1A1A" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Current Price -->
+                <TextView
+                    android:id="@+id/tvProductPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0 ₫"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#E53935" />
+
+                <!-- Discount Percent (if exists) -->
+                <TextView
+                    android:id="@+id/tvDiscountPercentInline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:background="#E8F5E9"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
