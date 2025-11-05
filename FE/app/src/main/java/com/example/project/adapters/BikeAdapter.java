@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.graphics.Paint;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -78,6 +79,9 @@ public class BikeAdapter extends RecyclerView.Adapter<BikeAdapter.BikeViewHolder
             discountBadge = itemView.findViewById(R.id.discountBadge);
             ivDetailIcon = itemView.findViewById(R.id.ivDetailIcon);
             ivAddToCart = itemView.findViewById(R.id.ivAddToCart);
+            
+            // Add strikethrough effect to original price
+            tvOriginalPrice.setPaintFlags(tvOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         }
 
         public void bind(Bike bike) {

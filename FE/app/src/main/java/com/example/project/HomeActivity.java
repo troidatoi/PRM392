@@ -96,6 +96,9 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvStoresTitle;
     private TextView tvStoresSubtitle;
     private CardView btnLocationInput;
+    
+    // Greeting TextView
+    private TextView tvGreeting;
 
     private static final String COLOR_BROWN = "#7B6047";
     private static final String COLOR_BE = "#CEB797";
@@ -124,6 +127,9 @@ public class HomeActivity extends AppCompatActivity {
         
         // Initialize API service
         apiService = RetrofitClient.getInstance().getApiService();
+        
+        // Load user info for greeting
+        loadUserInfo();
         
         // Load bikes from API
         loadBikes();
@@ -438,6 +444,9 @@ public class HomeActivity extends AppCompatActivity {
         rvProducts = findViewById(R.id.rvProducts);
         rvStores = findViewById(R.id.rvStores);
 
+        // Greeting
+        tvGreeting = findViewById(R.id.tvGreeting);
+
         // Search Box
         etSearch = findViewById(R.id.etSearch);
         searchCard = findViewById(R.id.searchCard);
@@ -614,6 +623,47 @@ public class HomeActivity extends AppCompatActivity {
         icon.setColorFilter(Color.parseColor("#666666"));
         text.setTextColor(Color.parseColor("#666666"));
         text.setTypeface(null, android.graphics.Typeface.NORMAL);
+    }
+
+    private void loadUserInfo() {
+        // Check if user is logged in
+        com.example.project.utils.AuthManager authManager = com.example.project.utils.AuthManager.getInstance(this);
+        
+        if (!authManager.isLoggedIn()) {
+            // If not logged in, show default greeting
+            tvGreeting.setText("Hello, User");
+            return;
+        }
+        
+        // Get current user from storage first
+        com.example.project.models.User currentUser = authManager.getCurrentUser();
+        if (currentUser != null && currentUser.getUsername() != null) {
+            tvGreeting.setText("Hello, " + currentUser.getUsername());
+        }
+        
+        // Then fetch fresh data from API
+        String authHeader = authManager.getAuthHeader();
+        if (authHeader != null) {
+            apiService.getMe(authHeader).enqueue(new Callback<ApiResponse<com.example.project.models.User>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<com.example.project.models.User>> call, Response<ApiResponse<com.example.project.models.User>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        com.example.project.models.User user = response.body().getData();
+                        if (user != null && user.getUsername() != null) {
+                            // Update greeting with username
+                            tvGreeting.setText("Hello, " + user.getUsername());
+                            // Update stored user data
+                            authManager.updateUser(user);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<com.example.project.models.User>> call, Throwable t) {
+                    // Keep the cached username if API fails
+                }
+            });
+        }
     }
 
     private void loadBikes() {
