@@ -3,12 +3,15 @@ package com.example.project;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,10 +35,12 @@ public class ProductManagementActivity extends AppCompatActivity {
     private RecyclerView rvProducts;
     private LinearLayout emptyState;
     private TextView tvBikeCount;
-    private TextView btnCategory, btnPrice, btnStock, btnEditDelete;
-    private com.google.android.material.floatingactionbutton.FloatingActionButton fabAddProduct;
+    private CardView btnBack, btnAddProduct;
+    private EditText etSearch;
+    private ProgressBar progressBar;
     private ProductCardAdapter productAdapter;
     private List<Bike> bikeList;
+    private List<Bike> filteredBikeList;
     private ApiService apiService;
     private AuthManager authManager;
     
@@ -61,15 +66,14 @@ public class ProductManagementActivity extends AppCompatActivity {
         rvProducts = findViewById(R.id.rvProducts);
         emptyState = findViewById(R.id.emptyState);
         tvBikeCount = findViewById(R.id.tvBikeCount);
+        progressBar = findViewById(R.id.progressBar);
         
-        // Filter buttons
-        btnCategory = findViewById(R.id.btnCategory);
-        btnPrice = findViewById(R.id.btnPrice);
-        btnStock = findViewById(R.id.btnStock);
-        btnEditDelete = findViewById(R.id.btnEditDelete);
+        // Buttons
+        btnBack = findViewById(R.id.btnBack);
+        btnAddProduct = findViewById(R.id.btnAddProduct);
         
-        // FAB
-        fabAddProduct = findViewById(R.id.fabAddProduct);
+        // Search
+        etSearch = findViewById(R.id.etSearch);
         
         // Bottom navigation
         navDashboard = findViewById(R.id.navDashboard);
@@ -84,6 +88,7 @@ public class ProductManagementActivity extends AppCompatActivity {
 
     private void initData() {
         bikeList = new ArrayList<>();
+        filteredBikeList = new ArrayList<>();
         apiService = RetrofitClient.getInstance().getApiService();
         authManager = AuthManager.getInstance(this);
     }
@@ -120,6 +125,9 @@ public class ProductManagementActivity extends AppCompatActivity {
     }
 
     private void loadBikes() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         emptyState.setVisibility(View.GONE);
         rvProducts.setVisibility(View.GONE);
 
@@ -134,16 +142,23 @@ public class ProductManagementActivity extends AppCompatActivity {
         call.enqueue(new Callback<ApiResponse<Bike[]>>() {
             @Override
             public void onResponse(Call<ApiResponse<Bike[]>> call, Response<ApiResponse<Bike[]>> response) {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
                 
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<Bike[]> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getData() != null) {
                         bikeList.clear();
                         bikeList.addAll(Arrays.asList(apiResponse.getData()));
+                        filteredBikeList.clear();
+                        filteredBikeList.addAll(bikeList);
                         
                         // Update bike count from pagination
                         if (apiResponse.getPagination() != null) {
-                            tvBikeCount.setText("Tổng số xe: " + apiResponse.getPagination().getTotalItems());
+                            tvBikeCount.setText(String.valueOf(apiResponse.getPagination().getTotalItems()));
+                        } else {
+                            tvBikeCount.setText(String.valueOf(bikeList.size()));
                         }
                         
                         if (bikeList.isEmpty()) {
@@ -164,6 +179,9 @@ public class ProductManagementActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<Bike[]>> call, Throwable t) {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
                 showError("Lỗi kết nối: " + t.getMessage());
             }
         });
@@ -174,35 +192,61 @@ public class ProductManagementActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         emptyState.setVisibility(View.VISIBLE);
         rvProducts.setVisibility(View.GONE);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     private void setupClickListeners() {
-        // Filter buttons
-        btnCategory.setOnClickListener(v -> {
-            // TODO: Implement category filter
-            Toast.makeText(this, "Category filter", Toast.LENGTH_SHORT).show();
-        });
+        // Back button
+        btnBack.setOnClickListener(v -> finish());
 
-        btnPrice.setOnClickListener(v -> {
-            // TODO: Implement price filter
-            Toast.makeText(this, "Price filter", Toast.LENGTH_SHORT).show();
-        });
-
-        btnStock.setOnClickListener(v -> {
-            // TODO: Implement stock filter
-            Toast.makeText(this, "Stock filter", Toast.LENGTH_SHORT).show();
-        });
-
-        btnEditDelete.setOnClickListener(v -> {
-            // TODO: Implement edit/delete mode
-            Toast.makeText(this, "Edit/Delete mode", Toast.LENGTH_SHORT).show();
-        });
-
-        // FAB -> navigate to CreateBikeActivity (full screen)
-        fabAddProduct.setOnClickListener(v -> {
+        // Add product button
+        btnAddProduct.setOnClickListener(v -> {
             Intent intent = new Intent(ProductManagementActivity.this, CreateBikeActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, 1001);
         });
+
+        // Search functionality
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new android.text.TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterBikes(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(android.text.Editable s) {}
+            });
+        }
+    }
+
+    private void filterBikes(String query) {
+        filteredBikeList.clear();
+        if (query.isEmpty()) {
+            filteredBikeList.addAll(bikeList);
+        } else {
+            String lowerCaseQuery = query.toLowerCase();
+            for (Bike bike : bikeList) {
+                if (bike.getName().toLowerCase().contains(lowerCaseQuery) ||
+                    bike.getBrand().toLowerCase().contains(lowerCaseQuery) ||
+                    bike.getModel().toLowerCase().contains(lowerCaseQuery)) {
+                    filteredBikeList.add(bike);
+                }
+            }
+        }
+        
+        if (filteredBikeList.isEmpty()) {
+            emptyState.setVisibility(View.VISIBLE);
+            rvProducts.setVisibility(View.GONE);
+        } else {
+            emptyState.setVisibility(View.GONE);
+            rvProducts.setVisibility(View.VISIBLE);
+        }
+        productAdapter.notifyDataSetChanged();
     }
     
     private void setupBottomNavigation() {
@@ -235,7 +279,9 @@ public class ProductManagementActivity extends AppCompatActivity {
         }
         if (navOrderManagement != null) {
             navOrderManagement.setOnClickListener(v -> {
-                Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ProductManagementActivity.this, OrderManagementActivity.class);
+                startActivity(intent);
+                finish();
             });
         }
         if (navChatManagement != null) {

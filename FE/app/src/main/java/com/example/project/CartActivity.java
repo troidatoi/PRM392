@@ -1,12 +1,20 @@
 package com.example.project;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -19,9 +27,10 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.project.adapters.StoreCartAdapter;
+import com.example.project.utils.NotificationHelper;
 
 @SuppressWarnings("deprecation")
-public class CartActivity extends AppCompatActivity implements StoreCartAdapter.OnCartItemListener {
+public class CartActivity extends AppCompatActivity implements StoreCartAdapter.OnCartSelectionListener {
 
     private RecyclerView rvCartItems;
     private StoreCartAdapter storeCartAdapter;
@@ -36,6 +45,15 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
     private View navHome, navProducts, navCart, navAccount;
     private ImageView iconHome, iconProducts, iconCart, iconAccount;
     private TextView tvHome, tvProducts, tvCart, tvAccount;
+    
+    // BroadcastReceiver to listen for cart updates
+    private BroadcastReceiver cartUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Reload cart when update broadcast is received
+            loadCartFromApi();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +63,27 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         initViews();
         setupRecyclerView();
         setupBottomNavigation();
+        
+        // Yêu cầu quyền notification cho Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, 
+                    android.Manifest.permission.POST_NOTIFICATIONS) 
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
+                    1001);
+            }
+        }
+        
         loadCartFromApi();
+        
+        // Register broadcast receiver with Android 13+ compatibility
+        IntentFilter filter = new IntentFilter("com.example.project.CART_UPDATED");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(cartUpdateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(cartUpdateReceiver, filter);
+        }
     }
 
     @Override
@@ -53,6 +91,37 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         super.onResume();
         // Reload giỏ hàng sau khi quay lại từ Checkout (cart có thể đã bị xóa)
         loadCartFromApi();
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Cập nhật badge khi app đi vào background
+        // Lấy số lượng từ tvBadge hoặc tính từ cartItems
+        int currentCount = 0;
+        try {
+            String badgeText = tvBadge.getText().toString();
+            if (!badgeText.isEmpty() && !badgeText.equals("0")) {
+                currentCount = Integer.parseInt(badgeText);
+            }
+        } catch (NumberFormatException e) {
+            // Tính từ cartItems nếu không parse được
+            for (CartItem item : cartItems) {
+                currentCount += item.getQuantity();
+            }
+        }
+        NotificationHelper.updateCartBadge(this, currentCount);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister broadcast receiver to prevent memory leaks
+        try {
+            unregisterReceiver(cartUpdateReceiver);
+        } catch (Exception e) {
+            // Receiver was not registered
+        }
     }
 
     private void initViews() {
@@ -180,6 +249,7 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                                             String name = "Sản phẩm";
                                             double price = 0;
                                             String productIdStr = null;
+                                            String imageUrl = null;
 
                                             if (productObj instanceof java.util.Map) {
                                                 java.util.Map product = (java.util.Map) productObj;
@@ -190,6 +260,33 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                                                 Object pid = product.get("_id");
                                                 if (pid == null) pid = product.get("id");
                                                 if (pid != null) productIdStr = String.valueOf(pid);
+
+                                                // Get image URL - try multiple fields
+                                                Object imgUrl = product.get("imageUrl");
+                                                if (imgUrl == null) imgUrl = product.get("image");
+                                                if (imgUrl == null) imgUrl = product.get("photo");
+                                                
+                                                // Check if it's an images array
+                                                if (imgUrl == null) {
+                                                    Object imagesObj = product.get("images");
+                                                    if (imagesObj instanceof java.util.List) {
+                                                        java.util.List imagesList = (java.util.List) imagesObj;
+                                                        if (!imagesList.isEmpty()) {
+                                                            Object firstImage = imagesList.get(0);
+                                                            if (firstImage instanceof java.util.Map) {
+                                                                // Image is an object with url field
+                                                                java.util.Map imageMap = (java.util.Map) firstImage;
+                                                                Object urlObj = imageMap.get("url");
+                                                                if (urlObj != null) imageUrl = String.valueOf(urlObj);
+                                                            } else if (firstImage != null) {
+                                                                // Image is a direct string URL
+                                                                imageUrl = String.valueOf(firstImage);
+                                                            }
+                                                        }
+                                                    }
+                                                } else if (imgUrl != null) {
+                                                    imageUrl = String.valueOf(imgUrl);
+                                                }
                                             } else {
                                                 // Fallback: lấy từ trường trên item
                                                 Object n2 = item.get("productName");
@@ -198,6 +295,10 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                                                 if (p2 instanceof Number) price = ((Number) p2).doubleValue();
                                                 Object pid2 = item.get("productId");
                                                 if (pid2 != null) productIdStr = String.valueOf(pid2);
+
+                                                Object imgUrl2 = item.get("imageUrl");
+                                                if (imgUrl2 == null) imgUrl2 = item.get("image");
+                                                if (imgUrl2 != null) imageUrl = String.valueOf(imgUrl2);
                                             }
 
                                             String priceText = formatPrice((long) price) + " VNĐ";
@@ -210,6 +311,11 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                                             if (productIdStr != null) ci.setProductId(productIdStr);
                                             if (outerStoreId != null) ci.setStoreId(outerStoreId);
                                             ci.setUnitPrice((long) price);
+                                            
+                                            // Set image URL with proper base URL if needed
+                                            if (imageUrl != null) {
+                                                ci.setImageUrl(getFullImageUrl(imageUrl));
+                                            }
 
                                             items.add(ci);
                                             group.items.add(ci);
@@ -243,6 +349,9 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                     updateCartSummary();
                     tvItemCount.setText(itemCount + " sản phẩm");
                     tvBadge.setText(String.valueOf(itemCount));
+                    
+                    // Cập nhật badge trên app icon
+                    NotificationHelper.updateCartBadge(CartActivity.this, itemCount);
                 } else {
                     updateCartSummary();
                 }
@@ -346,7 +455,7 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                 totalItems += cartItem.getQuantity();
                 // Only count selected items in subtotal
                 if (cartItem.isSelected()) {
-                    subtotal += cartItem.getTotalPrice();
+                    subtotal += cartItem.getUnitPrice() * cartItem.getQuantity();
                 }
             }
         }
@@ -358,6 +467,9 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         String formattedSubtotal = formatPrice(subtotal);
         tvSubtotal.setText(formattedSubtotal);
         tvTotal.setText(formattedSubtotal);
+        
+        // Cập nhật badge trên app icon khi cart summary thay đổi
+        NotificationHelper.updateCartBadge(this, totalItems);
     }
 
     private String formatPrice(long price) {
@@ -373,11 +485,27 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
             tvBadge.setText("0");
             btnCheckout.setEnabled(false);
             btnCheckout.setAlpha(0.5f);
+            // Xóa badge khi giỏ hàng trống
+            NotificationHelper.removeCartBadge(this);
         } else {
             emptyCartCard.setVisibility(View.GONE);
             rvCartItems.setVisibility(View.VISIBLE);
             btnCheckout.setEnabled(true);
             btnCheckout.setAlpha(1f);
+        }
+    }
+
+    @Override
+    public void onSelectionChanged() {
+        // Cập nhật tổng tiền khi có thay đổi checkbox
+        updateCartSummary();
+
+        // Cập nhật tất cả store totals
+        for (Object item : displayItems) {
+            if (item instanceof StoreCartAdapter.StoreHeader) {
+                StoreCartAdapter.StoreHeader header = (StoreCartAdapter.StoreHeader) item;
+                recalculateStoreTotal(header.storeId);
+            }
         }
     }
 
@@ -445,10 +573,49 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         
         // Cập nhật UI ngay lập tức (optimistic UI)
         storeCartAdapter.notifyItemChanged(position);
+
+        // Cập nhật store total
+        recalculateStoreTotal(cartItem.getStoreId());
+
         updateCartSummary();
         
         // Gọi API để cập nhật
         updateItemQuantity(cartItem, newQuantity);
+    }
+
+    private void recalculateStoreTotal(String storeId) {
+        if (storeId == null) return;
+
+        // Tìm store header tương ứng trong displayItems
+        int headerPosition = -1;
+        for (int i = 0; i < displayItems.size(); i++) {
+            Object item = displayItems.get(i);
+            if (item instanceof StoreCartAdapter.StoreHeader) {
+                StoreCartAdapter.StoreHeader header = (StoreCartAdapter.StoreHeader) item;
+                if (storeId.equals(header.storeId)) {
+                    headerPosition = i;
+                    break;
+                }
+            }
+        }
+
+        if (headerPosition == -1) return;
+
+        // Tính tổng tiền của store này - CHỈ TÍNH NHỮNG ITEM ĐƯỢC CHỌN
+        long newStoreTotal = 0;
+        for (Object item : displayItems) {
+            if (item instanceof CartItem) {
+                CartItem cartItem = (CartItem) item;
+                if (storeId.equals(cartItem.getStoreId()) && cartItem.isSelected()) {
+                    newStoreTotal += cartItem.getUnitPrice() * cartItem.getQuantity();
+                }
+            }
+        }
+
+        // Cập nhật store header
+        StoreCartAdapter.StoreHeader header = (StoreCartAdapter.StoreHeader) displayItems.get(headerPosition);
+        header.storeTotal = newStoreTotal;
+        storeCartAdapter.notifyItemChanged(headerPosition);
     }
 
     @Override
@@ -459,7 +626,8 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         if (!(item instanceof CartItem)) return;
         
         CartItem cartItem = (CartItem) item;
-        
+        String storeId = cartItem.getStoreId();
+
         // Gọi API để xóa
         removeItemFromCart(cartItem);
         
@@ -468,6 +636,9 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         cartItems.remove(cartItem);
         storeCartAdapter.notifyItemRemoved(position);
         
+        // Cập nhật store total
+        recalculateStoreTotal(storeId);
+
         updateCartSummary();
         checkEmptyCart();
         Toast.makeText(this, "Đã xóa sản phẩm khỏi giỏ hàng", Toast.LENGTH_SHORT).show();
@@ -546,5 +717,38 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
                 loadCartFromApi(); // Reload để đồng bộ
             }
         });
+    }
+    
+    @Override
+    public void onItemClicked(CartItem item) {
+        // Mở ProductDetailActivity khi click vào sản phẩm
+        if (item.getProductId() != null && !item.getProductId().isEmpty()) {
+            Intent intent = new Intent(CartActivity.this, ProductDetailActivity.class);
+            intent.putExtra("productId", item.getProductId());
+            intent.putExtra("productName", item.getName());
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Không tìm thấy thông tin sản phẩm", Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    // Helper method to get full image URL
+    private String getFullImageUrl(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return null;
+        }
+        
+        // If URL already starts with http:// or https://, return as is
+        if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+            return imageUrl;
+        }
+        
+        // If URL starts with /, remove it before appending
+        if (imageUrl.startsWith("/")) {
+            imageUrl = imageUrl.substring(1);
+        }
+        
+        // Append to base server URL (without /api/ path)
+        return "http://10.0.2.2:5001/" + imageUrl;
     }
 }

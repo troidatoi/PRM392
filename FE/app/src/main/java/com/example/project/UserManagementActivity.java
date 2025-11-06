@@ -2,7 +2,10 @@ package com.example.project;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -19,6 +22,7 @@ import com.example.project.models.ApiResponse;
 import com.example.project.models.User;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
+import com.example.project.utils.AdminNavHelper;
 import com.example.project.utils.AuthManager;
 
 import java.util.ArrayList;
@@ -30,20 +34,25 @@ import retrofit2.Response;
 
 public class UserManagementActivity extends AppCompatActivity {
 
-    private CardView btnBack;
-    private TextView tvTitle, tvUserCount;
+    private CardView btnAddNewUser, btnFilter;
+    private TextView tvTitle, tvUserCount, tvEmptyState;
+    private EditText etSearch;
     private RecyclerView recyclerViewUsers;
     private ProgressBar progressBar;
-    private TextView tvEmptyState;
+    private CardView emptyStateCard;
     private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
-    private ImageView iconUserManagement;
-    private TextView tvUserManagement;
+    private ImageView iconDashboard, iconUserManagement, iconProductManagement, iconStoreManagement, iconOrderManagement, iconChatManagement;
+    private TextView tvDashboard, tvUserManagement, tvProductManagement, tvStoreManagement, tvOrderManagement, tvChatManagement;
+    private CardView cardDashboard, cardUserManagement, cardProductManagement, cardStoreManagement, cardOrderManagement, cardChatManagement;
+    private CardView chipAll, chipCustomers, chipAdmins, chipActive, chipInactive;
     private TextView tabAll, tabCustomers, tabAdmins;
 
     private UserAdapter userAdapter;
     private List<User> userList;
+    private List<User> filteredUserList;
     private ApiService apiService;
     private AuthManager authManager;
+    private String currentFilter = "all";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,43 +66,76 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnBack = findViewById(R.id.btnBack);
+        btnAddNewUser = findViewById(R.id.btnAddNewUser);
+        btnFilter = findViewById(R.id.btnFilter);
         tvTitle = findViewById(R.id.tvTitle);
         tvUserCount = findViewById(R.id.tvUserCount);
+        etSearch = findViewById(R.id.etSearch);
         recyclerViewUsers = findViewById(R.id.recyclerViewUsers);
         progressBar = findViewById(R.id.progressBar);
         tvEmptyState = findViewById(R.id.tvEmptyState);
+        emptyStateCard = findViewById(R.id.emptyStateCard);
 
-        // Bottom nav (may be null depending on layout version)
+        // Bottom nav
         navDashboard = findViewById(R.id.navDashboard);
         navUserManagement = findViewById(R.id.navUserManagement);
         navProductManagement = findViewById(R.id.navProductManagement);
         navStoreManagement = findViewById(R.id.navStoreManagement);
         navOrderManagement = findViewById(R.id.navOrderManagement);
         navChatManagement = findViewById(R.id.navChatManagement);
-        iconUserManagement = findViewById(R.id.iconUserManagement);
-        tvUserManagement = findViewById(R.id.tvUserManagement);
         
-        // Set User Management tab as active
-        if (iconUserManagement != null) {
-            iconUserManagement.setColorFilter(0xFF2196F3); // active blue
-        }
-        if (tvUserManagement != null) {
-            tvUserManagement.setTextColor(0xFF2196F3); // active blue
-        }
+        iconDashboard = findViewById(R.id.iconDashboard);
+        iconUserManagement = findViewById(R.id.iconUserManagement);
+        iconProductManagement = findViewById(R.id.iconProductManagement);
+        iconStoreManagement = findViewById(R.id.iconStoreManagement);
+        iconOrderManagement = findViewById(R.id.iconOrderManagement);
+        iconChatManagement = findViewById(R.id.iconChatManagement);
+        
+        tvDashboard = findViewById(R.id.tvDashboard);
+        tvUserManagement = findViewById(R.id.tvUserManagement);
+        tvProductManagement = findViewById(R.id.tvProductManagement);
+        tvStoreManagement = findViewById(R.id.tvStoreManagement);
+        tvOrderManagement = findViewById(R.id.tvOrderManagement);
+        tvChatManagement = findViewById(R.id.tvChatManagement);
+        
+        cardDashboard = findViewById(R.id.cardDashboard);
+        cardUserManagement = findViewById(R.id.cardUserManagement);
+        cardProductManagement = findViewById(R.id.cardProductManagement);
+        cardStoreManagement = findViewById(R.id.cardStoreManagement);
+        cardOrderManagement = findViewById(R.id.cardOrderManagement);
+        cardChatManagement = findViewById(R.id.cardChatManagement);
 
+        // Filter chips
+        chipAll = findViewById(R.id.chipAll);
+        chipCustomers = findViewById(R.id.chipCustomers);
+        chipAdmins = findViewById(R.id.chipAdmins);
+        chipActive = findViewById(R.id.chipActive);
+        chipInactive = findViewById(R.id.chipInactive);
+        
         tabAll = findViewById(R.id.tabAll);
         tabCustomers = findViewById(R.id.tabCustomers);
         tabAdmins = findViewById(R.id.tabAdmins);
+
+        // Set User Management tab as active
+        AdminNavHelper.resetAllTabs(
+                cardDashboard, iconDashboard, tvDashboard,
+                cardUserManagement, iconUserManagement, tvUserManagement,
+                cardProductManagement, iconProductManagement, tvProductManagement,
+                cardStoreManagement, iconStoreManagement, tvStoreManagement,
+                cardOrderManagement, iconOrderManagement, tvOrderManagement,
+                cardChatManagement, iconChatManagement, tvChatManagement
+        );
+        AdminNavHelper.setActiveTab(cardUserManagement, iconUserManagement, tvUserManagement);
     }
 
     private void initData() {
         userList = new ArrayList<>();
+        filteredUserList = new ArrayList<>();
         apiService = RetrofitClient.getInstance().getApiService();
         authManager = AuthManager.getInstance(this);
 
         // Setup RecyclerView
-        userAdapter = new UserAdapter(userList, this);
+        userAdapter = new UserAdapter(filteredUserList, this);
         userAdapter.setOnUserClickListener(this::onUserClick);
         recyclerViewUsers.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewUsers.setAdapter(userAdapter);
@@ -127,17 +169,19 @@ public class UserManagementActivity extends AppCompatActivity {
                     if (apiResponse.isSuccess() && apiResponse.getUsers() != null) {
                         userList.clear();
                         userList.addAll(java.util.Arrays.asList(apiResponse.getUsers()));
-                        userAdapter.notifyDataSetChanged();
+                        
+                        // Apply current filter
+                        applyFilter();
                         
                         // Update user count
-                        tvUserCount.setText("Tổng: " + apiResponse.getCount() + " người dùng");
+                        tvUserCount.setText("Total: " + userList.size() + " users");
                         
                         // Show/hide empty state
-                        if (userList.isEmpty()) {
-                            tvEmptyState.setVisibility(View.VISIBLE);
+                        if (filteredUserList.isEmpty()) {
+                            emptyStateCard.setVisibility(View.VISIBLE);
                             recyclerViewUsers.setVisibility(View.GONE);
                         } else {
-                            tvEmptyState.setVisibility(View.GONE);
+                            emptyStateCard.setVisibility(View.GONE);
                             recyclerViewUsers.setVisibility(View.VISIBLE);
                         }
                     } else {
@@ -157,25 +201,189 @@ public class UserManagementActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
+        // Add new user button
+        if (btnAddNewUser != null) {
+            btnAddNewUser.setOnClickListener(v -> {
+                Toast.makeText(this, "Add new user feature coming soon", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        // Search functionality
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterUsers(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        }
 
         // Bottom navigation
         if (navDashboard != null) navDashboard.setOnClickListener(v -> startActivity(new Intent(this, AdminManagementActivity.class)));
         if (navProductManagement != null) navProductManagement.setOnClickListener(v -> startActivity(new Intent(this, ProductManagementActivity.class)));
         if (navStoreManagement != null) navStoreManagement.setOnClickListener(v -> startActivity(new Intent(this, StoreManagementActivity.class)));
-        if (navOrderManagement != null) navOrderManagement.setOnClickListener(v -> Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show());
+        if (navOrderManagement != null) navOrderManagement.setOnClickListener(v -> {
+            startActivity(new Intent(this, OrderManagementActivity.class));
+            finish();
+        });
         if (navChatManagement != null) navChatManagement.setOnClickListener(v -> startActivity(new Intent(this, AdminChatListActivity.class)));
 
-        // Tabs (UI highlight only)
-        if (tabAll != null && tabCustomers != null && tabAdmins != null) {
-            View.OnClickListener reset = x -> {
-                tabAll.setTextColor(0xFF6B7280);
-                tabCustomers.setTextColor(0xFF6B7280);
-                tabAdmins.setTextColor(0xFF6B7280);
-            };
-            tabAll.setOnClickListener(v -> { reset.onClick(v); tabAll.setTextColor(0xFF2196F3); });
-            tabCustomers.setOnClickListener(v -> { reset.onClick(v); tabCustomers.setTextColor(0xFF2196F3); });
-            tabAdmins.setOnClickListener(v -> { reset.onClick(v); tabAdmins.setTextColor(0xFF2196F3); });
+        // Filter chips
+        setupFilterChips();
+    }
+
+    private void setupFilterChips() {
+        if (chipAll != null && tabAll != null) {
+            chipAll.setOnClickListener(v -> {
+                currentFilter = "all";
+                setActiveChip(chipAll, tabAll);
+                applyFilter();
+            });
+        }
+
+        if (chipCustomers != null && tabCustomers != null) {
+            chipCustomers.setOnClickListener(v -> {
+                currentFilter = "customer";
+                setActiveChip(chipCustomers, tabCustomers);
+                applyFilter();
+            });
+        }
+
+        if (chipAdmins != null && tabAdmins != null) {
+            chipAdmins.setOnClickListener(v -> {
+                currentFilter = "admin";
+                setActiveChip(chipAdmins, tabAdmins);
+                applyFilter();
+            });
+        }
+
+        if (chipActive != null) {
+            chipActive.setOnClickListener(v -> {
+                currentFilter = "active";
+                setActiveChip(chipActive, null);
+                applyFilter();
+            });
+        }
+
+        if (chipInactive != null) {
+            chipInactive.setOnClickListener(v -> {
+                currentFilter = "inactive";
+                setActiveChip(chipInactive, null);
+                applyFilter();
+            });
+        }
+    }
+
+    private void setActiveChip(CardView activeChip, TextView activeText) {
+        // Reset all chips
+        resetChip(chipAll, tabAll);
+        resetChip(chipCustomers, tabCustomers);
+        resetChip(chipAdmins, tabAdmins);
+        resetChip(chipActive, null);
+        resetChip(chipInactive, null);
+
+        // Set active chip
+        if (activeChip != null) {
+            activeChip.setCardBackgroundColor(0xFF2196F3);
+        }
+        if (activeText != null) {
+            activeText.setTextColor(0xFFFFFFFF);
+        }
+    }
+
+    private void resetChip(CardView chip, TextView text) {
+        if (chip != null) {
+            chip.setCardBackgroundColor(0xFFF1F5F9);
+        }
+        if (text != null) {
+            text.setTextColor(0xFF64748B);
+        }
+    }
+
+    private void applyFilter() {
+        filteredUserList.clear();
+
+        for (User user : userList) {
+            boolean matches = false;
+
+            switch (currentFilter) {
+                case "all":
+                    matches = true;
+                    break;
+                case "customer":
+                    matches = user.getRole() != null && user.getRole().equalsIgnoreCase("customer");
+                    break;
+                case "admin":
+                    matches = user.getRole() != null && (user.getRole().equalsIgnoreCase("admin") || user.getRole().equalsIgnoreCase("staff"));
+                    break;
+                case "active":
+                    // Assume user is active if no specific field is available
+                    matches = true;
+                    break;
+                case "inactive":
+                    // Cannot determine inactive status without field
+                    matches = false;
+                    break;
+            }
+
+            if (matches) {
+                filteredUserList.add(user);
+            }
+        }
+
+        userAdapter.notifyDataSetChanged();
+
+        // Update UI
+        if (filteredUserList.isEmpty()) {
+            emptyStateCard.setVisibility(View.VISIBLE);
+            recyclerViewUsers.setVisibility(View.GONE);
+        } else {
+            emptyStateCard.setVisibility(View.GONE);
+            recyclerViewUsers.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void filterUsers(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            applyFilter();
+            return;
+        }
+
+        String lowerQuery = query.toLowerCase().trim();
+        filteredUserList.clear();
+
+        for (User user : userList) {
+            boolean matchesSearch = false;
+
+            if (user.getUsername() != null && user.getUsername().toLowerCase().contains(lowerQuery)) {
+                matchesSearch = true;
+            } else if (user.getEmail() != null && user.getEmail().toLowerCase().contains(lowerQuery)) {
+                matchesSearch = true;
+            }
+
+            if (matchesSearch) {
+                filteredUserList.add(user);
+            }
+        }
+
+        userAdapter.notifyDataSetChanged();
+
+        // Update UI
+        if (filteredUserList.isEmpty()) {
+            emptyStateCard.setVisibility(View.VISIBLE);
+            recyclerViewUsers.setVisibility(View.GONE);
+            if (tvEmptyState != null) {
+                tvEmptyState.setText("No users found for \"" + query + "\"");
+            }
+        } else {
+            emptyStateCard.setVisibility(View.GONE);
+            recyclerViewUsers.setVisibility(View.VISIBLE);
         }
     }
 
@@ -204,7 +412,7 @@ public class UserManagementActivity extends AppCompatActivity {
         if (show) {
             progressBar.setVisibility(View.VISIBLE);
             recyclerViewUsers.setVisibility(View.GONE);
-            tvEmptyState.setVisibility(View.GONE);
+            emptyStateCard.setVisibility(View.GONE);
         } else {
             progressBar.setVisibility(View.GONE);
         }
@@ -212,8 +420,10 @@ public class UserManagementActivity extends AppCompatActivity {
 
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        tvEmptyState.setText("Không thể tải dữ liệu\n" + message);
-        tvEmptyState.setVisibility(View.VISIBLE);
+        if (tvEmptyState != null) {
+            tvEmptyState.setText("Cannot load data\n" + message);
+        }
+        emptyStateCard.setVisibility(View.VISIBLE);
         recyclerViewUsers.setVisibility(View.GONE);
     }
 

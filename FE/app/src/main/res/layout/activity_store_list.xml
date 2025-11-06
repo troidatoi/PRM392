@@ -3,18 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="#F8F9FA">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:elevation="4dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@drawable/gradient_primary"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <RelativeLayout
@@ -23,19 +24,23 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/btnBack"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="8dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp">
+                    android:layout_marginStart="4dp"
+                    app:cardCornerRadius="21dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:src="@android:drawable/ic_menu_revert"
-                        android:tint="@android:color/white" />
+                        android:tint="#2196F3" />
                 </androidx.cardview.widget.CardView>
 
                 <TextView
@@ -43,11 +48,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="12dp"
                     android:layout_toEndOf="@id/btnBack"
                     android:text="Danh sách Cửa hàng"
-                    android:textColor="@android:color/white"
-                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
             </RelativeLayout>
@@ -77,7 +82,7 @@
                 android:id="@+id/rvStores"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp"
+                android:padding="16dp"
                 android:clipToPadding="false" />
 
             <TextView
@@ -88,8 +93,9 @@
                 android:gravity="center"
                 android:padding="32dp"
                 android:text="Không có cửa hàng nào"
-                android:textColor="#999999"
-                android:textSize="16sp"
+                android:textColor="#9E9E9E"
+                android:textSize="17sp"
+                android:textStyle="bold"
                 android:visibility="gone" />
 
         </RelativeLayout>

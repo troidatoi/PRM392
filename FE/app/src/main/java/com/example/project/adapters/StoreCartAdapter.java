@@ -26,8 +26,13 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public interface OnCartItemListener {
         void onQuantityChanged(int position, int delta);
         void onItemRemoved(int position);
+        void onItemClicked(CartItem item);
     }
     
+    public interface OnCartSelectionListener extends OnCartItemListener {
+        void onSelectionChanged();
+    }
+
     public StoreCartAdapter(List<Object> items, OnCartItemListener listener) {
         this.items = items;
         this.listener = listener;
@@ -106,7 +111,8 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         private ImageView ivProductImage;
         private TextView tvProductName, tvProductPrice, tvQuantity;
         private View btnDecrease, btnIncrease, btnRemove;
-        
+        private android.widget.CheckBox cbSelectItem;
+
         public CartItemViewHolder(@NonNull View itemView) {
             super(itemView);
             ivProductImage = itemView.findViewById(R.id.ivProductImage);
@@ -116,13 +122,49 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             tvQuantity = itemView.findViewById(R.id.tvQuantity);
             btnDecrease = itemView.findViewById(R.id.btnDecrease);
             btnIncrease = itemView.findViewById(R.id.btnIncrease);
+            cbSelectItem = itemView.findViewById(R.id.cbSelectItem);
         }
         
         void bind(CartItem item, int position, OnCartItemListener listener) {
             tvProductName.setText(item.getName());
-            tvProductPrice.setText(item.getPrice());
+
+            // Load product image with Glide
+            if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
+                com.bumptech.glide.Glide.with(itemView.getContext())
+                    .load(item.getImageUrl())
+                    .placeholder(R.drawable.splash_bike_background)
+                    .error(R.drawable.splash_bike_background)
+                    .centerCrop()
+                    .into(ivProductImage);
+            } else {
+                ivProductImage.setImageResource(item.getImageResId());
+            }
+
+            // Hiển thị tổng tiền = unitPrice × quantity
+            long totalItemPrice = item.getUnitPrice() * item.getQuantity();
+            tvProductPrice.setText(formatPrice(totalItemPrice) + " VNĐ");
+
             tvQuantity.setText(String.valueOf(item.getQuantity()));
             
+            // Set checkbox state
+            cbSelectItem.setOnCheckedChangeListener(null); // Clear listener trước
+            cbSelectItem.setChecked(item.isSelected());
+
+            // Handle checkbox change
+            cbSelectItem.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                item.setSelected(isChecked);
+                if (listener != null && listener instanceof OnCartSelectionListener) {
+                    ((OnCartSelectionListener) listener).onSelectionChanged();
+                }
+            });
+            
+            // Handle item click to view product details
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onItemClicked(item);
+                }
+            });
+
             btnDecrease.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onQuantityChanged(position, -1);
@@ -140,6 +182,10 @@ public class StoreCartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     listener.onItemRemoved(position);
                 }
             });
+        }
+
+        private String formatPrice(long price) {
+            return String.format("%,d", price).replace(",", ".");
         }
     }
 }
