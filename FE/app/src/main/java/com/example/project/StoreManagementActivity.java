@@ -231,6 +231,57 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         storeAdapter.notifyDataSetChanged();
         updateStatistics();
         updateEmptyState();
+        
+        // Load statistics for all stores
+        if (currentPage == 1) {
+            loadStoreStatistics();
+        }
+    }
+    
+    private void loadStoreStatistics() {
+        // Load total stores count (without filter)
+        Call<ApiService.StoreResponse> totalCall = apiService.getStores(
+            null, null, null, null, 1, 1, "createdAt"
+        );
+        
+        totalCall.enqueue(new Callback<ApiService.StoreResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    totalStoresCount = response.body().getTotal();
+                    
+                    // Now load active stores count
+                    loadActiveStoresCount();
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+                // Silently fail, keep current stats
+            }
+        });
+    }
+    
+    private void loadActiveStoresCount() {
+        // Load active stores count
+        Call<ApiService.StoreResponse> activeCall = apiService.getStores(
+            null, null, null, true, 1, 1, "createdAt"
+        );
+        
+        activeCall.enqueue(new Callback<ApiService.StoreResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    activeStoresCount = response.body().getTotal();
+                    updateStatistics();
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+                // Silently fail, keep current stats
+            }
+        });
     }
     
     private void refreshStores() {

@@ -87,14 +87,19 @@ const getAllStores = async (req, res) => {
       city,
       district,
       storeType,
-      isActive = true,
+      isActive,
       page = 1,
       limit = 10,
       sort = 'rating.average'
     } = req.query;
 
     // Build filter object
-    const filter = { isActive };
+    const filter = {};
+    
+    // Only filter by isActive if explicitly provided
+    if (isActive !== undefined && isActive !== null && isActive !== '') {
+      filter.isActive = isActive === 'true' || isActive === true;
+    }
     
     if (city) filter.city = new RegExp(city, 'i');
     if (district) filter.district = new RegExp(district, 'i');
