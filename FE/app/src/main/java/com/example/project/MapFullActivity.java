@@ -3,7 +3,13 @@ package com.example.project;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -61,6 +67,7 @@ public class MapFullActivity extends AppCompatActivity {
     private List<Store> storeList = new ArrayList<>();
     private GeoPoint userLocation;
     private Polyline currentRoadOverlay;
+    private Marker userLocationMarker; // Red pin marker for user location
     
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
@@ -138,8 +145,16 @@ public class MapFullActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         
         btnMyLocation.setOnClickListener(v -> {
-            if (myLocationOverlay != null && myLocationOverlay.getMyLocation() != null) {
+            if (userLocation != null) {
+                mapController.animateTo(userLocation);
+                mapController.setZoom(16.0);
+            } else if (myLocationOverlay != null && myLocationOverlay.getMyLocation() != null) {
                 GeoPoint myLocation = myLocationOverlay.getMyLocation();
+                userLocation = myLocation;
+                if (userLocationMarker != null) {
+                    userLocationMarker.setPosition(userLocation);
+                    mapView.invalidate();
+                }
                 mapController.animateTo(myLocation);
                 mapController.setZoom(16.0);
             } else {
@@ -184,8 +199,32 @@ public class MapFullActivity extends AppCompatActivity {
     private void setupMyLocationOverlay() {
         myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mapView);
         myLocationOverlay.enableMyLocation();
-        myLocationOverlay.enableFollowLocation();
-        mapView.getOverlays().add(myLocationOverlay);
+        // Don't add the default overlay to map, we'll use custom marker instead
+        
+        // Create custom red pin marker for user location
+        userLocationMarker = new Marker(mapView);
+        BitmapDrawable icon = new BitmapDrawable(getResources(), createRedPinBitmap());
+        userLocationMarker.setIcon(icon);
+        userLocationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        userLocationMarker.setTitle("Vị trí của bạn");
+        mapView.getOverlays().add(userLocationMarker);
+    }
+    
+    private Bitmap createRedPinBitmap() {
+        // Create bitmap with emoji 📍
+        int size = 120;
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTextSize(100);
+        paint.setTextAlign(Paint.Align.CENTER);
+        
+        // Draw red pin emoji
+        String emoji = "📍";
+        canvas.drawText(emoji, size / 2f, size * 0.85f, paint);
+        
+        return bitmap;
     }
 
     private void getCurrentLocation() {
@@ -199,6 +238,12 @@ public class MapFullActivity extends AppCompatActivity {
                 userLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
                 mapController.animateTo(userLocation);
                 mapController.setZoom(15.0);
+                
+                // Update user location marker position
+                if (userLocationMarker != null) {
+                    userLocationMarker.setPosition(userLocation);
+                    mapView.invalidate();
+                }
                 
                 // Update adapter with user location
                 if (storeAdapter != null) {
