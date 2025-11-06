@@ -134,12 +134,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
             v.getContext().startActivity(intent);
         });
-
-        if (holder.btnAddToCart != null) {
-            holder.btnAddToCart.setOnClickListener(v -> {
-                Toast.makeText(v.getContext(), "Đã thêm " + (product.getName() != null ? product.getName() : "sản phẩm") + " vào giỏ hàng", Toast.LENGTH_SHORT).show();
-            });
-        }
     }
 
     @Override
@@ -167,7 +161,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         TextView tvDiscountPercent;
         TextView tvDiscountPercentInline;
         LinearLayout discountBadge;
-        CardView btnAddToCart;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -179,7 +172,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             tvDiscountPercent = itemView.findViewById(R.id.tvDiscountPercent);
             tvDiscountPercentInline = itemView.findViewById(R.id.tvDiscountPercentInline);
             discountBadge = itemView.findViewById(R.id.discountBadge);
-            btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
         }
     }
 }

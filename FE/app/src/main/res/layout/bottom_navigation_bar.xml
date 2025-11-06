@@ -187,7 +187,7 @@
         android:gravity="center"
         android:clickable="true"
         android:focusable="true"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="@android:color/transparent"
         android:padding="2dp">
 
         <androidx.cardview.widget.CardView

@@ -98,6 +98,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Map Full Activity -->
+        <activity
+            android:name=".MapFullActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Profile Edit Activity -->
         <activity
             android:name=".ProfileEditActivity"
