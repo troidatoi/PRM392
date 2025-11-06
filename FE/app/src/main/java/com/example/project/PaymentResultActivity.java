@@ -20,6 +20,8 @@ public class PaymentResultActivity extends AppCompatActivity {
 
     private TextView tvStatus;
     private String orderCode;
+    private int retryCount = 0;
+    private static final int MAX_RETRY_COUNT = 10; // Tối đa 10 lần retry (20 giây)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,20 +72,50 @@ public class PaymentResultActivity extends AppCompatActivity {
 
                             if (Boolean.TRUE.equals(isPaid) || "PAID".equals(payosStatus)) {
                                 showSuccess("Thanh toán thành công!");
+                                return;
                             } else {
-                                showPending("Đang xử lý thanh toán...");
+                                // Payment chưa completed, check payment status từ database
+                                Object paymentObj = paymentData.get("payment");
+                                if (paymentObj instanceof java.util.Map) {
+                                    java.util.Map payment = (java.util.Map) paymentObj;
+                                    Object paymentStatus = payment.get("paymentStatus");
+                                    if ("completed".equals(paymentStatus)) {
+                                        showSuccess("Thanh toán thành công!");
+                                        return;
+                                    }
+                                }
+                                
+                                // Nếu chưa completed và chưa quá số lần retry
+                                if (retryCount < MAX_RETRY_COUNT) {
+                                    retryCount++;
+                                    showPending("Đang xử lý thanh toán... (" + retryCount + "/" + MAX_RETRY_COUNT + ")");
+                                    // Kiểm tra lại sau 2 giây (có thể webhook chưa xử lý xong)
+                                    new android.os.Handler().postDelayed(() -> {
+                                        verifyPayment(orderCode);
+                                    }, 2000);
+                                } else {
+                                    // Đã retry quá nhiều lần
+                                    showPending("Thanh toán đang được xử lý. Vui lòng kiểm tra lại sau.");
+                                }
+                                return;
                             }
-                            return;
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
                 
-                // Kiểm tra lại sau 2 giây (có thể webhook chưa xử lý xong)
-                new android.os.Handler().postDelayed(() -> {
-                    verifyPayment(orderCode);
-                }, 2000);
+                // Nếu response không thành công và chưa quá số lần retry
+                if (retryCount < MAX_RETRY_COUNT) {
+                    retryCount++;
+                    showPending("Đang xác minh thanh toán... (" + retryCount + "/" + MAX_RETRY_COUNT + ")");
+                    // Kiểm tra lại sau 2 giây
+                    new android.os.Handler().postDelayed(() -> {
+                        verifyPayment(orderCode);
+                    }, 2000);
+                } else {
+                    showError("Không thể xác minh thanh toán. Vui lòng thử lại sau.");
+                }
             }
 
             @Override

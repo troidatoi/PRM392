@@ -88,6 +88,13 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- PayOS Payment Activity (WebView) -->
+        <activity
+            android:name=".PayOSPaymentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+
         <!-- Product Detail Activity -->
         <activity
             android:name=".ProductDetailActivity"

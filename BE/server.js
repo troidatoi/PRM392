@@ -39,9 +39,9 @@ app.set('io', io);
 app.use(passport.initialize());
 require('./config/passport')(passport);
 
-// Body parser
+// Body parser - đặt trước routes để đảm bảo webhook nhận được body
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Enable CORS
 app.use(cors({

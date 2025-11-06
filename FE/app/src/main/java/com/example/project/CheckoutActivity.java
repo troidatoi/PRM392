@@ -449,13 +449,13 @@ public class CheckoutActivity extends AppCompatActivity {
                             Object checkoutUrl = paymentData.get("checkoutUrl");
                             
                             if (checkoutUrl != null) {
-                                // Mở browser để thanh toán
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(checkoutUrl.toString()));
-                                startActivity(browserIntent);
+                                // Mở WebView activity trong app để thanh toán PayOS
+                                Intent paymentIntent = new Intent(CheckoutActivity.this, PayOSPaymentActivity.class);
+                                paymentIntent.putExtra("checkoutUrl", checkoutUrl.toString());
+                                paymentIntent.putExtra("orderId", orderId);
                                 
-                                // Có thể finish activity này hoặc chờ callback
-                                Toast.makeText(CheckoutActivity.this, "Vui lòng hoàn tất thanh toán trên PayOS", Toast.LENGTH_LONG).show();
-                                finish();
+                                // Start activity and wait for result
+                                startActivityForResult(paymentIntent, 1001);
                                 return;
                             }
                         }
@@ -482,6 +482,31 @@ public class CheckoutActivity extends AppCompatActivity {
                 Toast.makeText(CheckoutActivity.this, "Lỗi kết nối. Vui lòng thử lại!", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == 1001) {
+            if (resultCode == RESULT_OK && data != null) {
+                String paymentStatus = data.getStringExtra("paymentStatus");
+                String orderId = data.getStringExtra("orderId");
+                
+                if ("success".equals(paymentStatus)) {
+                    // Payment successful - PaymentResultActivity đã được mở từ PayOSPaymentActivity
+                    // Có thể finish activity này hoặc show message
+                    Toast.makeText(this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else if ("cancelled".equals(paymentStatus)) {
+                    // Payment cancelled
+                    Toast.makeText(this, "Thanh toán đã bị hủy", Toast.LENGTH_SHORT).show();
+                }
+            } else if (resultCode == RESULT_CANCELED) {
+                // User cancelled payment
+                Toast.makeText(this, "Thanh toán đã bị hủy", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
 

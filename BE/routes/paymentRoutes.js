@@ -11,6 +11,8 @@ const {
 const { protect, authorize } = require('../middleware/auth');
 
 // Webhook từ PayOS (không cần authentication)
+// Route alias cho BACKEND_WEBHOOK_URL (dùng cho PayOS settings)
+router.post('/webhook', handlePayOSWebhook);
 router.post('/webhook/payos', handlePayOSWebhook);
 
 // Tạo payment link cho đơn hàng

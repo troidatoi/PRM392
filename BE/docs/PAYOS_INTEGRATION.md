@@ -14,8 +14,8 @@ Dự án đã được tích hợp với PayOS để xử lý thanh toán trực
 PAYOS_CLIENT_ID=your_client_id
 PAYOS_API_KEY=your_api_key
 PAYOS_CHECKSUM_KEY=your_checksum_key
-PAYOS_BASE_URL=https://api.payos.vn/v2
-BASE_URL=your_backend_url
+PAYOS_BASE_URL=https://api-merchant.payos.vn/v2
+BACKEND_WEBHOOK_URL=https://your-backend-url.com/api/payments/webhook
 FRONTEND_URL=your_frontend_url
 ```
 
@@ -219,7 +219,7 @@ Sau khi thanh toán, user sẽ được redirect về `returnUrl` với query pa
 
 1. Đăng ký tài khoản PayOS tại https://pay.payos.vn
 2. Lấy credentials từ PayOS Dashboard
-3. Cấu hình webhook URL trong PayOS Dashboard: `https://your-backend.com/api/payments/webhook/payos`
+3. Cấu hình webhook URL trong PayOS Dashboard: Sử dụng giá trị từ `BACKEND_WEBHOOK_URL` (ví dụ: `https://your-backend.com/api/payments/webhook`)
 4. Test với số tiền nhỏ (>= 1000 VND)
 
 ### Test Webhook Locally
@@ -231,7 +231,7 @@ Sử dụng ngrok hoặc cloudflare tunnel để expose local server:
 ngrok http 5000
 
 # Hoặc cloudflare tunnel (đã có trong project)
-# Cập nhật BASE_URL trong .env
+# Cập nhật BACKEND_WEBHOOK_URL trong .env với URL đầy đủ
 ```
 
 ## Security
