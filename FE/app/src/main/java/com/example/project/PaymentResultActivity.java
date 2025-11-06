@@ -20,8 +20,9 @@ public class PaymentResultActivity extends AppCompatActivity {
 
     private TextView tvStatus;
     private String orderCode;
+    private String orderId;
     private int retryCount = 0;
-    private static final int MAX_RETRY_COUNT = 10; // Tối đa 10 lần retry (20 giây)
+    private static final int MAX_RETRY_COUNT = 15; // Tối đa 15 lần retry (30 giây) để đợi webhook
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +31,18 @@ public class PaymentResultActivity extends AppCompatActivity {
 
         tvStatus = findViewById(R.id.tvStatus);
 
+        // Lấy orderId từ intent (ưu tiên)
+        orderId = getIntent().getStringExtra("orderId");
+        
         // Lấy orderCode từ intent hoặc deep link
         orderCode = getIntent().getStringExtra("orderCode");
         
         // Nếu không có trong extra, thử lấy từ data URI (deep link)
         if (orderCode == null && getIntent().getData() != null) {
             orderCode = getIntent().getData().getQueryParameter("orderCode");
+            if (orderId == null) {
+                orderId = getIntent().getData().getQueryParameter("orderId");
+            }
         }
         
         // Nếu vẫn không có, thử lấy từ query string trong URL
@@ -43,14 +50,90 @@ public class PaymentResultActivity extends AppCompatActivity {
             android.net.Uri uri = getIntent().getData();
             if (uri != null) {
                 orderCode = uri.getQueryParameter("orderCode");
+                if (orderId == null) {
+                    orderId = uri.getQueryParameter("orderId");
+                }
             }
         }
 
-        if (orderCode != null) {
+        // Ưu tiên dùng orderId để check payment status (chính xác hơn)
+        if (orderId != null) {
+            checkPaymentByOrder(orderId);
+        } else if (orderCode != null) {
             verifyPayment(orderCode);
         } else {
             showError("Không tìm thấy mã đơn hàng");
         }
+    }
+
+    private void checkPaymentByOrder(String orderId) {
+        AuthManager auth = AuthManager.getInstance(this);
+        ApiService api = RetrofitClient.getInstance().getApiService();
+
+        tvStatus.setText("Đang kiểm tra trạng thái thanh toán...");
+
+        api.getPaymentByOrder(auth.getAuthHeader(), orderId).enqueue(new Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    try {
+                        Object data = response.body().getData();
+                        if (data instanceof java.util.Map) {
+                            java.util.Map payment = (java.util.Map) data;
+                            Object paymentStatus = payment.get("paymentStatus");
+                            
+                            if ("completed".equals(paymentStatus)) {
+                                showSuccess("Thanh toán thành công!");
+                                return;
+                            } else if ("failed".equals(paymentStatus) || "cancelled".equals(paymentStatus)) {
+                                showError("Thanh toán thất bại hoặc đã bị hủy.");
+                                return;
+                            }
+                            
+                            // Payment đang pending/processing - đợi webhook
+                            if (retryCount < MAX_RETRY_COUNT) {
+                                retryCount++;
+                                showPending("Đang xử lý thanh toán... (" + retryCount + "/" + MAX_RETRY_COUNT + ")");
+                                // Kiểm tra lại sau 2 giây (đợi webhook từ PayOS)
+                                new android.os.Handler().postDelayed(() -> {
+                                    checkPaymentByOrder(orderId);
+                                }, 2000);
+                            } else {
+                                // Đã retry quá nhiều lần - có thể webhook chưa đến
+                                showPending("Thanh toán đang được xử lý. Vui lòng kiểm tra lại sau.");
+                            }
+                            return;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                
+                // Nếu response không thành công và chưa quá số lần retry
+                if (retryCount < MAX_RETRY_COUNT) {
+                    retryCount++;
+                    showPending("Đang kiểm tra... (" + retryCount + "/" + MAX_RETRY_COUNT + ")");
+                    new android.os.Handler().postDelayed(() -> {
+                        checkPaymentByOrder(orderId);
+                    }, 2000);
+                } else {
+                    showError("Không thể kiểm tra trạng thái thanh toán. Vui lòng thử lại sau.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                if (retryCount < MAX_RETRY_COUNT) {
+                    retryCount++;
+                    showPending("Đang kết nối... (" + retryCount + "/" + MAX_RETRY_COUNT + ")");
+                    new android.os.Handler().postDelayed(() -> {
+                        checkPaymentByOrder(orderId);
+                    }, 2000);
+                } else {
+                    showError("Lỗi kết nối: " + t.getMessage());
+                }
+            }
+        });
     }
 
     private void verifyPayment(String orderCode) {
@@ -120,7 +203,15 @@ public class PaymentResultActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
-                showError("Lỗi xác minh thanh toán: " + t.getMessage());
+                if (retryCount < MAX_RETRY_COUNT) {
+                    retryCount++;
+                    showPending("Đang kết nối... (" + retryCount + "/" + MAX_RETRY_COUNT + ")");
+                    new android.os.Handler().postDelayed(() -> {
+                        verifyPayment(orderCode);
+                    }, 2000);
+                } else {
+                    showError("Lỗi xác minh thanh toán: " + t.getMessage());
+                }
             }
         });
     }

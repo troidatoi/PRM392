@@ -424,7 +424,7 @@ public class CheckoutActivity extends AppCompatActivity {
 								Object storesObj = d.get("stores");
 								if (storesObj instanceof java.util.List) {
 									java.util.List stores = (java.util.List) storesObj;
-									for (Object so : stores) {
+                                    for (Object so : stores) {
 										java.util.Map s = (java.util.Map) so;
 										String sid = String.valueOf(s.get("storeId"));
 										Double dist = null; 
@@ -433,7 +433,9 @@ public class CheckoutActivity extends AppCompatActivity {
 										if (dd instanceof Number) dist = ((Number) dd).doubleValue();
 										Object ff = s.get("shippingFee"); 
 										if (ff instanceof Number) fee = ((Number) ff).longValue();
-										checkoutAdapter.updateHeaderShipping(sid, dist, fee);
+                                        if (checkoutAdapter != null) {
+                                            checkoutAdapter.updateHeaderShipping(sid, dist, fee);
+                                        }
 									}
 									
 									// Update bottom shipping fee display
@@ -644,7 +646,14 @@ public class CheckoutActivity extends AppCompatActivity {
 
 		// Get selected payment method
 		int selectedPaymentId = rgPaymentMethod.getCheckedRadioButtonId();
-		String paymentMethod = "vnpay"; // Chỉ dùng VNPay
+		String paymentMethod = "cash"; // Default
+		if (selectedPaymentId == R.id.rbCOD) {
+			paymentMethod = "cash";
+		} else if (selectedPaymentId == R.id.rbBankTransfer) {
+			paymentMethod = "bank_transfer";
+		} else if (selectedPaymentId == R.id.rbPayOS) {
+			paymentMethod = "payos";
+		}
 
 		// Show confirmation dialog
 		showConfirmationDialog(receiverName, receiverPhone, shippingAddress + "\n" + cityForApi, paymentMethod);
@@ -709,23 +718,48 @@ public class CheckoutActivity extends AppCompatActivity {
 			@Override
 			public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
 				if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-					String message = "Đơn hàng đã được tạo và đang chờ thanh toán VNPay.";
 					try {
 						Object data = response.body().getData();
-						if (data instanceof java.util.Map) {
+						if ("payos".equalsIgnoreCase(paymentMethod) && data instanceof java.util.Map) {
 							java.util.Map d = (java.util.Map) data;
-							Object summaryObj = d.get("summary");
-							if (summaryObj instanceof java.util.Map) {
-								java.util.Map summary = (java.util.Map) summaryObj;
-								Object totalOrders = summary.get("totalOrders");
-								Object totalAmount = summary.get("totalAmount");
-								message = "Tạo " + String.valueOf(totalOrders) + " đơn hàng. Tổng: " + formatCurrency(totalAmount) + " VNĐ";
+							Object ordersObj = d.get("orders");
+							if (ordersObj instanceof java.util.List) {
+								java.util.List orders = (java.util.List) ordersObj;
+								if (!orders.isEmpty()) {
+									Object firstOrder = orders.get(0);
+									if (firstOrder instanceof java.util.Map) {
+										java.util.Map orderMap = (java.util.Map) firstOrder;
+										Object orderObj = orderMap.get("order");
+										if (orderObj instanceof java.util.Map) {
+											Object orderId = ((java.util.Map) orderObj).get("_id");
+											if (orderId != null) {
+												createPaymentLinkAndRedirect(orderId.toString(), name, phone, address);
+												return;
+											}
+										}
+									}
+								}
+							}
+						}
+					} catch (Exception ignored) {}
+
+					String message = "Đơn hàng đã được tạo và đang chờ thanh toán.";
+					try {
+						Object data2 = response.body().getData();
+						if (data2 instanceof java.util.Map) {
+							java.util.Map d2 = (java.util.Map) data2;
+							Object summaryObj2 = d2.get("summary");
+							if (summaryObj2 instanceof java.util.Map) {
+								java.util.Map summary2 = (java.util.Map) summaryObj2;
+								Object totalOrders2 = summary2.get("totalOrders");
+								Object totalAmount2 = summary2.get("totalAmount");
+								message = "Tạo " + String.valueOf(totalOrders2) + " đơn hàng. Tổng: " + formatCurrency(totalAmount2) + " VNĐ";
 							}
 						}
 					} catch (Exception ignored) {}
 
 					new AlertDialog.Builder(CheckoutActivity.this)
-						.setTitle("Thanh toán VNPay")
+						.setTitle("Thành công")
 						.setMessage(message)
 						.setPositiveButton("OK", (dialog, which) -> finish())
 						.setCancelable(false)
