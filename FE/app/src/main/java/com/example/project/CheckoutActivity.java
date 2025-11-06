@@ -599,9 +599,6 @@ public class CheckoutActivity extends AppCompatActivity {
 			@Override
 			public void onNothingSelected(android.widget.AdapterView<?> parent) {}
 		});
-			@Override
-			public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-		});
 	}
 
 	private void confirmOrder() {
