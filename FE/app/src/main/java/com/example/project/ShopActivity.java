@@ -1,17 +1,21 @@
 package com.example.project;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Window;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,16 +41,19 @@ public class ShopActivity extends AppCompatActivity {
     private ApiService apiService;
 
     // Top Bar
-    private EditText etSearch;
-    private ImageView iconFilter;
+    private View iconFilter;
 
     // Categories
-    private LinearLayout categoryAll, categoryMountain, categoryFolding, categoryEGravel, btnFilter;
-    private LinearLayout lastSelectedCategory;
+    private View categoryAll, categoryMountain, categoryFolding, categoryEGravel;
+    private View lastSelectedCategory;
 
     // View Toggle
-    private LinearLayout viewGrid, viewList;
+    private View viewGrid, viewList;
     private boolean isGridMode = true;
+    
+    // Filter variables
+    private String selectedPriceRange = "all";
+    private List<String> selectedCategories = new ArrayList<>();
 
     // Bottom Navigation
     private View navHome, navProducts, navCart, navAccount;
@@ -77,7 +84,6 @@ public class ShopActivity extends AppCompatActivity {
         tvResultsCount = findViewById(R.id.tvResultsCount);
 
         // Top Bar
-        etSearch = findViewById(R.id.etSearch);
         iconFilter = findViewById(R.id.iconFilter);
 
         // Categories
@@ -85,7 +91,6 @@ public class ShopActivity extends AppCompatActivity {
         categoryMountain = findViewById(R.id.categoryMountain);
         categoryFolding = findViewById(R.id.categoryFolding);
         categoryEGravel = findViewById(R.id.categoryEGravel);
-        btnFilter = findViewById(R.id.btnFilter);
 
         // View Toggle
         viewGrid = findViewById(R.id.viewGrid);
@@ -110,27 +115,8 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     private void setupTopBar() {
-        // Setup search functionality
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Search with delay to avoid too many API calls
-                String searchQuery = s.toString().trim();
-                if (searchQuery.length() >= 2 || searchQuery.isEmpty()) {
-                    loadBikes(null, searchQuery);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
         iconFilter.setOnClickListener(v -> {
-            // Open advanced filter dialog
-            // TODO: Implement advanced filter dialog
+            showFilterDialog();
         });
     }
 
@@ -160,27 +146,29 @@ public class ShopActivity extends AppCompatActivity {
             selectCategory(categoryEGravel);
             filterByCategory("E-gravel");
         });
-
-        btnFilter.setOnClickListener(v -> {
-            // Open filter dialog
-        });
     }
 
-    private void selectCategory(LinearLayout category) {
-        // Reset last selected
+    private void selectCategory(View category) {
+        // Reset last selected - set to white background
         if (lastSelectedCategory != null) {
-            lastSelectedCategory.setBackgroundResource(R.drawable.category_button_inactive);
-            TextView text = (TextView) lastSelectedCategory.getChildAt(0);
-            if (text != null) {
-                text.setTextColor(getResources().getColor(R.color.category_text_inactive, null));
+            if (lastSelectedCategory instanceof androidx.cardview.widget.CardView) {
+                ((androidx.cardview.widget.CardView) lastSelectedCategory).setCardBackgroundColor(Color.WHITE);
+                TextView text = (TextView) ((androidx.cardview.widget.CardView) lastSelectedCategory).getChildAt(0);
+                if (text != null) {
+                    text.setTextColor(Color.parseColor("#666666"));
+                    text.setTypeface(null, android.graphics.Typeface.NORMAL);
+                }
             }
         }
 
-        // Set new selected
-        category.setBackgroundResource(R.drawable.category_button_active);
-        TextView text = (TextView) category.getChildAt(0);
-        if (text != null) {
-            text.setTextColor(getResources().getColor(R.color.white, null));
+        // Set new selected - set to blue background
+        if (category instanceof androidx.cardview.widget.CardView) {
+            ((androidx.cardview.widget.CardView) category).setCardBackgroundColor(Color.parseColor("#2196F3"));
+            TextView text = (TextView) ((androidx.cardview.widget.CardView) category).getChildAt(0);
+            if (text != null) {
+                text.setTextColor(Color.WHITE);
+                text.setTypeface(null, android.graphics.Typeface.BOLD);
+            }
         }
         lastSelectedCategory = category;
     }
@@ -205,15 +193,45 @@ public class ShopActivity extends AppCompatActivity {
 
     private void updateViewToggle() {
         if (isGridMode) {
-            viewGrid.setBackgroundResource(R.drawable.view_toggle_active);
-            viewList.setBackgroundResource(android.R.color.transparent);
-            ((ImageView) viewGrid.getChildAt(0)).setColorFilter(getResources().getColor(R.color.white, null));
-            ((ImageView) viewList.getChildAt(0)).setColorFilter(getResources().getColor(R.color.category_text_inactive, null));
+            // Grid is active
+            if (viewGrid instanceof androidx.cardview.widget.CardView) {
+                ((androidx.cardview.widget.CardView) viewGrid).setCardBackgroundColor(Color.parseColor("#2196F3"));
+                ImageView gridIcon = (ImageView) ((androidx.cardview.widget.CardView) viewGrid).getChildAt(0).findViewById(R.id.iconHome);
+                if (gridIcon == null) {
+                    // Try to get ImageView directly from RelativeLayout
+                    android.view.ViewGroup layout = (android.view.ViewGroup) ((androidx.cardview.widget.CardView) viewGrid).getChildAt(0);
+                    if (layout.getChildCount() > 0 && layout.getChildAt(0) instanceof ImageView) {
+                        gridIcon = (ImageView) layout.getChildAt(0);
+                        gridIcon.setColorFilter(Color.WHITE);
+                    }
+                }
+            }
+            if (viewList instanceof androidx.cardview.widget.CardView) {
+                ((androidx.cardview.widget.CardView) viewList).setCardBackgroundColor(Color.TRANSPARENT);
+                android.view.ViewGroup layout = (android.view.ViewGroup) ((androidx.cardview.widget.CardView) viewList).getChildAt(0);
+                if (layout.getChildCount() > 0 && layout.getChildAt(0) instanceof ImageView) {
+                    ImageView listIcon = (ImageView) layout.getChildAt(0);
+                    listIcon.setColorFilter(Color.parseColor("#9E9E9E"));
+                }
+            }
         } else {
-            viewList.setBackgroundResource(R.drawable.view_toggle_active);
-            viewGrid.setBackgroundResource(android.R.color.transparent);
-            ((ImageView) viewList.getChildAt(0)).setColorFilter(getResources().getColor(R.color.white, null));
-            ((ImageView) viewGrid.getChildAt(0)).setColorFilter(getResources().getColor(R.color.category_text_inactive, null));
+            // List is active
+            if (viewList instanceof androidx.cardview.widget.CardView) {
+                ((androidx.cardview.widget.CardView) viewList).setCardBackgroundColor(Color.parseColor("#2196F3"));
+                android.view.ViewGroup layout = (android.view.ViewGroup) ((androidx.cardview.widget.CardView) viewList).getChildAt(0);
+                if (layout.getChildCount() > 0 && layout.getChildAt(0) instanceof ImageView) {
+                    ImageView listIcon = (ImageView) layout.getChildAt(0);
+                    listIcon.setColorFilter(Color.WHITE);
+                }
+            }
+            if (viewGrid instanceof androidx.cardview.widget.CardView) {
+                ((androidx.cardview.widget.CardView) viewGrid).setCardBackgroundColor(Color.TRANSPARENT);
+                android.view.ViewGroup layout = (android.view.ViewGroup) ((androidx.cardview.widget.CardView) viewGrid).getChildAt(0);
+                if (layout.getChildCount() > 0 && layout.getChildAt(0) instanceof ImageView) {
+                    ImageView gridIcon = (ImageView) layout.getChildAt(0);
+                    gridIcon.setColorFilter(Color.parseColor("#9E9E9E"));
+                }
+            }
         }
     }
 
@@ -256,9 +274,8 @@ public class ShopActivity extends AppCompatActivity {
             }
         }
         
-        // Get current search query
-        String searchQuery = etSearch.getText().toString().trim();
-        loadBikes(categoryFilter, searchQuery);
+        // Load bikes without search query
+        loadBikes(categoryFilter, null);
     }
 
     private void setupSearchBox() {
@@ -435,10 +452,191 @@ public class ShopActivity extends AppCompatActivity {
         }
     }
     
-    private void updateCategoryButton(LinearLayout categoryButton, String displayName) {
-        TextView textView = (TextView) categoryButton.getChildAt(0);
-        if (textView != null) {
-            textView.setText(displayName);
+    private void updateCategoryButton(View categoryButton, String displayName) {
+        if (categoryButton instanceof androidx.cardview.widget.CardView) {
+            TextView textView = (TextView) ((androidx.cardview.widget.CardView) categoryButton).getChildAt(0);
+            if (textView != null) {
+                textView.setText(displayName);
+            }
         }
     }
+    
+    private void showFilterDialog() {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_filter);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        
+        // Price range cards
+        CardView priceAll = dialog.findViewById(R.id.priceAll);
+        CardView priceUnder10M = dialog.findViewById(R.id.priceUnder10M);
+        CardView price10to20M = dialog.findViewById(R.id.price10to20M);
+        CardView price20to50M = dialog.findViewById(R.id.price20to50M);
+        CardView priceAbove50M = dialog.findViewById(R.id.priceAbove50M);
+        
+        // Category checkboxes
+        CheckBox cbMountain = dialog.findViewById(R.id.cbMountain);
+        CheckBox cbFolding = dialog.findViewById(R.id.cbFolding);
+        CheckBox cbEGravel = dialog.findViewById(R.id.cbEGravel);
+        CheckBox cbRoad = dialog.findViewById(R.id.cbRoad);
+        
+        // Buttons
+        CardView btnClose = dialog.findViewById(R.id.btnCloseFilter);
+        CardView btnReset = dialog.findViewById(R.id.btnResetFilter);
+        CardView btnApply = dialog.findViewById(R.id.btnApplyFilter);
+        
+        // Set current selections
+        setSelectedPriceCard(priceAll, selectedPriceRange.equals("all"));
+        setSelectedPriceCard(priceUnder10M, selectedPriceRange.equals("under10"));
+        setSelectedPriceCard(price10to20M, selectedPriceRange.equals("10to20"));
+        setSelectedPriceCard(price20to50M, selectedPriceRange.equals("20to50"));
+        setSelectedPriceCard(priceAbove50M, selectedPriceRange.equals("above50"));
+        
+        cbMountain.setChecked(selectedCategories.contains("mountain"));
+        cbFolding.setChecked(selectedCategories.contains("folding"));
+        cbEGravel.setChecked(selectedCategories.contains("cargo"));
+        cbRoad.setChecked(selectedCategories.contains("road"));
+        
+        // Price range click listeners
+        priceAll.setOnClickListener(v -> {
+            selectedPriceRange = "all";
+            setSelectedPriceCard(priceAll, true);
+            setSelectedPriceCard(priceUnder10M, false);
+            setSelectedPriceCard(price10to20M, false);
+            setSelectedPriceCard(price20to50M, false);
+            setSelectedPriceCard(priceAbove50M, false);
+        });
+        
+        priceUnder10M.setOnClickListener(v -> {
+            selectedPriceRange = "under10";
+            setSelectedPriceCard(priceAll, false);
+            setSelectedPriceCard(priceUnder10M, true);
+            setSelectedPriceCard(price10to20M, false);
+            setSelectedPriceCard(price20to50M, false);
+            setSelectedPriceCard(priceAbove50M, false);
+        });
+        
+        price10to20M.setOnClickListener(v -> {
+            selectedPriceRange = "10to20";
+            setSelectedPriceCard(priceAll, false);
+            setSelectedPriceCard(priceUnder10M, false);
+            setSelectedPriceCard(price10to20M, true);
+            setSelectedPriceCard(price20to50M, false);
+            setSelectedPriceCard(priceAbove50M, false);
+        });
+        
+        price20to50M.setOnClickListener(v -> {
+            selectedPriceRange = "20to50";
+            setSelectedPriceCard(priceAll, false);
+            setSelectedPriceCard(priceUnder10M, false);
+            setSelectedPriceCard(price10to20M, false);
+            setSelectedPriceCard(price20to50M, true);
+            setSelectedPriceCard(priceAbove50M, false);
+        });
+        
+        priceAbove50M.setOnClickListener(v -> {
+            selectedPriceRange = "above50";
+            setSelectedPriceCard(priceAll, false);
+            setSelectedPriceCard(priceUnder10M, false);
+            setSelectedPriceCard(price10to20M, false);
+            setSelectedPriceCard(price20to50M, false);
+            setSelectedPriceCard(priceAbove50M, true);
+        });
+        
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+        
+        btnReset.setOnClickListener(v -> {
+            selectedPriceRange = "all";
+            selectedCategories.clear();
+            setSelectedPriceCard(priceAll, true);
+            setSelectedPriceCard(priceUnder10M, false);
+            setSelectedPriceCard(price10to20M, false);
+            setSelectedPriceCard(price20to50M, false);
+            setSelectedPriceCard(priceAbove50M, false);
+            cbMountain.setChecked(false);
+            cbFolding.setChecked(false);
+            cbEGravel.setChecked(false);
+            cbRoad.setChecked(false);
+        });
+        
+        btnApply.setOnClickListener(v -> {
+            // Update selected categories
+            selectedCategories.clear();
+            if (cbMountain.isChecked()) selectedCategories.add("mountain");
+            if (cbFolding.isChecked()) selectedCategories.add("folding");
+            if (cbEGravel.isChecked()) selectedCategories.add("cargo");
+            if (cbRoad.isChecked()) selectedCategories.add("road");
+            
+            // Apply filters
+            applyFilters();
+            dialog.dismiss();
+        });
+        
+        dialog.show();
+    }
+    
+    private void setSelectedPriceCard(CardView card, boolean isSelected) {
+        TextView textView = (TextView) card.getChildAt(0);
+        if (isSelected) {
+            card.setCardBackgroundColor(Color.parseColor("#2196F3"));
+            textView.setTextColor(Color.WHITE);
+            textView.setTypeface(null, android.graphics.Typeface.BOLD);
+        } else {
+            card.setCardBackgroundColor(Color.WHITE);
+            textView.setTextColor(Color.parseColor("#666666"));
+            textView.setTypeface(null, android.graphics.Typeface.NORMAL);
+        }
+    }
+    
+    private void applyFilters() {
+        if (bikeList == null) return;
+        
+        List<Bike> filteredList = new ArrayList<>();
+        
+        for (Bike bike : bikeList) {
+            boolean matchesPrice = false;
+            boolean matchesCategory = false;
+            
+            // Check price range
+            double price = bike.getPrice();
+            switch (selectedPriceRange) {
+                case "all":
+                    matchesPrice = true;
+                    break;
+                case "under10":
+                    matchesPrice = price < 10000000;
+                    break;
+                case "10to20":
+                    matchesPrice = price >= 10000000 && price < 20000000;
+                    break;
+                case "20to50":
+                    matchesPrice = price >= 20000000 && price < 50000000;
+                    break;
+                case "above50":
+                    matchesPrice = price >= 50000000;
+                    break;
+            }
+            
+            // Check category
+            if (selectedCategories.isEmpty()) {
+                matchesCategory = true;
+            } else {
+                String bikeCategory = bike.getCategory();
+                matchesCategory = selectedCategories.contains(bikeCategory);
+            }
+            
+            // Add to filtered list if matches both criteria
+            if (matchesPrice && matchesCategory) {
+                filteredList.add(bike);
+            }
+        }
+        
+        // Update adapter with filtered list
+        bikeAdapter = new BikeAdapter(filteredList);
+        rvProducts.setAdapter(bikeAdapter);
+        
+        // Update results count
+        tvResultsCount.setText(filteredList.size() + " Results");
+    }
 }
+

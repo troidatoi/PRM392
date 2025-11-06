@@ -132,12 +132,12 @@ public class BottomNavigationHelper {
             text.setTextColor(color);
 
             if (isActive) {
-                // Active state - bold text with vibrant background
+                // Active state - bold text without background
                 text.setTypeface(null, android.graphics.Typeface.BOLD);
                 if (container != null) {
-                    container.setCardBackgroundColor(COLOR_ACTIVE_BG);
-                    container.setCardElevation(3f); // Subtle elevation for depth
-                    container.setRadius(20f); // Smooth rounded corners
+                    container.setCardBackgroundColor(0x00000000); // Fully transparent
+                    container.setCardElevation(0f);
+                    container.setRadius(20f);
                 }
             } else {
                 // Inactive state - normal weight with transparent background

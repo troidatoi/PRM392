@@ -480,6 +480,13 @@ public class HomeActivity extends AppCompatActivity {
         
         // Setup location input button
         btnLocationInput.setOnClickListener(v -> showLocationInputDialog());
+        
+        // View Map Button
+        CardView btnViewMap = findViewById(R.id.btnViewMap);
+        btnViewMap.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, MapFullActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void setupSearchBox() {
@@ -537,10 +544,10 @@ public class HomeActivity extends AppCompatActivity {
         
         mapView = findViewById(R.id.mapView);
         if (mapView != null) {
+            // Using OpenStreetMap MAPNIK (standard)
             mapView.setTileSource(TileSourceFactory.MAPNIK);
             mapView.setMultiTouchControls(true);
             mapView.setBuiltInZoomControls(true);
-            mapView.setClickable(true);
             
             mapController = mapView.getController();
             mapController.setZoom(12.0);
