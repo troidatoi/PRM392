@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="#E0E0E0"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="#FFFFFF"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -14,7 +14,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#E0E0E0"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -26,23 +25,22 @@
             android:gravity="center_vertical">
 
             <androidx.cardview.widget.CardView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:cardCornerRadius="22.5dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFFFFF">
+                app:cardBackgroundColor="#E3F2FD">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#E0E0E0"
                     android:gravity="center">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
                         android:src="@drawable/ic_cart"
-                        app:tint="#000000"
+                        app:tint="#2196F3"
                         android:contentDescription="Order" />
 
                 </RelativeLayout>
@@ -54,25 +52,40 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="12dp">
+                android:layout_marginStart="14dp">
 
                 <TextView
                     android:id="@+id/tvOrderId"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Đơn hàng #12345"
-                    android:textSize="16sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
-                    android:textColor="#000000" />
+                    android:textColor="#212121" />
 
-                <TextView
-                    android:id="@+id/tvOrderDate"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20/10/2025"
-                    android:textSize="12sp"
-                    android:textColor="#999999"
-                    android:layout_marginTop="4dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="4dp">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_calendar"
+                        app:tint="#757575"
+                        android:layout_marginEnd="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvOrderDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="20/10/2025"
+                        android:textSize="13sp"
+                        android:textColor="#757575" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -80,29 +93,22 @@
                 android:id="@+id/statusBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="14dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#FFFFFF">
+                app:cardBackgroundColor="#4CAF50">
 
-                <RelativeLayout
+                <TextView
+                    android:id="@+id/tvOrderStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
+                    android:text="Đã giao"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
                     android:paddingTop="6dp"
-                    android:paddingBottom="6dp">
-
-                    <TextView
-                        android:id="@+id/tvOrderStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Đã giao"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        android:textColor="#000000" />
-
-                </RelativeLayout>
+                    android:paddingBottom="6dp" />
 
             </androidx.cardview.widget.CardView>
 
@@ -113,9 +119,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#E0E0E0"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:alpha="0.3" />
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="14dp" />
 
         <!-- Order Items -->
         <LinearLayout
@@ -129,8 +134,8 @@
                 android:layout_height="wrap_content"
                 android:text="Xe đạp điện VinFast Klara S x1\nPhụ kiện bảo vệ xe x2"
                 android:textSize="14sp"
-                android:textColor="#666666"
-                android:lineSpacingExtra="4dp" />
+                android:textColor="#616161"
+                android:lineSpacingExtra="6dp" />
 
         </LinearLayout>
 
@@ -140,7 +145,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="14dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -152,15 +157,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tổng tiền"
-                    android:textSize="12sp"
-                    android:textColor="#999999" />
+                    android:textSize="13sp"
+                    android:textColor="#757575" />
 
                 <TextView
                     android:id="@+id/tvOrderTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="30.500.000 ₫"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#2196F3"
                     android:layout_marginTop="4dp" />
@@ -170,31 +175,38 @@
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnViewDetail"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                app:cardCornerRadius="20dp"
+                android:layout_height="42dp"
+                app:cardCornerRadius="21dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#E0E0E0"
+                app:cardBackgroundColor="#2196F3"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#E0E0E0"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
                     android:gravity="center">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Chi tiết"
-                        android:textColor="#000000"
+                        android:textColor="#FFFFFF"
                         android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
 
-                </RelativeLayout>
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="#FFFFFF" />
+
+                </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 

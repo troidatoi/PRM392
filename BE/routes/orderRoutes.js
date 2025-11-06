@@ -6,12 +6,16 @@ const {
   getOrderDetails,
   updateOrderStatus,
   cancelOrder,
-  getOrdersByStore
+  getOrdersByStore,
+  estimateShipping
 } = require('../controllers/orderController');
 const { protect, authorize } = require('../middleware/auth');
 
 // Create orders from cart (split by store)
 router.post('/create', protect, createOrders);
+
+// Estimate shipping fee and distance without creating orders
+router.post('/estimate', protect, estimateShipping);
 
 // Get user orders
 router.get('/user/:userId', protect, getUserOrders);

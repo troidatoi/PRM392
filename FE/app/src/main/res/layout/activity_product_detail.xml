@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/light_gray_background">
+    android:fitsSystemWindows="true"
+    android:background="@drawable/gradient_background">
 
     <!-- Header with Back Button -->
     <androidx.cardview.widget.CardView
@@ -11,18 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="10dp"
         app:cardBackgroundColor="#FFFFFF">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
+                            android:padding="20dp"
             android:gravity="center_vertical">
 
             <androidx.cardview.widget.CardView
@@ -57,9 +58,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Chi Tiết Sản Phẩm"
-                android:textSize="20sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="#1A1A1A"
                 android:gravity="center" />
 
             <androidx.cardview.widget.CardView
@@ -114,22 +115,30 @@
             <!-- Product Image Carousel -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="350dp"
                 android:layout_marginBottom="20dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="12dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="20dp">
+                    android:layout_height="match_parent">
 
                     <androidx.viewpager2.widget.ViewPager2
                         android:id="@+id/viewPagerImages"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_above="@id/indicatorLayout" />
+                        android:clipToPadding="false"
+                        android:clipChildren="false"
+                        android:overScrollMode="never" />
+
+                    <!-- Gradient Overlay at Bottom -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@drawable/gradient_overlay_bottom" />
 
                     <!-- Indicator Layout -->
                     <LinearLayout
@@ -138,9 +147,11 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
-                        android:layout_marginBottom="12dp"
+                        android:layout_marginBottom="16dp"
                         android:orientation="horizontal"
-                        android:gravity="center" />
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:background="@drawable/indicator_background" />
 
                 </RelativeLayout>
 
@@ -150,9 +161,9 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="10dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
@@ -168,7 +179,7 @@
                         android:text="Xe đạp điện VinFast Klara S"
                         android:textSize="24sp"
                         android:textStyle="bold"
-                        android:textColor="#000000"
+                        android:textColor="#1A1A1A"
                         android:layout_marginBottom="12dp" />
 
                     <!-- Product Price -->
@@ -265,15 +276,15 @@
                 android:text="Mô Tả Sản Phẩm"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="#1A1A1A"
                 android:layout_marginBottom="12dp" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="10dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
@@ -302,15 +313,15 @@
                 android:text="Thông Số Kỹ Thuật"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="#1A1A1A"
                 android:layout_marginBottom="12dp" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="10dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
@@ -463,15 +474,15 @@
                 android:text="Tình Trạng Kho Hàng"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="#1A1A1A"
                 android:layout_marginBottom="12dp" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="8dp"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="10dp"
                 app:cardBackgroundColor="#FFFFFF">
 
                 <LinearLayout
@@ -494,101 +505,86 @@
 
     </ScrollView>
 
-    <!-- Bottom Action Bar -->
-    <androidx.cardview.widget.CardView
+    <!-- Bottom Action Buttons -->
+    <RelativeLayout
         android:id="@+id/bottomActionBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="12dp"
-        app:cardBackgroundColor="#FFFFFF">
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="12dp">
+        <!-- Add to Cart Button -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnAddToCart"
+            android:layout_width="170dp"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="12dp"
+            app:cardBackgroundColor="#FFFFFF"
+            android:clickable="true"
+            android:focusable="true">
 
-            <!-- Add to Cart Button -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnAddToCart"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="#FFFFFF"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
+                <ImageView
+                    android:id="@+id/iconCart"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ic_cart"
+                    app:tint="#2196F3"
+                    android:contentDescription="Cart" />
 
-                    <ImageView
-                        android:id="@+id/iconCart"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="20dp"
-                        android:src="@drawable/ic_cart"
-                        app:tint="#000000"
-                        android:contentDescription="Cart" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Giỏ hàng"
+                    android:textColor="#2196F3"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:text="Thêm vào giỏ"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+            </RelativeLayout>
 
-                </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-            </androidx.cardview.widget.CardView>
+        <!-- Buy Now Button -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnBuyNow"
+            android:layout_width="170dp"
+            android:layout_height="60dp"
+            android:layout_alignParentEnd="true"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="12dp"
+            android:clickable="true"
+            android:focusable="true">
 
-            <!-- Buy Now Button -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnBuyNow"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="#FFFFFF"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_button"
+                android:gravity="center">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mua Ngay"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Mua Ngay"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+            </RelativeLayout>
 
-                </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+    </RelativeLayout>
 
 </RelativeLayout>

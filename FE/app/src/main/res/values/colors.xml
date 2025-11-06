@@ -56,9 +56,27 @@
     <color name="brown">#FF795548</color>
     <color name="blue_grey">#FF607D8B</color>
     
-    <!-- Shop colors -->
+        <!-- Shop colors -->
     <color name="category_inactive">#8B7355</color>
     <color name="category_active">#1A1A1A</color>
     <color name="category_inactive_new">#E0E0E0</color>
     <color name="category_text_inactive">#666666</color>
+    
+    <!-- Dialog colors -->
+    <color name="primary_blue">#3498DB</color>
+    <color name="light_gray">#F8F9FA</color>
+    <color name="light_green">#E8F5E9</color>
+    <color name="light_orange">#FFF3E0</color>
+    <color name="light_red">#FFEBEE</color>
+    
+    <!-- New Modern Colors for Product Management -->
+    <color name="background_gray">#F5F7FA</color>
+    <color name="background_light_gray">#F8F9FA</color>
+    <color name="divider">#E5E7EB</color>
+    <color name="text_hint">#9CA3AF</color>
+    <color name="success_green">#10B981</color>
+    <color name="warning_orange">#F59E0B</color>
+    <color name="warning">#F59E0B</color>
+    <color name="danger_red">#EF4444</color>
+    <color name="primary_light">#E3F2FD</color>
 </resources>

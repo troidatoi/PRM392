@@ -58,112 +58,92 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     public class UserViewHolder extends RecyclerView.ViewHolder {
         private CardView cardViewUser;
-        private ImageView imgAvatar, imgStatus;
-        private TextView tvUsername, tvEmail, tvRole, tvStatus, tvLastLogin, tvCreatedAt;
+        private ImageView imgAvatar;
+        private View statusDot;
+        private TextView tvUsername, tvEmail, tvRole, tvStatus;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             cardViewUser = itemView.findViewById(R.id.cardViewUser);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
-            imgStatus = itemView.findViewById(R.id.imgStatus);
+            statusDot = itemView.findViewById(R.id.statusDot);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvEmail = itemView.findViewById(R.id.tvEmail);
             tvRole = itemView.findViewById(R.id.tvRole);
             tvStatus = itemView.findViewById(R.id.tvStatus);
-            tvLastLogin = itemView.findViewById(R.id.tvLastLogin);
-            tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
         }
 
         public void bind(User user) {
             // Username
-            tvUsername.setText(user.getUsername());
+            if (tvUsername != null) {
+                tvUsername.setText(user.getUsername() != null ? user.getUsername() : "Unknown");
+            }
 
             // Email
-            tvEmail.setText(user.getEmail());
+            if (tvEmail != null) {
+                tvEmail.setText(user.getEmail() != null ? user.getEmail() : "No email");
+            }
 
             // Role with color coding
             String role = user.getRole();
-            tvRole.setText(getRoleDisplayName(role));
-            setRoleColor(tvRole, role);
+            if (tvRole != null) {
+                tvRole.setText(getRoleDisplayName(role));
+                // Set role badge background color based on role
+                if (role != null) {
+                    switch (role.toLowerCase()) {
+                        case "admin":
+                        case "staff":
+                            tvRole.setTextColor(0xFF0284C7); // Blue
+                            break;
+                        case "customer":
+                            tvRole.setTextColor(0xFF0284C7); // Blue
+                            break;
+                        default:
+                            tvRole.setTextColor(0xFF64748B); // Gray
+                            break;
+                    }
+                }
+            }
 
             // Status
             boolean isActive = user.isActive();
-            tvStatus.setText(isActive ? "Hoạt động" : "Tạm khóa");
-            tvStatus.setTextColor(isActive ? 
-                context.getResources().getColor(android.R.color.holo_green_dark) : 
-                context.getResources().getColor(android.R.color.holo_red_dark));
+            if (tvStatus != null) {
+                tvStatus.setText(isActive ? "Active" : "Inactive");
+                tvStatus.setTextColor(isActive ? 0xFF059669 : 0xFFDC2626); // Green or Red
+            }
             
-            imgStatus.setImageResource(isActive ? R.drawable.ic_home : R.drawable.ic_search);
-            imgStatus.setColorFilter(isActive ? 
-                context.getResources().getColor(android.R.color.holo_green_dark) : 
-                context.getResources().getColor(android.R.color.holo_red_dark));
-
-            // Last login
-            if (user.getLastLogin() != null && !user.getLastLogin().isEmpty()) {
-                tvLastLogin.setText("Đăng nhập: " + formatDate(user.getLastLogin()));
-            } else {
-                tvLastLogin.setText("Chưa đăng nhập");
+            // Status dot color
+            if (statusDot != null) {
+                statusDot.setBackgroundResource(isActive ? R.drawable.circle_green : R.drawable.circle_red);
             }
 
-            // Created date
-            if (user.getCreatedAt() != null && !user.getCreatedAt().isEmpty()) {
-                tvCreatedAt.setText("Tạo: " + formatDate(user.getCreatedAt()));
-            } else {
-                tvCreatedAt.setText("");
+            // Avatar placeholder - just show icon, no need to set color as it's in the CardView
+            if (imgAvatar != null) {
+                imgAvatar.setImageResource(R.drawable.ic_account_circle);
             }
-
-            // Avatar placeholder
-            imgAvatar.setImageResource(R.drawable.ic_account);
-            imgAvatar.setColorFilter(context.getResources().getColor(android.R.color.darker_gray));
 
             // Click listener for user detail
-            cardViewUser.setOnClickListener(v -> {
-                if (onUserClickListener != null) {
-                    onUserClickListener.onUserClick(user);
-                }
-            });
+            if (cardViewUser != null) {
+                cardViewUser.setOnClickListener(v -> {
+                    if (onUserClickListener != null) {
+                        onUserClickListener.onUserClick(user);
+                    }
+                });
+            }
         }
 
         private String getRoleDisplayName(String role) {
-            switch (role) {
+            if (role == null) return "Customer";
+            
+            switch (role.toLowerCase()) {
                 case "admin":
-                    return "Quản trị viên";
+                    return "Admin";
                 case "staff":
-                    return "Nhân viên";
+                    return "Staff";
                 case "customer":
-                    return "Khách hàng";
+                    return "Customer";
                 default:
                     return role;
-            }
-        }
-
-        private void setRoleColor(TextView textView, String role) {
-            int color;
-            switch (role) {
-                case "admin":
-                    color = context.getResources().getColor(android.R.color.holo_red_dark);
-                    break;
-                case "staff":
-                    color = context.getResources().getColor(android.R.color.holo_blue_dark);
-                    break;
-                case "customer":
-                    color = context.getResources().getColor(android.R.color.holo_green_dark);
-                    break;
-                default:
-                    color = context.getResources().getColor(android.R.color.darker_gray);
-                    break;
-            }
-            textView.setTextColor(color);
-        }
-
-        private String formatDate(String dateString) {
-            try {
-                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-                SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-                Date date = inputFormat.parse(dateString);
-                return outputFormat.format(date);
-            } catch (Exception e) {
-                return dateString;
             }
         }
     }

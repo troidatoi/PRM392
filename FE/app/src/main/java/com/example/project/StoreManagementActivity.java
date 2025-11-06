@@ -31,7 +31,7 @@ import com.example.project.models.ApiResponse;
 
 public class StoreManagementActivity extends AppCompatActivity implements StoreAdapter.OnStoreActionListener, StoreAdapter.OnStoreClickListener {
 
-    private CardView btnBack, btnAddStore;
+    private CardView btnBack, btnAddStore, btnShippingRates;
     private RecyclerView rvStores;
     private TextView tvTotalStores, tvActiveStores;
     private LinearLayout emptyState;
@@ -44,6 +44,10 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     // API related
     private ApiService apiService;
     private AuthManager authManager;
+    
+    // Statistics
+    private int totalStoresCount = 0;
+    private int activeStoresCount = 0;
     
     // Bottom navigation
     private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
@@ -87,6 +91,7 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         btnAddStore = findViewById(R.id.btnAddStore);
+        btnShippingRates = findViewById(R.id.btnShippingRates);
         rvStores = findViewById(R.id.rvStores);
         tvTotalStores = findViewById(R.id.tvTotalStores);
         tvActiveStores = findViewById(R.id.tvActiveStores);
@@ -111,6 +116,14 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         btnAddStore.setOnClickListener(v -> {
             showAddStoreDialog();
         });
+
+        // Shipping rates button
+        if (btnShippingRates != null) {
+            btnShippingRates.setOnClickListener(v -> {
+                Intent intent = new Intent(StoreManagementActivity.this, ShippingRateManagementActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     private void setupRecyclerView() {
@@ -204,6 +217,17 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         totalPages = response.getPages();
         hasMoreData = currentPage < totalPages;
         
+        // Get total count from API response
+        totalStoresCount = response.getTotal();
+        
+        // Count active stores from all loaded stores
+        activeStoresCount = 0;
+        for (Store store : storeList) {
+            if (store.isActive()) {
+                activeStoresCount++;
+            }
+        }
+        
         storeAdapter.notifyDataSetChanged();
         updateStatistics();
         updateEmptyState();
@@ -232,17 +256,9 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     }
 
     private void updateStatistics() {
-        int totalStores = storeList.size();
-        int activeStores = 0;
-
-        for (Store store : storeList) {
-            if (store.isActive()) {
-                activeStores++;
-            }
-        }
-
-        tvTotalStores.setText(String.valueOf(totalStores));
-        tvActiveStores.setText(String.valueOf(activeStores));
+        // Use total count from API response instead of counting from loaded list
+        tvTotalStores.setText(String.valueOf(totalStoresCount));
+        tvActiveStores.setText(String.valueOf(activeStoresCount));
     }
 
     private void showAddStoreDialog() {
@@ -375,7 +391,9 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         }
         if (navOrderManagement != null) {
             navOrderManagement.setOnClickListener(v -> {
-                Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(StoreManagementActivity.this, OrderManagementActivity.class);
+                startActivity(intent);
+                finish();
             });
         }
         if (navChatManagement != null) {

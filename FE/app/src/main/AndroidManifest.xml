@@ -12,6 +12,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     
+    <!-- Notification permissions -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
     <!-- OpenStreetMap (OSMDroid) permissions -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -101,6 +105,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Map Full Activity -->
+        <activity
+            android:name=".MapFullActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Profile Edit Activity -->
         <activity
             android:name=".ProfileEditActivity"
@@ -122,6 +132,12 @@
         <!-- Store Management Activity -->
         <activity
             android:name=".StoreManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
+        <!-- Shipping Rate Management Activity -->
+        <activity
+            android:name=".ShippingRateManagementActivity"
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
@@ -222,6 +238,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Order Management Activity -->
+        <activity
+            android:name=".OrderManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Store List Activity -->
         <activity
             android:name=".StoreListActivity"
@@ -243,6 +265,13 @@
                       android:pathPrefix="/payment" />
             </intent-filter>
         </activity>
+
+        <!-- Cart Badge Service -->
+        <service
+            android:name=".CartBadgeService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
     </application>
 
