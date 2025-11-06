@@ -290,9 +290,17 @@ public class ShopActivity extends AppCompatActivity {
     private void setupBottomNavigation() {
         // Set Products as selected by default (blue color and bold)
         selectNavItem(iconProducts, tvProducts);
+        
+        // Set other tabs as deselected
+        deselectNavItem(iconHome, tvHome);
+        deselectNavItem(iconCart, tvCart);
+        deselectNavItem(iconAccount, tvAccount);
 
         navHome.setOnClickListener(v -> {
-            finish(); // Go back to home
+            Intent intent = new Intent(ShopActivity.this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish(); // Close shop activity
         });
 
         navProducts.setOnClickListener(v -> {
