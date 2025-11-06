@@ -231,6 +231,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Order Management Activity -->
+        <activity
+            android:name=".OrderManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Store List Activity -->
         <activity
             android:name=".StoreListActivity"

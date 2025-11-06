@@ -228,7 +228,10 @@ public class UserManagementActivity extends AppCompatActivity {
         if (navDashboard != null) navDashboard.setOnClickListener(v -> startActivity(new Intent(this, AdminManagementActivity.class)));
         if (navProductManagement != null) navProductManagement.setOnClickListener(v -> startActivity(new Intent(this, ProductManagementActivity.class)));
         if (navStoreManagement != null) navStoreManagement.setOnClickListener(v -> startActivity(new Intent(this, StoreManagementActivity.class)));
-        if (navOrderManagement != null) navOrderManagement.setOnClickListener(v -> startActivity(new Intent(this, AdminOrderListActivity.class)));
+        if (navOrderManagement != null) navOrderManagement.setOnClickListener(v -> {
+            startActivity(new Intent(this, OrderManagementActivity.class));
+            finish();
+        });
         if (navChatManagement != null) navChatManagement.setOnClickListener(v -> startActivity(new Intent(this, AdminChatListActivity.class)));
 
         // Filter chips

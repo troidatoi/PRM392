@@ -8,27 +8,26 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
     app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="0dp">
+        android:orientation="vertical">
 
         <!-- Bike Image Container -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp">
+            android:layout_height="200dp">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:cardCornerRadius="20dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#F5F5F5">
+                app:cardBackgroundColor="#F8F9FA">
 
                 <ImageView
                     android:id="@+id/ivBikeImage"
@@ -40,6 +39,31 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Status Badge -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/statusBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/success_green">
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Còn hàng"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp" />
+
+            </androidx.cardview.widget.CardView>
+
             <!-- Discount Badge -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/discountBadge"
@@ -48,9 +72,9 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="#E53935"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FF5252"
                 android:visibility="gone">
 
                 <TextView
@@ -66,6 +90,27 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Favorite Button -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnFavorite"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/white">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_favorite_border"
+                    android:tint="@color/primary_blue" />
+
+            </androidx.cardview.widget.CardView>
+
         </RelativeLayout>
 
         <!-- Bike Info -->
@@ -75,33 +120,100 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Category Badge -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#E3F2FD">
+
+                <TextView
+                    android:id="@+id/tvCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="City Bike"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp" />
+
+            </androidx.cardview.widget.CardView>
+
             <!-- Bike Name -->
             <TextView
                 android:id="@+id/tvBikeName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="6dp"
+                android:layout_marginBottom="4dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="Xe đạp điện VinFast Klara S"
-                android:textColor="#1A1A1A"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:lineSpacingExtra="2dp" />
 
             <!-- Brand and Model -->
-            <TextView
-                android:id="@+id/tvBikeBrand"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginBottom="8dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="VinFast"
-                android:textColor="#757575"
-                android:textSize="13sp" />
+                android:gravity="center_vertical">
 
-            <!-- Original Price -->
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_store"
+                    android:tint="@color/text_secondary"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/tvBikeBrand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="VinFast"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <!-- Stock Info -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_inventory"
+                    android:tint="@color/text_secondary"
+                    android:layout_marginEnd="4dp" />
+
+                <TextView
+                    android:id="@+id/tvStock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Còn 10 xe"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Original Price (Strikethrough) -->
             <TextView
                 android:id="@+id/tvBikeOriginalPrice"
                 android:layout_width="wrap_content"
@@ -109,7 +221,7 @@
                 android:layout_marginBottom="4dp"
                 android:text=""
                 android:textSize="13sp"
-                android:textColor="#9E9E9E"
+                android:textColor="@color/text_hint"
                 android:visibility="gone" />
 
             <!-- Price Row -->
@@ -126,37 +238,33 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="29.990.000 ₫"
-                    android:textColor="#2196F3"
-                    android:textSize="18sp"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <!-- Discount Percent -->
+                <!-- View Detail Button -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/discountInlineBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="8dp"
+                    app:cardCornerRadius="12dp"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="#E8F5E9"
-                    android:visibility="gone">
+                    app:cardBackgroundColor="@color/primary_blue">
 
                     <TextView
-                        android:id="@+id/tvDiscountPercentInline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=""
+                        android:text="Chi tiết"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#4CAF50"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="4dp" />
+                        android:textColor="@color/white"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="8dp" />
 
                 </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
         </LinearLayout>
-
 
     </LinearLayout>
 
