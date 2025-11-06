@@ -10,12 +10,15 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.example.project.utils.AdminNavHelper;
+
 public class AdminManagementActivity extends AppCompatActivity {
 
     private TextView tvTotalSales, tvOrderUser, tvTotalProducts, tvTotalUsers;
     private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
     private ImageView iconDashboard, iconUserManagement, iconProductManagement, iconStoreManagement, iconOrderManagement, iconChatManagement;
     private TextView tvDashboard, tvUserManagement, tvProductManagement, tvStoreManagement, tvOrderManagement, tvChatManagement;
+    private CardView cardDashboard, cardUserManagement, cardProductManagement, cardStoreManagement, cardOrderManagement, cardChatManagement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,21 +58,43 @@ public class AdminManagementActivity extends AppCompatActivity {
         tvOrderManagement = findViewById(R.id.tvOrderManagement);
         tvChatManagement = findViewById(R.id.tvChatManagement);
 
-        // Mark current tab active
-        if (iconDashboard != null) {
-            iconDashboard.setColorFilter(0xFF2196F3); // active blue
-        }
-        if (tvDashboard != null) {
-            tvDashboard.setTextColor(0xFF2196F3); // active blue
-        }
+        cardDashboard = findViewById(R.id.cardDashboard);
+        cardUserManagement = findViewById(R.id.cardUserManagement);
+        cardProductManagement = findViewById(R.id.cardProductManagement);
+        cardStoreManagement = findViewById(R.id.cardStoreManagement);
+        cardOrderManagement = findViewById(R.id.cardOrderManagement);
+        cardChatManagement = findViewById(R.id.cardChatManagement);
+
+        // Mark current tab active with gradient background
+        setActiveTab(cardDashboard, iconDashboard, tvDashboard);
+    }
+
+    private void setActiveTab(CardView activeCard, ImageView activeIcon, TextView activeText) {
+        // Reset all tabs to inactive state
+        AdminNavHelper.resetAllTabs(
+                cardDashboard, iconDashboard, tvDashboard,
+                cardUserManagement, iconUserManagement, tvUserManagement,
+                cardProductManagement, iconProductManagement, tvProductManagement,
+                cardStoreManagement, iconStoreManagement, tvStoreManagement,
+                cardOrderManagement, iconOrderManagement, tvOrderManagement,
+                cardChatManagement, iconChatManagement, tvChatManagement
+        );
+
+        // Set active tab
+        AdminNavHelper.setActiveTab(activeCard, activeIcon, activeText);
+    }
+
+    private void resetTab(CardView card, ImageView icon, TextView text) {
+        AdminNavHelper.resetTab(card, icon, text);
     }
 
     private void loadStatistics() {
         // TODO: Load real statistics from database
-        tvTotalSales.setText("#1F2937");
-        tvOrderUser.setText("#PB2F0C9");
-        tvTotalProducts.setText("7FE3D1");
-        tvTotalUsers.setText("#BB2F0C9");
+        // For now, showing demo data with proper formatting
+        tvTotalSales.setText("$125K");
+        tvOrderUser.setText("342");
+        tvTotalProducts.setText("89");
+        tvTotalUsers.setText("1,247");
     }
 
     private void setupClickListeners() {

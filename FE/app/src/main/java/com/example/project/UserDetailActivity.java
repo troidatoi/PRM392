@@ -159,30 +159,27 @@ public class UserDetailActivity extends AppCompatActivity {
         // Role
         String role = user.getRole();
         tvRole.setText(getRoleDisplayName(role));
-        setRoleColor(tvRole, role);
 
         // Status
         boolean isActive = user.isActive();
-        tvStatus.setText(isActive ? "Hoạt động" : "Tạm khóa");
-        tvStatus.setTextColor(isActive ? 
-            getResources().getColor(android.R.color.holo_green_dark) : 
-            getResources().getColor(android.R.color.holo_red_dark));
+        tvStatus.setText(isActive ? "Active" : "Inactive");
+        tvStatus.setTextColor(isActive ? 0xFF059669 : 0xFFDC2626);
         
-        imgStatus.setImageResource(isActive ? R.drawable.ic_home : R.drawable.ic_search);
-        imgStatus.setColorFilter(isActive ? 
-            getResources().getColor(android.R.color.holo_green_dark) : 
-            getResources().getColor(android.R.color.holo_red_dark));
+        // Update status icon
+        if (imgStatus != null) {
+            imgStatus.setImageResource(isActive ? R.drawable.circle_green : R.drawable.circle_red);
+        }
 
         // Last login
         if (user.getLastLogin() != null && !user.getLastLogin().isEmpty()) {
-            tvLastLogin.setText("Đăng nhập cuối: " + formatDate(user.getLastLogin()));
+            tvLastLogin.setText(formatDate(user.getLastLogin()));
         } else {
-            tvLastLogin.setText("Chưa đăng nhập");
+            tvLastLogin.setText("Never logged in");
         }
 
         // Created date
         if (user.getCreatedAt() != null && !user.getCreatedAt().isEmpty()) {
-            tvCreatedAt.setText("Ngày tạo: " + formatDate(user.getCreatedAt()));
+            tvCreatedAt.setText(formatDate(user.getCreatedAt()));
         } else {
             tvCreatedAt.setText("");
         }
@@ -217,35 +214,18 @@ public class UserDetailActivity extends AppCompatActivity {
     }
 
     private String getRoleDisplayName(String role) {
-        switch (role) {
+        if (role == null) return "Customer";
+        
+        switch (role.toLowerCase()) {
             case "admin":
-                return "Quản trị viên";
+                return "Admin";
             case "staff":
-                return "Nhân viên";
+                return "Staff";
             case "customer":
-                return "Khách hàng";
+                return "Customer";
             default:
                 return role;
         }
-    }
-
-    private void setRoleColor(TextView textView, String role) {
-        int color;
-        switch (role) {
-            case "admin":
-                color = getResources().getColor(android.R.color.holo_red_dark);
-                break;
-            case "staff":
-                color = getResources().getColor(android.R.color.holo_blue_dark);
-                break;
-            case "customer":
-                color = getResources().getColor(android.R.color.holo_green_dark);
-                break;
-            default:
-                color = getResources().getColor(android.R.color.darker_gray);
-                break;
-        }
-        textView.setTextColor(color);
     }
 
     private String formatDate(String dateString) {

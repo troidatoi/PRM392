@@ -3,18 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottomNavBar"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="72dp"
     android:layout_alignParentBottom="true"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="12dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="16dp"
     android:backgroundTint="#FFFFFF">
+
+    <!-- Top indicator line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/gradient_navbar_indicator" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingBottom="12dp"
+        android:gravity="center_vertical"
         android:baselineAligned="false">
 
         <!-- Dashboard Tab -->
@@ -29,20 +39,33 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless">
 
-            <ImageView
-                android:id="@+id/iconDashboard"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_modern_dashboard"
-                app:tint="#9CA3AF" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardDashboard"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#E3F2FD">
+
+                <ImageView
+                    android:id="@+id/iconDashboard"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_modern_dashboard"
+                    app:tint="#64748B" />
+
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/tvDashboard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dashboard"
-                android:textSize="11sp"
-                android:textColor="#9CA3AF" />
+                android:text="Home"
+                android:textSize="10sp"
+                android:textColor="#64748B"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
@@ -58,20 +81,33 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless">
 
-            <ImageView
-                android:id="@+id/iconUserManagement"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_modern_users"
-                app:tint="#9CA3AF" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardUserManagement"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <ImageView
+                    android:id="@+id/iconUserManagement"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_modern_users"
+                    app:tint="#64748B" />
+
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/tvUserManagement"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Người dùng"
-                android:textSize="11sp"
-                android:textColor="#9CA3AF" />
+                android:text="Users"
+                android:textSize="10sp"
+                android:textColor="#64748B"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
@@ -87,20 +123,33 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless">
 
-            <ImageView
-                android:id="@+id/iconProductManagement"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_modern_products"
-                app:tint="#9CA3AF" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardProductManagement"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <ImageView
+                    android:id="@+id/iconProductManagement"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_modern_products"
+                    app:tint="#64748B" />
+
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/tvProductManagement"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sản phẩm"
-                android:textSize="11sp"
-                android:textColor="#9CA3AF" />
+                android:text="Products"
+                android:textSize="10sp"
+                android:textColor="#64748B"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
@@ -116,20 +165,33 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless">
 
-            <ImageView
-                android:id="@+id/iconStoreManagement"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_modern_branches"
-                app:tint="#9CA3AF" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardStoreManagement"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <ImageView
+                    android:id="@+id/iconStoreManagement"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_modern_branches"
+                    app:tint="#64748B" />
+
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/tvStoreManagement"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cửa hàng"
-                android:textSize="11sp"
-                android:textColor="#9CA3AF" />
+                android:text="Stores"
+                android:textSize="10sp"
+                android:textColor="#64748B"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
@@ -145,20 +207,33 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless">
 
-            <ImageView
-                android:id="@+id/iconOrderManagement"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_modern_orders"
-                app:tint="#9CA3AF" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardOrderManagement"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <ImageView
+                    android:id="@+id/iconOrderManagement"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_modern_orders"
+                    app:tint="#64748B" />
+
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/tvOrderManagement"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đơn hàng"
-                android:textSize="11sp"
-                android:textColor="#9CA3AF" />
+                android:text="Orders"
+                android:textSize="10sp"
+                android:textColor="#64748B"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
@@ -174,20 +249,33 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackgroundBorderless">
 
-            <ImageView
-                android:id="@+id/iconChatManagement"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_chat_bubble"
-                app:tint="#9CA3AF" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardChatManagement"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F5F5F5">
+
+                <ImageView
+                    android:id="@+id/iconChatManagement"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_chat_bubble"
+                    app:tint="#64748B" />
+
+            </androidx.cardview.widget.CardView>
 
             <TextView
                 android:id="@+id/tvChatManagement"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Chat"
-                android:textSize="11sp"
-                android:textColor="#9CA3AF" />
+                android:textSize="10sp"
+                android:textColor="#64748B"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
