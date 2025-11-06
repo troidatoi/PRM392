@@ -126,8 +126,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         }
         if (navOrderManagement != null) {
             navOrderManagement.setOnClickListener(v -> {
-                Intent intent = new Intent(AdminManagementActivity.this, AdminOrderListActivity.class);
+                Intent intent = new Intent(AdminManagementActivity.this, OrderManagementActivity.class);
                 startActivity(intent);
+                finish();
             });
         }
         if (navChatManagement != null) {

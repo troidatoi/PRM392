@@ -329,7 +329,7 @@ public class ShippingRateManagementActivity extends AppCompatActivity implements
             }
             if (navOrderManagement != null) {
                 navOrderManagement.setOnClickListener(v -> {
-                    Intent intent = new Intent(this, AdminOrderListActivity.class);
+                    Intent intent = new Intent(this, OrderManagementActivity.class);
                     startActivity(intent);
                     finish();
                 });

@@ -391,7 +391,9 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         }
         if (navOrderManagement != null) {
             navOrderManagement.setOnClickListener(v -> {
-                Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(StoreManagementActivity.this, OrderManagementActivity.class);
+                startActivity(intent);
+                finish();
             });
         }
         if (navChatManagement != null) {

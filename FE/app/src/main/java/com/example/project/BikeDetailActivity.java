@@ -38,7 +38,7 @@ import retrofit2.Response;
 public class BikeDetailActivity extends AppCompatActivity {
 
     // Views
-    private CardView btnBack, btnEdit, btnDelete;
+    private CardView btnBack;
     private ImageView ivMainImage;
     private RecyclerView rvImageGallery;
     private TextView tvBikeName, tvBikeBrand, tvBikeModel, tvBikePrice, tvOriginalPrice;
@@ -389,8 +389,6 @@ public class BikeDetailActivity extends AppCompatActivity {
 
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
-        btnEdit = findViewById(R.id.btnEdit);
-        btnDelete = findViewById(R.id.btnDelete);
         ivMainImage = findViewById(R.id.ivMainImage);
         rvImageGallery = findViewById(R.id.rvImageGallery);
         tvBikeName = findViewById(R.id.tvBikeName);
@@ -426,25 +424,6 @@ public class BikeDetailActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
-        
-        btnEdit.setOnClickListener(v -> {
-            if (authManager.isStaff()) {
-                Intent intent = new Intent(BikeDetailActivity.this, UpdateBikeActivity.class);
-                intent.putExtra("bike_id", bikeId);
-                // Use Activity Result API replacement
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Bạn không có quyền chỉnh sửa", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnDelete.setOnClickListener(v -> {
-            if (authManager.isStaff()) {
-                showDeleteConfirmationDialog();
-            } else {
-                Toast.makeText(this, "Bạn không có quyền xóa", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         // No add-to-cart action on admin bike detail
     }

@@ -303,7 +303,9 @@ public class AdminChatListActivity extends AppCompatActivity implements ChatUser
         }
         if (navOrderManagement != null) {
             navOrderManagement.setOnClickListener(v -> {
-                Toast.makeText(this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(AdminChatListActivity.this, OrderManagementActivity.class);
+                startActivity(intent);
+                finish();
             });
         }
     }
