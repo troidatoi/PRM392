@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         apiService = RetrofitClient.getInstance().getApiService();
         
         // Test network connection
-        NetworkTest.testConnection("http://10.0.2.2:5001/api/health");
+        NetworkTest.testConnection("http://10.0.2.2:5000/api/health");
 
         // Initialize views
         tilEmail = findViewById(R.id.tilEmail);

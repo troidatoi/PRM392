@@ -5,7 +5,7 @@
 
 const axios = require('axios');
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5001/api';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:5000/api';
 const TEST_EMAIL = 'test@example.com';
 const TEST_PASSWORD = 'password123';
 

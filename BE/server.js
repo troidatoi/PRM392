@@ -22,7 +22,7 @@ const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
       ? ['https://yourdomain.com'] 
-      : ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.2:5001'],
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://10.0.2.2:5000'],
     credentials: true,
     methods: ['GET', 'POST']
   },

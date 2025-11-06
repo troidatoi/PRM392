@@ -749,6 +749,6 @@ public class CartActivity extends AppCompatActivity implements StoreCartAdapter.
         }
         
         // Append to base server URL (without /api/ path)
-        return "http://10.0.2.2:5001/" + imageUrl;
+        return "http://10.0.2.2:5000/" + imageUrl;
     }
 }

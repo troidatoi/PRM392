@@ -191,7 +191,7 @@
             }
 
             // Connect to server
-            socket = io('http://localhost:5001', {
+            socket = io('http://localhost:5000', {
                 auth: { token },
                 transports: ['websocket', 'polling']
             });

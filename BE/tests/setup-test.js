@@ -36,7 +36,7 @@ if (!requiredVars.GOOGLE_CLIENT_ID || requiredVars.GOOGLE_CLIENT_ID.includes('yo
 1. Truy cập: https://console.cloud.google.com/
 2. Tạo project mới hoặc chọn project existing
 3. APIs & Services → Credentials → Create OAuth 2.0 Client ID  
-4. Web application, Authorized redirect URIs: http://localhost:5001/api/auth/google/callback
+4. Web application, Authorized redirect URIs: http://localhost:5000/api/auth/google/callback
 5. Copy Client ID và Secret vào file .env
   `);
 }
