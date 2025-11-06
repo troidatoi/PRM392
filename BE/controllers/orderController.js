@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const OrderDetail = require('../models/OrderDetail');
+const Payment = require('../models/Payment');
 const Cart = require('../models/Cart');
 const CartItem = require('../models/CartItem');
 const Inventory = require('../models/Inventory');
@@ -13,11 +14,12 @@ const createOrders = async (req, res) => {
   try {
     const { userId, shippingAddress, paymentMethod, notes } = req.body;
 
-    // Validate payment method: VNPay only
-    if (paymentMethod !== 'vnpay') {
+    // Validate payment method
+    const allowedPaymentMethods = ['vnpay', 'payos', 'cash', 'bank_transfer'];
+    if (!allowedPaymentMethods.includes(paymentMethod)) {
       return res.status(400).json({
         success: false,
-        message: 'Chỉ hỗ trợ thanh toán VNPay'
+        message: `Phương thức thanh toán không hợp lệ. Chỉ hỗ trợ: ${allowedPaymentMethods.join(', ')}`
       });
     }
 
@@ -186,6 +188,21 @@ const createOrders = async (req, res) => {
       order.orderDetails = orderDetails.map(detail => detail._id);
       await order.save();
       
+      // Create Payment record for online payment methods (payos, vnpay)
+      let payment = null;
+      if (paymentMethod === 'payos' || paymentMethod === 'vnpay') {
+        payment = new Payment({
+          order: order._id,
+          user: userId,
+          amount: order.finalAmount,
+          paymentMethod: paymentMethod,
+          paymentGateway: paymentMethod,
+          paymentStatus: 'pending',
+          currency: 'VND'
+        });
+        await payment.save();
+      }
+      
       createdOrders.push({
         order,
         orderDetails,
@@ -193,7 +210,12 @@ const createOrders = async (req, res) => {
         shipping: {
           distanceKm: Number(distanceKm.toFixed(2)),
           shippingFee
-        }
+        },
+        payment: payment ? {
+          _id: payment._id,
+          paymentStatus: payment.paymentStatus,
+          paymentMethod: payment.paymentMethod
+        } : null
       });
     }
     

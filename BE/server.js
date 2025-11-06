@@ -67,6 +67,9 @@ app.use('/api/orders', require('./routes/orderRoutes')); // Order routes
 app.use('/api/inventory', require('./routes/inventoryRoutes')); // Inventory routes
 app.use('/api/chat', require('./routes/chatRoutes')); // Chat routes
 app.use('/api/shipping-rates', require('./routes/shippingRateRoutes')); // Shipping rates routes
+app.use('/api/payos', require('./routes/payosRoutes')); // PayOS payment routes
+// Alias webhook route để phù hợp với BACKEND_WEBHOOK_URL trong .env
+app.use('/api/payments', require('./routes/payosRoutes')); // PayOS payment routes (alias)
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
