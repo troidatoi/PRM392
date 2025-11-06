@@ -399,11 +399,8 @@ public class CheckoutActivity extends AppCompatActivity {
 		String cityForApi = (district.isEmpty() ? "" : (district + ", ")) + city;
 
 		// Get selected payment method
-		int selectedPaymentId = rgPaymentMethod.getCheckedRadioButtonId();
-		String paymentMethod = "vnpay"; // Chỉ dùng VNPay
-        // Get selected payment method
         int selectedPaymentId = rgPaymentMethod.getCheckedRadioButtonId();
-        String paymentMethod = "cash"; // Default
+		String paymentMethod = "cash"; // Default
         
         if (selectedPaymentId == R.id.rbCOD) {
             paymentMethod = "cash";
@@ -415,6 +412,143 @@ public class CheckoutActivity extends AppCompatActivity {
 
 		// Show confirmation dialog
 		showConfirmationDialog(receiverName, receiverPhone, shippingAddress + "\n" + cityForApi, paymentMethod);
+	}
+
+	private void setupEstimateListeners() {
+		android.text.TextWatcher watcher = new android.text.TextWatcher() {
+			private android.os.Handler handler = new android.os.Handler();
+			private Runnable work;
+			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			@Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			@Override public void afterTextChanged(android.text.Editable s) {
+				if (work != null) handler.removeCallbacks(work);
+				work = () -> estimateShippingIfReady();
+				handler.postDelayed(work, 600);
+			}
+		};
+		etShippingAddress.addTextChangedListener(watcher);
+		estimateShippingIfReady();
+	}
+
+	private void estimateShippingIfReady() {
+		String addr = etShippingAddress.getText().toString().trim();
+		int cityPos = spCity.getSelectedItemPosition();
+		int districtPos = spDistrict.getSelectedItemPosition();
+		if (cityPos <= 0 || addr.isEmpty()) {
+			estimatedShippingFee = 0;
+			updateTotalsUI();
+			return;
+		}
+		String city = spCity.getSelectedItem().toString();
+		String district = (districtPos > 0 ? spDistrict.getSelectedItem().toString() : "");
+		String cityForApi = (district.isEmpty() ? "" : (district + ", ")) + city;
+
+		try {
+			com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+			com.example.project.models.User user = auth.getCurrentUser();
+			if (user == null) return;
+
+			com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+			java.util.Map<String, Object> body = new java.util.HashMap<>();
+			body.put("userId", user.getId());
+			java.util.Map<String, Object> shipping = new java.util.HashMap<>();
+			shipping.put("address", addr);
+			shipping.put("city", cityForApi);
+			body.put("shippingAddress", shipping);
+
+			api.estimateOrders(auth.getAuthHeader(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+				@Override
+				public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+					if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+						try {
+							Object data = response.body().getData();
+							if (data instanceof java.util.Map) {
+								java.util.Map d = (java.util.Map) data;
+								Object summaryObj = d.get("summary");
+								if (summaryObj instanceof java.util.Map) {
+									java.util.Map summary = (java.util.Map) summaryObj;
+									Object totalShip = summary.get("totalShippingFee");
+									if (totalShip instanceof Number) {
+										estimatedShippingFee = ((Number) totalShip).longValue();
+									}
+								}
+							}
+						} catch (Exception ignored) {}
+					}
+					updateTotalsUI();
+				}
+
+				@Override
+				public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+					updateTotalsUI();
+				}
+			});
+		} catch (Exception ignored) {}
+	}
+
+	private void setupCityDistrictPickers() {
+		java.util.List<String> citiesList = new java.util.ArrayList<>();
+		citiesList.add("-- Chọn thành phố --");
+		citiesList.add("Hà Nội");
+		citiesList.add("TP.HCM");
+		citiesList.add("Đà Nẵng");
+		citiesList.add("Hải Phòng");
+		citiesList.add("Cần Thơ");
+
+		android.widget.ArrayAdapter<String> cityAdapter = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_spinner_item, citiesList);
+		cityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spCity.setAdapter(cityAdapter);
+		spCity.setSelection(0);
+
+		java.util.List<String> emptyDistrictList = new java.util.ArrayList<>();
+		emptyDistrictList.add("-- Chọn quận/huyện --");
+		final android.widget.ArrayAdapter<String> emptyDistrictAdapter = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_spinner_item, emptyDistrictList);
+		emptyDistrictAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spDistrict.setAdapter(emptyDistrictAdapter);
+		spDistrict.setSelection(0);
+
+		final java.util.Map<String, String[]> districts = new java.util.HashMap<>();
+		districts.put("Hà Nội", new String[] { "-- Chọn quận/huyện --", "Ba Đình", "Hoàn Kiếm", "Đống Đa" });
+		districts.put("TP.HCM", new String[] { "-- Chọn quận/huyện --", "Quận 1", "Quận 3", "Bình Thạnh" });
+		districts.put("Đà Nẵng", new String[] { "-- Chọn quận/huyện --", "Hải Châu", "Sơn Trà" });
+
+		spCity.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+				if (position > 0) {
+					String selectedCity = citiesList.get(position);
+					String[] ds = districts.get(selectedCity);
+					if (ds != null) {
+						java.util.List<String> districtList = new java.util.ArrayList<>();
+						for (String d : ds) districtList.add(d);
+						android.widget.ArrayAdapter<String> dAdapter = new android.widget.ArrayAdapter<>(CheckoutActivity.this, android.R.layout.simple_spinner_item, districtList);
+						dAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+						spDistrict.setAdapter(dAdapter);
+						spDistrict.setSelection(0);
+					} else {
+						spDistrict.setAdapter(emptyDistrictAdapter);
+						spDistrict.setSelection(0);
+					}
+				} else {
+					spDistrict.setAdapter(emptyDistrictAdapter);
+					spDistrict.setSelection(0);
+				}
+				estimateShippingIfReady();
+			}
+
+			@Override
+			public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+		});
+
+		spDistrict.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+				estimateShippingIfReady();
+			}
+
+			@Override
+			public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+		});
 	}
 
 	private void showConfirmationDialog(String name, String phone, String address, String paymentMethod) {
@@ -469,57 +603,8 @@ public class CheckoutActivity extends AppCompatActivity {
 		String cityForApi = (district.isEmpty() ? "" : (district + ", ")) + city;
 		shipping.put("city", cityForApi);
 		body.put("shippingAddress", shipping);
-		body.put("paymentMethod", "vnpay");
+		body.put("paymentMethod", paymentMethod);
 		body.put("notes", "");
-        java.util.Map<String, Object> body = new java.util.HashMap<>();
-        body.put("userId", user.getId());
-        java.util.Map<String, Object> shipping = new java.util.HashMap<>();
-        shipping.put("fullName", name);
-        shipping.put("phone", phone);
-        shipping.put("address", address);
-        shipping.put("city", etCity.getText().toString().trim());
-        body.put("shippingAddress", shipping);
-        body.put("paymentMethod", paymentMethod);
-        body.put("notes", "");
-
-		api.createOrders(auth.getAuthHeader(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
-			@Override
-			public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
-				if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-					String message = "Đơn hàng đã được tạo và đang chờ thanh toán VNPay.";
-					try {
-						Object data = response.body().getData();
-						if (data instanceof java.util.Map) {
-							java.util.Map d = (java.util.Map) data;
-							Object summaryObj = d.get("summary");
-							if (summaryObj instanceof java.util.Map) {
-								java.util.Map summary = (java.util.Map) summaryObj;
-								Object totalOrders = summary.get("totalOrders");
-								Object totalAmount = summary.get("totalAmount");
-								message = "Tạo " + String.valueOf(totalOrders) + " đơn hàng. Tổng: " + formatCurrency(totalAmount) + " VNĐ";
-							}
-						}
-					} catch (Exception ignored) {}
-
-					new AlertDialog.Builder(CheckoutActivity.this)
-						.setTitle("Thanh toán VNPay")
-						.setMessage(message)
-						.setPositiveButton("OK", (dialog, which) -> finish())
-						.setCancelable(false)
-						.show();
-				} else {
-					String err = "Tạo đơn hàng thất bại. Vui lòng thử lại!";
-					try {
-						if (response.errorBody() != null) {
-							String eb = response.errorBody().string();
-							if (eb.contains("Thiếu tồn kho")) {
-								err = "Cửa hàng không còn đủ xe cho một số sản phẩm.";
-							}
-						}
-					} catch (Exception ignored) {}
-					Toast.makeText(CheckoutActivity.this, err, Toast.LENGTH_LONG).show();
-				}
-			}
         api.createOrders(auth.getAuthHeader(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
             @Override
             public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
