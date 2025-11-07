@@ -171,16 +171,23 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
                                 
                                 // For admin view:
                                 // isFromUser = true if message is FROM customer (userId)
-                                // isFromUser = false if message is FROM admin (currentAdminId)
+                                // isFromUser = false if message is FROM admin
+                                // Sử dụng isFromAdmin từ backend nếu có, nếu không thì fallback về logic cũ
                                 boolean isFromUser;
-                                if (messageSenderId != null && userId != null) {
-                                    // Check if sender is the customer we're chatting with
-                                    isFromUser = messageSenderId.equals(userId);
-                                    Log.d(TAG, "Sender is customer: " + isFromUser);
+                                Boolean isFromAdmin = msg.getIsFromAdmin();
+                                if (isFromAdmin != null) {
+                                    // Nếu có isFromAdmin từ backend, sử dụng nó
+                                    isFromUser = !isFromAdmin;
+                                    Log.d(TAG, "Using isFromAdmin from backend: " + isFromAdmin + ", isFromUser: " + isFromUser);
                                 } else {
-                                    // If we can't determine, assume it's from customer
-                                    isFromUser = true;
-                                    Log.d(TAG, "Could not determine sender, treating as customer message");
+                                    // Fallback: so sánh sender ID với customer ID
+                                    if (messageSenderId != null && userId != null) {
+                                        isFromUser = messageSenderId.equals(userId);
+                                        Log.d(TAG, "Fallback: Sender is customer: " + isFromUser);
+                                    } else {
+                                        isFromUser = true; // Default to customer
+                                        Log.d(TAG, "Fallback: Could not determine, treating as customer message");
+                                    }
                                 }
                                 
                                 msg.setFromUser(isFromUser);
@@ -361,10 +368,17 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
             
             // For admin view: 
             // isFromUser = true if message is FROM customer (userId)
-            // isFromUser = false if message is FROM admin (different from customer)
+            // isFromUser = false if message is FROM admin
+            // Sử dụng isFromAdmin từ socket message nếu có
             boolean isFromUser = false; // Default to false (from admin)
-            if (userId != null && senderId != null && senderId.equals(userId)) {
+            boolean isFromAdmin = data.optBoolean("isFromAdmin", false);
+            if (isFromAdmin) {
+                isFromUser = false; // Message from admin
+            } else if (userId != null && senderId != null && senderId.equals(userId)) {
                 isFromUser = true; // Message from customer
+            } else {
+                // Fallback: nếu không xác định được, giả định là từ customer
+                isFromUser = true;
             }
             
             Log.d(TAG, "Real-time message received:");

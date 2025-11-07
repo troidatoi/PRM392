@@ -154,15 +154,26 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
 
                                 // For customer view:
                                 // isFromUser = true if the message sender is the current customer
-                                // isFromUser = false if the message sender is admin (different from customer)
+                                // isFromUser = false if the message sender is admin
+                                // Sử dụng isFromAdmin từ backend nếu có, nếu không thì fallback về logic cũ
                                 boolean isFromUser;
-                                if (messageSenderId != null && userId != null) {
-                                    isFromUser = messageSenderId.equals(userId);
-                                    Log.d(TAG, "Sender equals current user: " + isFromUser);
+                                Boolean isFromAdmin = msg.getIsFromAdmin();
+                                if (isFromAdmin != null) {
+                                    // Nếu có isFromAdmin từ backend, sử dụng nó
+                                    // isFromAdmin = true → tin nhắn từ admin → isFromUser = false
+                                    // isFromAdmin = false → tin nhắn từ customer → isFromUser = true
+                                    isFromUser = !isFromAdmin;
+                                    Log.d(TAG, "Using isFromAdmin from backend: " + isFromAdmin + ", isFromUser: " + isFromUser);
                                 } else {
-                                    // If we can't determine, assume it's from admin
-                                    isFromUser = false;
-                                    Log.d(TAG, "Could not determine sender, treating as admin message");
+                                    // Fallback: so sánh sender ID với current user ID
+                                    if (messageSenderId != null && userId != null) {
+                                        isFromUser = messageSenderId.equals(userId);
+                                        Log.d(TAG, "Fallback: Sender equals current user: " + isFromUser);
+                                    } else {
+                                        // If we can't determine, assume it's from admin
+                                        isFromUser = false;
+                                        Log.d(TAG, "Fallback: Could not determine sender, treating as admin message");
+                                    }
                                 }
                                 
                                 msg.setFromUser(isFromUser);
@@ -342,10 +353,17 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
             
             // For customer view:
             // isFromUser = true if message is FROM current customer (userId)
-            // isFromUser = false if message is FROM admin (different from customer)
+            // isFromUser = false if message is FROM admin
+            // Sử dụng isFromAdmin từ socket message nếu có
             boolean isFromCurrentUser = false; // Default to false (from admin)
-            if (senderId != null && userId != null && senderId.equals(userId)) {
+            boolean isFromAdmin = data.optBoolean("isFromAdmin", false);
+            if (isFromAdmin) {
+                isFromCurrentUser = false; // Message from admin
+            } else if (senderId != null && userId != null && senderId.equals(userId)) {
                 isFromCurrentUser = true; // Message from current customer
+            } else {
+                // Fallback: nếu không xác định được, giả định là từ admin
+                isFromCurrentUser = false;
             }
             
             Log.d(TAG, "Real-time message received:");

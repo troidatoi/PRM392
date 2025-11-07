@@ -39,7 +39,8 @@ exports.getChatHistory = async (req, res, next) => {
       sentAt: msg.sentAt.getTime(), // Convert Date to timestamp
       isRead: msg.isRead,
       isEdited: msg.isEdited,
-      isDeleted: msg.isDeleted
+      isDeleted: msg.isDeleted,
+      isFromAdmin: msg.isFromAdmin || false // Thêm field isFromAdmin
     }));
 
     res.status(200).json({
@@ -59,19 +60,22 @@ exports.getConversations = async (req, res, next) => {
   try {
     console.log('GET /api/chat/conversations - Admin:', req.user.role);
     
-    // Lấy danh sách unique users đã gửi tin nhắn
+    // Lấy danh sách unique rooms (mỗi room = 1 conversation với 1 customer)
+    // Chỉ lấy messages có roomId bắt đầu bằng "admin_"
     const conversations = await ChatMessage.aggregate([
       {
         $match: {
-          isDeleted: false
+          isDeleted: false,
+          roomId: { $regex: /^admin_/ } // Chỉ lấy messages trong admin rooms
         }
       },
       {
         $sort: { sentAt: -1 }
       },
       {
+        // Group theo roomId để mỗi room là 1 conversation riêng biệt
         $group: {
-          _id: '$user',
+          _id: '$roomId',
           lastMessage: { $first: '$$ROOT' },
           unreadCount: {
             $sum: {
@@ -82,15 +86,44 @@ exports.getConversations = async (req, res, next) => {
         }
       },
       {
+        // Extract userId từ roomId: "admin_userId" -> userId
+        $addFields: {
+          extractedUserId: {
+            $arrayElemAt: [
+              { $split: ['$_id', '_'] },
+              1
+            ]
+          }
+        }
+      },
+      {
+        // Lookup user từ extracted userId (userId của customer trong room)
         $lookup: {
           from: 'users',
-          localField: '_id',
-          foreignField: '_id',
+          let: { userIdStr: '$extractedUserId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$_id', { $toObjectId: '$$userIdStr' }]
+                }
+              }
+            }
+          ],
           as: 'user'
         }
       },
       {
-        $unwind: '$user'
+        $unwind: {
+          path: '$user',
+          preserveNullAndEmptyArrays: false // Chỉ lấy conversations có user hợp lệ
+        }
+      },
+      {
+        // Loại trừ admin và staff - chỉ lấy customers
+        $match: {
+          'user.role': { $nin: ['admin', 'staff'] }
+        }
       },
       {
         $project: {

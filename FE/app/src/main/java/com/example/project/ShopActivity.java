@@ -358,8 +358,8 @@ public class ShopActivity extends AppCompatActivity {
     }
     
     private void loadBikes(String category, String search) {
-        // Call API to get bikes with optional category filter and search
-        apiService.getBikes(1, 100, category, null, null, null, null, search, null)
+        // Call API to get only available bikes for customers with optional category filter and search
+        apiService.getBikes(1, 100, category, "available", null, null, null, search, null)
             .enqueue(new Callback<ApiResponse<Bike[]>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Bike[]>> call, Response<ApiResponse<Bike[]>> response) {
