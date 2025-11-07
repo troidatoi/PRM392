@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -205,6 +206,20 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
     }
     
     private void handleStoreResponse(ApiService.StoreResponse response) {
+        // DEBUG LOG
+        android.util.Log.d("StoreManagement", "=== STORE RESPONSE DEBUG ===");
+        android.util.Log.d("StoreManagement", "Response data size: " + (response.getData() != null ? response.getData().size() : 0));
+        android.util.Log.d("StoreManagement", "Response total: " + response.getTotal());
+        android.util.Log.d("StoreManagement", "Response page: " + response.getPage());
+        android.util.Log.d("StoreManagement", "Response pages: " + response.getPages());
+        if (response.getData() != null) {
+            for (int i = 0; i < response.getData().size(); i++) {
+                Store store = response.getData().get(i);
+                android.util.Log.d("StoreManagement", "Store " + (i+1) + ": " + store.getName() + " (ID: " + store.getId() + ", Active: " + store.isActive() + ")");
+            }
+        }
+        android.util.Log.d("StoreManagement", "Current storeList size before: " + storeList.size());
+        
         if (currentPage == 1) {
             storeList.clear();
         }
@@ -212,6 +227,9 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         if (response.getData() != null) {
             storeList.addAll(response.getData());
         }
+        
+        android.util.Log.d("StoreManagement", "Current storeList size after: " + storeList.size());
+        android.util.Log.d("StoreManagement", "=== END DEBUG ===");
         
         currentPage = response.getPage();
         totalPages = response.getPages();
@@ -229,8 +247,60 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         }
         
         storeAdapter.notifyDataSetChanged();
+        updateRecyclerViewHeight();
         updateStatistics();
         updateEmptyState();
+        
+        // Load statistics for all stores
+        if (currentPage == 1) {
+            loadStoreStatistics();
+        }
+    }
+    
+    private void loadStoreStatistics() {
+        // Load total stores count (without filter)
+        Call<ApiService.StoreResponse> totalCall = apiService.getStores(
+            null, null, null, null, 1, 1, "createdAt"
+        );
+        
+        totalCall.enqueue(new Callback<ApiService.StoreResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    totalStoresCount = response.body().getTotal();
+                    
+                    // Now load active stores count
+                    loadActiveStoresCount();
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+                // Silently fail, keep current stats
+            }
+        });
+    }
+    
+    private void loadActiveStoresCount() {
+        // Load active stores count
+        Call<ApiService.StoreResponse> activeCall = apiService.getStores(
+            null, null, null, true, 1, 1, "createdAt"
+        );
+        
+        activeCall.enqueue(new Callback<ApiService.StoreResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.StoreResponse> call, Response<ApiService.StoreResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    activeStoresCount = response.body().getTotal();
+                    updateStatistics();
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.StoreResponse> call, Throwable t) {
+                // Silently fail, keep current stats
+            }
+        });
     }
     
     private void refreshStores() {
@@ -243,6 +313,47 @@ public class StoreManagementActivity extends AppCompatActivity implements StoreA
         if (progressBar != null) {
             progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         }
+    }
+    
+    private void updateRecyclerViewHeight() {
+        if (rvStores == null || storeList.isEmpty()) {
+            return;
+        }
+        
+        // Post to ensure layout is ready
+        rvStores.post(() -> {
+            try {
+                // Measure all items
+                int totalHeight = 0;
+                RecyclerView.Adapter adapter = rvStores.getAdapter();
+                
+                if (adapter != null) {
+                    for (int i = 0; i < adapter.getItemCount(); i++) {
+                        RecyclerView.ViewHolder holder = adapter.createViewHolder(rvStores, adapter.getItemViewType(i));
+                        adapter.onBindViewHolder(holder, i);
+                        holder.itemView.measure(
+                            View.MeasureSpec.makeMeasureSpec(rvStores.getWidth(), View.MeasureSpec.EXACTLY),
+                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                        );
+                        totalHeight += holder.itemView.getMeasuredHeight();
+                    }
+                }
+                
+                // Add extra padding at bottom for comfortable scrolling (200dp in pixels)
+                int extraPadding = (int) (200 * getResources().getDisplayMetrics().density);
+                totalHeight += extraPadding;
+                
+                // Set the calculated height
+                ViewGroup.LayoutParams params = rvStores.getLayoutParams();
+                params.height = totalHeight;
+                rvStores.setLayoutParams(params);
+                rvStores.requestLayout();
+                
+                android.util.Log.d("StoreManagement", "RecyclerView height set to: " + totalHeight + "px for " + storeList.size() + " items");
+            } catch (Exception e) {
+                android.util.Log.e("StoreManagement", "Error calculating RecyclerView height", e);
+            }
+        });
     }
     
     private void updateEmptyState() {

@@ -270,7 +270,7 @@ public interface ApiService {
     );
     
     @GET("orders")
-    Call<ApiResponse<Object>> getAllOrders(
+    Call<OrderResponse> getAllOrders(
         @Header("Authorization") String token,
         @retrofit2.http.Query("status") String status,
         @retrofit2.http.Query("page") Integer page,
@@ -746,6 +746,237 @@ public interface ApiService {
         
         public void setSenderId(String senderId) {
             this.senderId = senderId;
+        }
+    }
+    
+    // Order Response class
+    class OrderResponse {
+        private boolean success;
+        private String message;
+        private int count;
+        private int total;
+        private int page;
+        private int pages;
+        private List<OrderData> data;
+        
+        public OrderResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public int getCount() {
+            return count;
+        }
+        
+        public void setCount(int count) {
+            this.count = count;
+        }
+        
+        public int getTotal() {
+            return total;
+        }
+        
+        public void setTotal(int total) {
+            this.total = total;
+        }
+        
+        public int getPage() {
+            return page;
+        }
+        
+        public void setPage(int page) {
+            this.page = page;
+        }
+        
+        public int getPages() {
+            return pages;
+        }
+        
+        public void setPages(int pages) {
+            this.pages = pages;
+        }
+        
+        public List<OrderData> getData() {
+            return data;
+        }
+        
+        public void setData(List<OrderData> data) {
+            this.data = data;
+        }
+    }
+    
+    // Order Data class
+    class OrderData {
+        private String _id;
+        private String orderNumber;
+        private String userId;
+        private String status;
+        private double totalAmount;
+        private String createdAt;
+        private String updatedAt;
+        private List<OrderItem> items;
+        private UserInfo user;
+        
+        public OrderData() {}
+        
+        public String getId() {
+            return _id;
+        }
+        
+        public void setId(String _id) {
+            this._id = _id;
+        }
+        
+        public String getOrderNumber() {
+            return orderNumber;
+        }
+        
+        public void setOrderNumber(String orderNumber) {
+            this.orderNumber = orderNumber;
+        }
+        
+        public String getUserId() {
+            return userId;
+        }
+        
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+        
+        public String getStatus() {
+            return status;
+        }
+        
+        public void setStatus(String status) {
+            this.status = status;
+        }
+        
+        public double getTotalAmount() {
+            return totalAmount;
+        }
+        
+        public void setTotalAmount(double totalAmount) {
+            this.totalAmount = totalAmount;
+        }
+        
+        public String getCreatedAt() {
+            return createdAt;
+        }
+        
+        public void setCreatedAt(String createdAt) {
+            this.createdAt = createdAt;
+        }
+        
+        public String getUpdatedAt() {
+            return updatedAt;
+        }
+        
+        public void setUpdatedAt(String updatedAt) {
+            this.updatedAt = updatedAt;
+        }
+        
+        public List<OrderItem> getItems() {
+            return items;
+        }
+        
+        public void setItems(List<OrderItem> items) {
+            this.items = items;
+        }
+        
+        public UserInfo getUser() {
+            return user;
+        }
+        
+        public void setUser(UserInfo user) {
+            this.user = user;
+        }
+    }
+    
+    // Order Item class
+    class OrderItem {
+        private String bikeId;
+        private String bikeName;
+        private int quantity;
+        private double price;
+        
+        public OrderItem() {}
+        
+        public String getBikeId() {
+            return bikeId;
+        }
+        
+        public void setBikeId(String bikeId) {
+            this.bikeId = bikeId;
+        }
+        
+        public String getBikeName() {
+            return bikeName;
+        }
+        
+        public void setBikeName(String bikeName) {
+            this.bikeName = bikeName;
+        }
+        
+        public int getQuantity() {
+            return quantity;
+        }
+        
+        public void setQuantity(int quantity) {
+            this.quantity = quantity;
+        }
+        
+        public double getPrice() {
+            return price;
+        }
+        
+        public void setPrice(double price) {
+            this.price = price;
+        }
+    }
+    
+    // User Info class for order
+    class UserInfo {
+        private String _id;
+        private String username;
+        private String email;
+        
+        public UserInfo() {}
+        
+        public String getId() {
+            return _id;
+        }
+        
+        public void setId(String _id) {
+            this._id = _id;
+        }
+        
+        public String getUsername() {
+            return username;
+        }
+        
+        public void setUsername(String username) {
+            this.username = username;
+        }
+        
+        public String getEmail() {
+            return email;
+        }
+        
+        public void setEmail(String email) {
+            this.email = email;
         }
     }
 }
