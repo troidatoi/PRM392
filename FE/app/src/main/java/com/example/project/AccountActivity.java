@@ -1,9 +1,7 @@
 package com.example.project;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,20 +10,14 @@ import androidx.cardview.widget.CardView;
 import com.bumptech.glide.Glide;
 import com.example.project.models.User;
 import com.example.project.utils.AuthManager;
+import com.example.project.utils.BottomNavigationHelper;
 
 public class AccountActivity extends AppCompatActivity {
 
     private TextView tvUserName, tvUserEmail, tvPhone, tvAddress;
     private CardView btnEditProfile, btnOrders, btnStores, btnFavorites, btnSettings, btnChangePassword, btnLogout;
     private ImageView ivAvatar;
-
-    private View navHome, navProducts, navCart, navAccount;
-    private ImageView iconHome, iconProducts, iconCart, iconAccount;
-    private TextView tvHome, tvProducts, tvCart, tvAccountNav;
-    private View blurHome, blurProducts, blurCart, blurAccount;
-
     private AuthManager authManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,72 +50,11 @@ public class AccountActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnSettings);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         btnLogout = findViewById(R.id.btnLogout);
-
-        navHome = findViewById(R.id.navHome);
-        navProducts = findViewById(R.id.navProducts);
-        navCart = findViewById(R.id.navCart);
-        navAccount = findViewById(R.id.navAccount);
-
-
-        iconHome = findViewById(R.id.iconHome);
-        iconProducts = findViewById(R.id.iconProducts);
-        iconCart = findViewById(R.id.iconCart);
-        iconAccount = findViewById(R.id.iconAccount);
-
-        tvHome = findViewById(R.id.tvHome);
-        tvProducts = findViewById(R.id.tvProducts);
-        tvCart = findViewById(R.id.tvCart);
-        tvAccountNav = findViewById(R.id.tvAccount);
-
-        blurHome = findViewById(R.id.blurHome);
-        blurProducts = findViewById(R.id.blurProducts);
-        blurCart = findViewById(R.id.blurCart);
-        blurAccount = findViewById(R.id.blurAccount);
     }
 
     private void setupBottomNavigation() {
-        // Set Account as selected by default
-        selectNavItem(blurAccount, iconAccount, tvAccountNav);
-
-        navHome.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountActivity.this, HomeActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        });
-
-        navProducts.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountActivity.this, ShopActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        });
-
-        navCart.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountActivity.this, CartActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        });
-
-        navAccount.setOnClickListener(v -> {
-            selectNavItem(blurAccount, iconAccount, tvAccountNav);
-            deselectNavItem(blurHome, iconHome, tvHome);
-            deselectNavItem(blurProducts, iconProducts, tvProducts);
-            deselectNavItem(blurCart, iconCart, tvCart);
-        });
-    }
-
-    private void selectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.VISIBLE);
-        icon.setColorFilter(Color.parseColor("#2196F3"));
-        text.setTextColor(Color.parseColor("#2196F3"));
-    }
-
-    private void deselectNavItem(View blur, ImageView icon, TextView text) {
-        blur.setVisibility(View.GONE);
-        icon.setColorFilter(Color.parseColor("#666666"));
-        text.setTextColor(Color.parseColor("#666666"));
+        // Setup bottom navigation with Account tab active (index 3)
+        BottomNavigationHelper.setupBottomNavigation(this, 3);
     }
 
     private void setupClickListeners() {

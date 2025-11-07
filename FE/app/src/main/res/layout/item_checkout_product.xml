@@ -75,7 +75,7 @@
                 android:id="@+id/tvProductTotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thành tiền: 29.990.000 VNĐ"
+                android:text="Thành tiền: 0 VNĐ"
                 android:textSize="14sp"
                 android:textColor="#4CAF50"
                 android:textStyle="bold"

@@ -38,11 +38,11 @@ import retrofit2.Response;
 public class BikeDetailActivity extends AppCompatActivity {
 
     // Views
-    private CardView btnBack, btnEdit, btnDelete;
+    private CardView btnBack;
     private ImageView ivMainImage;
     private RecyclerView rvImageGallery;
     private TextView tvBikeName, tvBikeBrand, tvBikeModel, tvBikePrice, tvOriginalPrice;
-    private TextView tvBikeDescription, tvBikeCategory, tvBikeStatus;
+    private TextView tvBikeDescription, tvBikeCategory;
     private TextView tvBikeWarranty, tvBikeRating, tvBikeFeatures;
     private LinearLayout llSpecifications, llErrorState;
     private ProgressBar progressBar;
@@ -389,8 +389,6 @@ public class BikeDetailActivity extends AppCompatActivity {
 
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
-        btnEdit = findViewById(R.id.btnEdit);
-        btnDelete = findViewById(R.id.btnDelete);
         ivMainImage = findViewById(R.id.ivMainImage);
         rvImageGallery = findViewById(R.id.rvImageGallery);
         tvBikeName = findViewById(R.id.tvBikeName);
@@ -400,7 +398,7 @@ public class BikeDetailActivity extends AppCompatActivity {
         tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
         tvBikeDescription = findViewById(R.id.tvBikeDescription);
         tvBikeCategory = findViewById(R.id.tvBikeCategory);
-        tvBikeStatus = findViewById(R.id.tvBikeStatus);
+        // Status view removed from layout
         // Stock label removed from layout
         tvBikeWarranty = findViewById(R.id.tvBikeWarranty);
         tvBikeRating = findViewById(R.id.tvBikeRating);
@@ -426,25 +424,6 @@ public class BikeDetailActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnBack.setOnClickListener(v -> finish());
-        
-        btnEdit.setOnClickListener(v -> {
-            if (authManager.isStaff()) {
-                Intent intent = new Intent(BikeDetailActivity.this, UpdateBikeActivity.class);
-                intent.putExtra("bike_id", bikeId);
-                // Use Activity Result API replacement
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Bạn không có quyền chỉnh sửa", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnDelete.setOnClickListener(v -> {
-            if (authManager.isStaff()) {
-                showDeleteConfirmationDialog();
-            } else {
-                Toast.makeText(this, "Bạn không có quyền xóa", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         // No add-to-cart action on admin bike detail
     }
@@ -499,7 +478,7 @@ public class BikeDetailActivity extends AppCompatActivity {
         tvBikeModel.setText(bike.getModel());
         tvBikeDescription.setText(bike.getDescription());
         tvBikeCategory.setText(getCategoryDisplayName(bike.getCategory()));
-        tvBikeStatus.setText(bike.getStatus());
+        // Status display removed
         // Stock row removed
         tvBikeWarranty.setText(bike.getWarranty() != null ? bike.getWarranty() : "12 tháng");
 
@@ -538,21 +517,7 @@ public class BikeDetailActivity extends AppCompatActivity {
             tvBikeFeatures.setText("Không có thông tin đặc điểm");
         }
 
-        // Set status color
-        switch (bike.getStatus().toLowerCase()) {
-            case "available":
-                tvBikeStatus.setTextColor(getColor(R.color.green));
-                break;
-            case "out_of_stock":
-                tvBikeStatus.setTextColor(getColor(R.color.red));
-                break;
-            case "discontinued":
-                tvBikeStatus.setTextColor(getColor(R.color.orange));
-                break;
-            default:
-                tvBikeStatus.setTextColor(getColor(R.color.gray));
-                break;
-        }
+        // Status color setting removed
 
         // Load images
         loadBikeImages();

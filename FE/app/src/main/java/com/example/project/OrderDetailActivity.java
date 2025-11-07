@@ -136,10 +136,27 @@ public class OrderDetailActivity extends AppCompatActivity {
                             tvReceiverPhone.setText(val(s, "phone"));
                             tvShippingAddress.setText(val(s, "address")+", "+val(s,"city"));
                         }
-                        // Tổng tiền - cần kiểm tra các trường subtotal/totalAmount/finalAmount/fee
-                        tvSubtotal.setText(formatCurrency(valN(m, "totalAmount")));
-                        tvShippingFee.setText("Miễn phí");
-                        tvTotal.setText(formatCurrency(valN(m, "finalAmount", "totalAmount")));
+                        // Tổng tiền - totalAmount = tổng sản phẩm, shippingFee = phí ship, finalAmount = tổng cộng
+                        long shippingFee = valN(m, "shippingFee");
+                        long totalAmountValue = valN(m, "totalAmount");
+                        long finalAmountValue = valN(m, "finalAmount");
+                        
+                        // Nếu finalAmount chưa có, tính từ totalAmount + shippingFee
+                        if (finalAmountValue == 0 && totalAmountValue > 0) {
+                            finalAmountValue = totalAmountValue + shippingFee;
+                        }
+                        
+                        // Hiển thị: Tạm tính = tổng sản phẩm (totalAmount - shippingFee nếu đã tính)
+                        // Hoặc nếu totalAmount đã là tổng sản phẩm, thì dùng trực tiếp
+                        long subtotalValue = totalAmountValue;
+                        if (finalAmountValue > 0 && shippingFee > 0) {
+                            // Nếu có finalAmount và shippingFee, tính lại subtotal
+                            subtotalValue = finalAmountValue - shippingFee;
+                        }
+                        
+                        tvSubtotal.setText(formatCurrency(subtotalValue));
+                        tvShippingFee.setText(shippingFee > 0 ? formatCurrency(shippingFee) : "Miễn phí");
+                        tvTotal.setText(formatCurrency(finalAmountValue > 0 ? finalAmountValue : (subtotalValue + shippingFee)));
                         // Products
                         Object details = m.get("orderDetails");
                         if (details instanceof java.util.List) {

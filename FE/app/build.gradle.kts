@@ -54,6 +54,7 @@ dependencies {
     
     // OpenStreetMap - Miễn phí hoàn toàn, không cần API key
     implementation("org.osmdroid:osmdroid-android:6.1.17")
+    implementation("com.github.MKergall:osmbonuspack:6.9.0")
     
     // Google Play Services Location (for GPS)
     implementation("com.google.android.gms:play-services-location:21.0.1")

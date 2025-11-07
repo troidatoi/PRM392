@@ -1,6 +1,7 @@
 package com.example.project;
 
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,18 +37,33 @@ public class ProductStockAdapter extends RecyclerView.Adapter<ProductStockAdapte
         holder.tvStockQuantity.setText(String.valueOf(stock.getQuantity()));
         holder.tvStockStatus.setText(stock.getStatus());
 
-        // Set color based on status
+        // Set colors and background based on stock quantity
         int statusColor;
+        int backgroundColor;
+        
         if (stock.getQuantity() > 10) {
-            statusColor = Color.parseColor("#4CAF50"); // Green - Còn hàng
+            // Green - Còn hàng
+            statusColor = Color.parseColor("#4CAF50");
+            backgroundColor = Color.parseColor("#E8F5E9");
         } else if (stock.getQuantity() > 0) {
-            statusColor = Color.parseColor("#FF9800"); // Orange - Sắp hết
+            // Orange - Sắp hết
+            statusColor = Color.parseColor("#FF9800");
+            backgroundColor = Color.parseColor("#FFF3E0");
         } else {
-            statusColor = Color.parseColor("#F44336"); // Red - Hết hàng
+            // Red - Hết hàng
+            statusColor = Color.parseColor("#F44336");
+            backgroundColor = Color.parseColor("#FFEBEE");
         }
 
         holder.tvStockQuantity.setTextColor(statusColor);
         holder.tvStockStatus.setTextColor(statusColor);
+        
+        // Create rounded background for status badge
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setCornerRadius(32f); // 12dp in pixels approximately
+        drawable.setColor(backgroundColor);
+        holder.tvStockStatus.setBackground(drawable);
     }
 
     @Override

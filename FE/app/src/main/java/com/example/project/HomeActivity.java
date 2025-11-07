@@ -96,9 +96,12 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvStoresTitle;
     private TextView tvStoresSubtitle;
     private CardView btnLocationInput;
+    
+    // Greeting TextView
+    private TextView tvGreeting;
 
-    private static final String COLOR_BROWN = "#7B6047";
-    private static final String COLOR_BE = "#CEB797";
+    private static final String COLOR_ACTIVE_BLUE = "#2196F3"; // Material Blue
+    private static final String COLOR_INACTIVE_GRAY = "#9E9E9E"; // Gray
     
     // Default location (Ho Chi Minh City)
     private static final double DEFAULT_LAT = 10.7769;
@@ -124,6 +127,9 @@ public class HomeActivity extends AppCompatActivity {
         
         // Initialize API service
         apiService = RetrofitClient.getInstance().getApiService();
+        
+        // Load user info for greeting
+        loadUserInfo();
         
         // Load bikes from API
         loadBikes();
@@ -424,6 +430,9 @@ public class HomeActivity extends AppCompatActivity {
         if (mapView != null) {
             mapView.onResume();
         }
+        
+        // Reset bottom navigation colors when returning to Home
+        resetBottomNavigationToHome();
     }
     
     @Override
@@ -437,6 +446,9 @@ public class HomeActivity extends AppCompatActivity {
     private void initViews() {
         rvProducts = findViewById(R.id.rvProducts);
         rvStores = findViewById(R.id.rvStores);
+
+        // Greeting
+        tvGreeting = findViewById(R.id.tvGreeting);
 
         // Search Box
         etSearch = findViewById(R.id.etSearch);
@@ -468,6 +480,13 @@ public class HomeActivity extends AppCompatActivity {
         
         // Setup location input button
         btnLocationInput.setOnClickListener(v -> showLocationInputDialog());
+        
+        // View Map Button
+        CardView btnViewMap = findViewById(R.id.btnViewMap);
+        btnViewMap.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, MapFullActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void setupSearchBox() {
@@ -525,10 +544,10 @@ public class HomeActivity extends AppCompatActivity {
         
         mapView = findViewById(R.id.mapView);
         if (mapView != null) {
+            // Using OpenStreetMap MAPNIK (standard)
             mapView.setTileSource(TileSourceFactory.MAPNIK);
             mapView.setMultiTouchControls(true);
             mapView.setBuiltInZoomControls(true);
-            mapView.setClickable(true);
             
             mapController = mapView.getController();
             mapController.setZoom(12.0);
@@ -545,63 +564,119 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        // Đặt mặc định: TẤT CẢ tab be, chỉ tab hiện tại là nâu đậm
-        iconHome.setColorFilter(Color.parseColor(COLOR_BROWN));
-        tvHome.setTextColor(Color.parseColor(COLOR_BROWN));
-        iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
-        tvProducts.setTextColor(Color.parseColor(COLOR_BE));
-        iconCart.setColorFilter(Color.parseColor(COLOR_BE));
-        tvCart.setTextColor(Color.parseColor(COLOR_BE));
-        iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
-        tvAccount.setTextColor(Color.parseColor(COLOR_BE));
+        // Đặt mặc định: tab Home màu xanh dương active, các tab khác màu xám inactive
+        iconHome.setColorFilter(Color.parseColor(COLOR_ACTIVE_BLUE));
+        tvHome.setTextColor(Color.parseColor(COLOR_ACTIVE_BLUE));
+        tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
+        
+        iconProducts.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvProducts.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+        iconCart.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvCart.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+        iconAccount.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvAccount.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
 
         navHome.setOnClickListener(v -> {
-            iconHome.setColorFilter(Color.parseColor(COLOR_BROWN));
-            tvHome.setTextColor(Color.parseColor(COLOR_BROWN));
-            iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
-            tvProducts.setTextColor(Color.parseColor(COLOR_BE));
-            iconCart.setColorFilter(Color.parseColor(COLOR_BE));
-            tvCart.setTextColor(Color.parseColor(COLOR_BE));
-            iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
-            tvAccount.setTextColor(Color.parseColor(COLOR_BE));
+            iconHome.setColorFilter(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvHome.setTextColor(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
+            
+            iconProducts.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvProducts.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvProducts.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconCart.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvCart.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvCart.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconAccount.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvAccount.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvAccount.setTypeface(null, android.graphics.Typeface.NORMAL);
             // Không cần mở lại Home nếu đã ở Home
         });
+        
         navProducts.setOnClickListener(v -> {
-            iconHome.setColorFilter(Color.parseColor(COLOR_BE));
-            tvHome.setTextColor(Color.parseColor(COLOR_BE));
-            iconProducts.setColorFilter(Color.parseColor(COLOR_BROWN));
-            tvProducts.setTextColor(Color.parseColor(COLOR_BROWN));
-            iconCart.setColorFilter(Color.parseColor(COLOR_BE));
-            tvCart.setTextColor(Color.parseColor(COLOR_BE));
-            iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
-            tvAccount.setTextColor(Color.parseColor(COLOR_BE));
+            iconHome.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvHome.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvHome.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconProducts.setColorFilter(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvProducts.setTextColor(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvProducts.setTypeface(null, android.graphics.Typeface.BOLD);
+            
+            iconCart.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvCart.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvCart.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconAccount.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvAccount.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvAccount.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
             Intent intent = new Intent(HomeActivity.this, ShopActivity.class);
             startActivity(intent);
         });
+        
         navCart.setOnClickListener(v -> {
-            iconHome.setColorFilter(Color.parseColor(COLOR_BE));
-            tvHome.setTextColor(Color.parseColor(COLOR_BE));
-            iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
-            tvProducts.setTextColor(Color.parseColor(COLOR_BE));
-            iconCart.setColorFilter(Color.parseColor(COLOR_BROWN));
-            tvCart.setTextColor(Color.parseColor(COLOR_BROWN));
-            iconAccount.setColorFilter(Color.parseColor(COLOR_BE));
-            tvAccount.setTextColor(Color.parseColor(COLOR_BE));
+            iconHome.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvHome.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvHome.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconProducts.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvProducts.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvProducts.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconCart.setColorFilter(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvCart.setTextColor(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvCart.setTypeface(null, android.graphics.Typeface.BOLD);
+            
+            iconAccount.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvAccount.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvAccount.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
             Intent intent = new Intent(HomeActivity.this, CartActivity.class);
             startActivity(intent);
         });
+        
         navAccount.setOnClickListener(v -> {
-            iconHome.setColorFilter(Color.parseColor(COLOR_BE));
-            tvHome.setTextColor(Color.parseColor(COLOR_BE));
-            iconProducts.setColorFilter(Color.parseColor(COLOR_BE));
-            tvProducts.setTextColor(Color.parseColor(COLOR_BE));
-            iconCart.setColorFilter(Color.parseColor(COLOR_BE));
-            tvCart.setTextColor(Color.parseColor(COLOR_BE));
-            iconAccount.setColorFilter(Color.parseColor(COLOR_BROWN));
-            tvAccount.setTextColor(Color.parseColor(COLOR_BROWN));
+            iconHome.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvHome.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvHome.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconProducts.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvProducts.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvProducts.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconCart.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvCart.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+            tvCart.setTypeface(null, android.graphics.Typeface.NORMAL);
+            
+            iconAccount.setColorFilter(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvAccount.setTextColor(Color.parseColor(COLOR_ACTIVE_BLUE));
+            tvAccount.setTypeface(null, android.graphics.Typeface.BOLD);
+            
             Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void resetBottomNavigationToHome() {
+        // Set Home tab as active with blue color
+        iconHome.setColorFilter(Color.parseColor(COLOR_ACTIVE_BLUE));
+        tvHome.setTextColor(Color.parseColor(COLOR_ACTIVE_BLUE));
+        tvHome.setTypeface(null, android.graphics.Typeface.BOLD);
+        
+        // Set all other tabs as inactive with gray color
+        iconProducts.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvProducts.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvProducts.setTypeface(null, android.graphics.Typeface.NORMAL);
+        
+        iconCart.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvCart.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvCart.setTypeface(null, android.graphics.Typeface.NORMAL);
+        
+        iconAccount.setColorFilter(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvAccount.setTextColor(Color.parseColor(COLOR_INACTIVE_GRAY));
+        tvAccount.setTypeface(null, android.graphics.Typeface.NORMAL);
     }
 
     private void selectNavItem(ImageView icon, TextView text) {
@@ -614,6 +689,47 @@ public class HomeActivity extends AppCompatActivity {
         icon.setColorFilter(Color.parseColor("#666666"));
         text.setTextColor(Color.parseColor("#666666"));
         text.setTypeface(null, android.graphics.Typeface.NORMAL);
+    }
+
+    private void loadUserInfo() {
+        // Check if user is logged in
+        com.example.project.utils.AuthManager authManager = com.example.project.utils.AuthManager.getInstance(this);
+        
+        if (!authManager.isLoggedIn()) {
+            // If not logged in, show default greeting
+            tvGreeting.setText("Hello, User");
+            return;
+        }
+        
+        // Get current user from storage first
+        com.example.project.models.User currentUser = authManager.getCurrentUser();
+        if (currentUser != null && currentUser.getUsername() != null) {
+            tvGreeting.setText("Hello, " + currentUser.getUsername());
+        }
+        
+        // Then fetch fresh data from API
+        String authHeader = authManager.getAuthHeader();
+        if (authHeader != null) {
+            apiService.getMe(authHeader).enqueue(new Callback<ApiResponse<com.example.project.models.User>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<com.example.project.models.User>> call, Response<ApiResponse<com.example.project.models.User>> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        com.example.project.models.User user = response.body().getData();
+                        if (user != null && user.getUsername() != null) {
+                            // Update greeting with username
+                            tvGreeting.setText("Hello, " + user.getUsername());
+                            // Update stored user data
+                            authManager.updateUser(user);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<com.example.project.models.User>> call, Throwable t) {
+                    // Keep the cached username if API fails
+                }
+            });
+        }
     }
 
     private void loadBikes() {
@@ -629,6 +745,10 @@ public class HomeActivity extends AppCompatActivity {
                         // Convert bikes to products
                         for (Bike bike : bikes) {
                             String priceText = String.format("%.0f ₫", bike.getPrice());
+                            String originalPriceText = null;
+                            if (bike.getOriginalPrice() > 0 && bike.getOriginalPrice() > bike.getPrice()) {
+                                originalPriceText = String.format("%.0f ₫", bike.getOriginalPrice());
+                            }
                             String imageUrl = (bike.getImages() != null && !bike.getImages().isEmpty()) 
                                 ? bike.getImages().get(0).getUrl() 
                                 : null;
@@ -637,8 +757,11 @@ public class HomeActivity extends AppCompatActivity {
                                 bike.getName(),
                                 bike.getDescription(),
                                 priceText,
+                                originalPriceText,
                                 R.drawable.splash_bike_background,
-                                imageUrl
+                                imageUrl,
+                                false,
+                                false
                             );
                             product.setBikeId(bike.getId());
                             productList.add(product);

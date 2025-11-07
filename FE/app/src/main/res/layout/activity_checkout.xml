@@ -75,7 +75,7 @@
     </androidx.cardview.widget.CardView>
 
     <!-- Main Content -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/headerCard"
@@ -226,17 +226,33 @@
                             android:textColor="#999999"
                             android:layout_marginBottom="8dp" />
 
-                        <EditText
-                            android:id="@+id/etCity"
+                        <Spinner
+                            android:id="@+id/spCity"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Nhập tên thành phố (VD: Hà Nội)"
+                            android:layout_height="48dp"
                             android:textSize="16sp"
-                            android:textColor="#000000"
-                            android:textColorHint="#CCCCCC"
-                            android:background="@android:color/transparent"
-                            android:inputType="textCapWords"
-                            android:importantForAutofill="no" />
+                            android:paddingStart="4dp"
+                            android:paddingEnd="4dp" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="12dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Quận/Huyện"
+                            android:textSize="12sp"
+                            android:textColor="#999999"
+                            android:layout_marginBottom="8dp" />
+
+                        <Spinner
+                            android:id="@+id/spDistrict"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:textSize="16sp"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="4dp" />
 
                         <View
                             android:layout_width="match_parent"
@@ -254,13 +270,13 @@
                             android:id="@+id/etShippingAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Nhập địa chỉ chi tiết"
+                            android:hint="Nhập số nhà, đường, phường/xã"
                             android:textSize="16sp"
                             android:textColor="#000000"
                             android:textColorHint="#CCCCCC"
                             android:background="@android:color/transparent"
                             android:inputType="textMultiLine"
-                            android:minLines="3"
+                            android:minLines="2"
                             android:gravity="top"
                             android:importantForAutofill="no" />
 
@@ -366,10 +382,10 @@
                             android:paddingVertical="8dp" />
 
                         <RadioButton
-                            android:id="@+id/rbEWallet"
+                            android:id="@+id/rbPayOS"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Ví điện tử (Momo, ZaloPay)"
+                            android:text="PayOS (Thanh toán qua VietQR)"
                             android:textSize="16sp"
                             android:textColor="#000000"
                             android:paddingVertical="8dp" />
@@ -496,7 +512,7 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Confirm Order Button -->
     <androidx.cardview.widget.CardView

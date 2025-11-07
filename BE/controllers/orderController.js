@@ -1,20 +1,25 @@
 const Order = require('../models/Order');
 const OrderDetail = require('../models/OrderDetail');
+const Payment = require('../models/Payment');
 const Cart = require('../models/Cart');
 const CartItem = require('../models/CartItem');
 const Inventory = require('../models/Inventory');
 const Bike = require('../models/Bike');
+const Store = require('../models/Store');
+const { geocodeAddress } = require('../utils/geocoding');
+const { haversineKm, calculateShippingFee } = require('../utils/shipping');
 
 // Create separate orders for each store
 const createOrders = async (req, res) => {
   try {
     const { userId, shippingAddress, paymentMethod, notes } = req.body;
 
-    // Validate payment method: VNPay only
-    if (paymentMethod !== 'vnpay') {
+    // Validate payment method
+    const allowedPaymentMethods = ['vnpay', 'payos', 'cash', 'bank_transfer'];
+    if (!allowedPaymentMethods.includes(paymentMethod)) {
       return res.status(400).json({
         success: false,
-        message: 'Chỉ hỗ trợ thanh toán VNPay'
+        message: `Phương thức thanh toán không hợp lệ. Chỉ hỗ trợ: ${allowedPaymentMethods.join(', ')}`
       });
     }
 
@@ -97,6 +102,19 @@ const createOrders = async (req, res) => {
       });
     }
 
+    // Geocode shipping address once
+    const fullAddress = `${shippingAddress?.address || ''}, ${shippingAddress?.city || ''}`.trim();
+    let destinationCoords = null;
+    try {
+      if (!shippingAddress || !shippingAddress.address || !shippingAddress.city) {
+        return res.status(400).json({ success: false, message: 'Thiếu địa chỉ giao hàng' });
+      }
+      const { latitude, longitude } = await geocodeAddress(fullAddress);
+      destinationCoords = { lat: latitude, lng: longitude };
+    } catch (geoErr) {
+      return res.status(400).json({ success: false, message: geoErr.message });
+    }
+
     // Create ONE order for EACH store
     const createdOrders = [];
     
@@ -110,6 +128,20 @@ const createOrders = async (req, res) => {
         storeTotal += item.quantity * currentPrice;
       }
       
+      // Load store to get coordinates
+      const storeDoc = await Store.findById(storeId);
+      let distanceKm = 0;
+      let shippingFee = 0;
+      if (storeDoc && destinationCoords) {
+        distanceKm = haversineKm(
+          storeDoc.latitude,
+          storeDoc.longitude,
+          destinationCoords.lat,
+          destinationCoords.lng
+        );
+        shippingFee = await calculateShippingFee(distanceKm);
+      }
+
       // Create ONE order for THIS store
       const order = new Order({
         user: userId,
@@ -118,9 +150,9 @@ const createOrders = async (req, res) => {
         paymentMethod,
         notes: `${notes || ''}`.trim(),
         totalAmount: storeTotal,
-        shippingFee: 0,
+        shippingFee: shippingFee,
         discountAmount: 0,
-        finalAmount: storeTotal
+        finalAmount: storeTotal + shippingFee
       });
       
       await order.save();
@@ -156,10 +188,34 @@ const createOrders = async (req, res) => {
       order.orderDetails = orderDetails.map(detail => detail._id);
       await order.save();
       
+      // Create Payment record for online payment methods (payos, vnpay)
+      let payment = null;
+      if (paymentMethod === 'payos' || paymentMethod === 'vnpay') {
+        payment = new Payment({
+          order: order._id,
+          user: userId,
+          amount: order.finalAmount,
+          paymentMethod: paymentMethod,
+          paymentGateway: paymentMethod,
+          paymentStatus: 'pending',
+          currency: 'VND'
+        });
+        await payment.save();
+      }
+      
       createdOrders.push({
         order,
         orderDetails,
-        store: storeData.store
+        store: storeData.store,
+        shipping: {
+          distanceKm: Number(distanceKm.toFixed(2)),
+          shippingFee
+        },
+        payment: payment ? {
+          _id: payment._id,
+          paymentStatus: payment.paymentStatus,
+          paymentMethod: payment.paymentMethod
+        } : null
       });
     }
     
@@ -193,6 +249,100 @@ const createOrders = async (req, res) => {
       message: 'Lỗi server',
       error: error.message
     });
+  }
+};
+
+// Estimate shipping fee and distance per store without creating orders
+const estimateShipping = async (req, res) => {
+  try {
+    const { userId, shippingAddress } = req.body;
+
+    // Get cart with items for user
+    const cart = await Cart.findOne({ 
+      user: userId, 
+      status: 'active' 
+    })
+    .populate({
+      path: 'items',
+      populate: [
+        {
+          path: 'product',
+          select: 'name brand price originalPrice'
+        },
+        {
+          path: 'store',
+          select: 'name address city latitude longitude'
+        }
+      ]
+    });
+
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ success: false, message: 'Giỏ hàng trống hoặc không tồn tại' });
+    }
+
+    if (!shippingAddress || !shippingAddress.address || !shippingAddress.city) {
+      return res.status(400).json({ success: false, message: 'Thiếu địa chỉ giao hàng' });
+    }
+
+    const fullAddress = `${shippingAddress.address}, ${shippingAddress.city}`.trim();
+    let destinationCoords;
+    try {
+      const { latitude, longitude } = await geocodeAddress(fullAddress);
+      destinationCoords = { lat: latitude, lng: longitude };
+    } catch (e) {
+      return res.status(400).json({ success: false, message: e.message });
+    }
+
+    // Group items by store
+    const itemsByStore = {};
+    cart.items.forEach(cartItem => {
+      const storeId = cartItem.store._id.toString();
+      if (!itemsByStore[storeId]) {
+        itemsByStore[storeId] = {
+          store: cartItem.store,
+          items: []
+        };
+      }
+      itemsByStore[storeId].items.push(cartItem);
+    });
+
+    const perStore = [];
+    let totalShippingFee = 0;
+
+    for (const [storeId, storeData] of Object.entries(itemsByStore)) {
+      const storeDoc = await Store.findById(storeId);
+      if (!storeDoc) continue;
+
+      const distanceKm = haversineKm(
+        storeDoc.latitude,
+        storeDoc.longitude,
+        destinationCoords.lat,
+        destinationCoords.lng
+      );
+      const shippingFee = await calculateShippingFee(distanceKm);
+      totalShippingFee += shippingFee;
+
+      perStore.push({
+        storeId,
+        storeName: storeDoc.name,
+        distanceKm: Number(distanceKm.toFixed(2)),
+        shippingFee
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Ước tính phí vận chuyển thành công',
+      data: {
+        stores: perStore,
+        summary: {
+          totalStores: perStore.length,
+          totalShippingFee
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
 };
 
@@ -423,5 +573,6 @@ module.exports = {
   updateOrderStatus,
   cancelOrder,
   getOrdersByStore,
-  getAllOrders
+  getAllOrders,
+  estimateShipping
 };

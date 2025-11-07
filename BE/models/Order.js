@@ -18,7 +18,7 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: [true, 'Phương thức thanh toán là bắt buộc'],
-    enum: ['cash', 'bank_transfer', 'vnpay', 'zalopay', 'paypal', 'credit_card']
+    enum: ['cash', 'bank_transfer', 'vnpay', 'zalopay', 'paypal', 'credit_card', 'payos']
   },
   shippingAddress: {
     fullName: {
