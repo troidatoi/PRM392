@@ -33,7 +33,7 @@ public class EditStoreDialog extends Dialog {
     private TextInputEditText etStoreName, etAddress, etCity, etLatitude, etLongitude;
     private TextInputEditText etPhone, etEmail, etDescription;
     private Switch switchIsActive;
-    private Button btnCancel, btnUpdate;
+    private Button btnCancel, btnUpdate, btnOperatingHours;
 
     public interface OnStoreUpdatedListener {
         void onStoreUpdated(Store store);
@@ -75,6 +75,7 @@ public class EditStoreDialog extends Dialog {
         btnCancel = findViewById(R.id.btnCancel);
         btnUpdate = findViewById(R.id.btnCreate); // Reuse btnCreate button
         btnUpdate.setText("Cập Nhật");
+        btnOperatingHours = findViewById(R.id.btnOperatingHours);
     }
 
     private void populateFields() {
@@ -109,6 +110,27 @@ public class EditStoreDialog extends Dialog {
                 updateStore();
             }
         });
+        
+        // Operating Hours button
+        if (btnOperatingHours != null) {
+            btnOperatingHours.setOnClickListener(v -> showOperatingHoursDialog());
+        }
+    }
+    
+    private void showOperatingHoursDialog() {
+        OperatingHoursDialog dialog = new OperatingHoursDialog(
+            context,
+            currentStore.getOperatingHours(),
+            new OperatingHoursDialog.OnOperatingHoursUpdatedListener() {
+                @Override
+                public void onOperatingHoursUpdated(OperatingHours operatingHours) {
+                    // Update store's operating hours
+                    currentStore.setOperatingHours(operatingHours);
+                    Toast.makeText(context, "Đã cập nhật thời gian hoạt động", Toast.LENGTH_SHORT).show();
+                }
+            }
+        );
+        dialog.show();
     }
 
     private boolean validateInput() {
@@ -219,6 +241,9 @@ public class EditStoreDialog extends Dialog {
         } else {
             currentStore.setDescription(null);
         }
+        
+        // OperatingHours is already set when user updates it via OperatingHoursDialog
+        // No need to set it here as it's already in currentStore
 
         // Get auth header
         String authHeader = authManager.getAuthHeader();

@@ -1250,7 +1250,8 @@ public class HomeActivity extends AppCompatActivity {
             store.setPhone(mapStore.getPhone());
             store.setLatitude(mapStore.getLatitude());
             store.setLongitude(mapStore.getLongitude());
-            store.setIsActive(mapStore.isOpenNow());
+            store.setOperatingHours(mapStore.getOperatingHours());
+            store.setIsActive(mapStore.isActive());
             
             // Set distance if available (this is the key to show km)
             if (mapStore.getDistance() != null) {
@@ -1264,7 +1265,7 @@ public class HomeActivity extends AppCompatActivity {
             }
             
             // Set status (always show Hoạt động/Đóng cửa)
-            store.setStatus(mapStore.isOpenNow() ? "Hoạt động" : "Đóng cửa");
+            store.setStatus(store.isOpenNow() ? "Đang mở" : "Đóng cửa");
             
             storeList.add(store);
         }

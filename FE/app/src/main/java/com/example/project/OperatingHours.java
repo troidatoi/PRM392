@@ -128,8 +128,14 @@ public class OperatingHours {
             return isOpen;
         }
 
+        public void setIsOpen(boolean isOpen) {
+            this.isOpen = isOpen;
+        }
+        
+        // Legacy method for backward compatibility
+        @Deprecated
         public void setOpen(boolean open) {
-            isOpen = open;
+            this.isOpen = open;
         }
 
         // Helper method to get formatted hours

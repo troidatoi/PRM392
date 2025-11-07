@@ -222,5 +222,86 @@ public class Store {
         }
         return null;
     }
+    
+    /**
+     * Kiểm tra xem cửa hàng có đang mở hay không dựa trên operatingHours và thời gian hiện tại
+     */
+    public boolean isOpenNow() {
+        if (operatingHours == null) {
+            // Fallback to isActive if no operating hours
+            return isActive;
+        }
+        
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
+        
+        // Convert Calendar day to our day name (Calendar: Sunday=1, Monday=2, ..., Saturday=7)
+        String dayName = getDayNameFromCalendar(dayOfWeek);
+        OperatingHours.DaySchedule daySchedule = operatingHours.getScheduleForDay(dayName);
+        
+        if (daySchedule == null || !daySchedule.isOpen()) {
+            return false;
+        }
+        
+        // Get current time in HH:mm format
+        int hour = calendar.get(java.util.Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(java.util.Calendar.MINUTE);
+        String currentTime = String.format("%02d:%02d", hour, minute);
+        
+        // Compare with open and close times
+        String openTime = daySchedule.getOpen();
+        String closeTime = daySchedule.getClose();
+        
+        if (openTime == null || closeTime == null) {
+            return false;
+        }
+        
+        return currentTime.compareTo(openTime) >= 0 && currentTime.compareTo(closeTime) <= 0;
+    }
+    
+    /**
+     * Lấy text hiển thị operating hours cho ngày hiện tại
+     */
+    public String getOperatingHoursText() {
+        if (operatingHours == null) {
+            return null;
+        }
+        
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
+        String dayName = getDayNameFromCalendar(dayOfWeek);
+        OperatingHours.DaySchedule daySchedule = operatingHours.getScheduleForDay(dayName);
+        
+        if (daySchedule == null) {
+            return null;
+        }
+        
+        return daySchedule.getFormattedHours();
+    }
+    
+    /**
+     * Convert Calendar day of week to day name
+     * Calendar: Sunday=1, Monday=2, Tuesday=3, Wednesday=4, Thursday=5, Friday=6, Saturday=7
+     */
+    private String getDayNameFromCalendar(int calendarDay) {
+        switch (calendarDay) {
+            case java.util.Calendar.MONDAY:
+                return "monday";
+            case java.util.Calendar.TUESDAY:
+                return "tuesday";
+            case java.util.Calendar.WEDNESDAY:
+                return "wednesday";
+            case java.util.Calendar.THURSDAY:
+                return "thursday";
+            case java.util.Calendar.FRIDAY:
+                return "friday";
+            case java.util.Calendar.SATURDAY:
+                return "saturday";
+            case java.util.Calendar.SUNDAY:
+                return "sunday";
+            default:
+                return "monday";
+        }
+    }
 }
 

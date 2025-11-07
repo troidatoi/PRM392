@@ -398,9 +398,38 @@ const getStoresForMap = async (req, res) => {
     }
 
     // Get all active stores
+    const resolveIsOpenNow = (store) => {
+      if (!store || !store.operatingHours) {
+        return !!store?.isActive;
+      }
+
+      const now = new Date();
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const dayName = dayNames[now.getDay()];
+
+      const daySchedule = store.operatingHours[dayName];
+      if (!daySchedule || !daySchedule.isOpen) {
+        return false;
+      }
+
+      const openTime = daySchedule.open;
+      const closeTime = daySchedule.close;
+      if (!openTime || !closeTime) {
+        return false;
+      }
+
+      const currentTime = now.toTimeString().substring(0, 5);
+      return currentTime >= openTime && currentTime <= closeTime;
+    };
+
     let allStores = await Store.find({ isActive: true })
-      .select('name latitude longitude address city phone isOpenNow')
+      .select('name latitude longitude address city phone operatingHours isActive')
       .lean();
+
+    allStores = allStores.map(store => ({
+      ...store,
+      isOpenNow: resolveIsOpenNow(store)
+    }));
 
     // If location provided, calculate distances and filter by radius
     if (latitude && longitude) {
@@ -438,6 +467,8 @@ const getStoresForMap = async (req, res) => {
       address: store.address,
       city: store.city,
       phone: store.phone,
+      isActive: store.isActive,
+      operatingHours: store.operatingHours || null,
       isOpenNow: store.isOpenNow,
       distance: store.distance || null
     }));

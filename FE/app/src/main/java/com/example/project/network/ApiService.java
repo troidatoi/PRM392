@@ -6,6 +6,7 @@ import com.example.project.models.LoginRequest;
 import com.example.project.models.RegisterRequest;
 import com.example.project.models.User;
 import com.example.project.Store;
+import com.example.project.OperatingHours;
 import com.example.project.ChatMessage;
 import com.example.project.ChatConversation;
 
@@ -547,6 +548,8 @@ public interface ApiService {
             private String phone;
             @com.google.gson.annotations.SerializedName("isOpenNow")
             private boolean isOpenNow;
+            private boolean isActive;
+            private OperatingHours operatingHours;
             private Double distance;
             
             public String getId() {
@@ -611,6 +614,22 @@ public interface ApiService {
             
             public void setOpenNow(boolean openNow) {
                 isOpenNow = openNow;
+            }
+
+            public boolean isActive() {
+                return isActive;
+            }
+
+            public void setActive(boolean active) {
+                isActive = active;
+            }
+
+            public OperatingHours getOperatingHours() {
+                return operatingHours;
+            }
+
+            public void setOperatingHours(OperatingHours operatingHours) {
+                this.operatingHours = operatingHours;
             }
             
             public Double getDistance() {

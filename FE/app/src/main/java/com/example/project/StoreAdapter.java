@@ -77,13 +77,45 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             }
         }
         
-        // Show status (Hoạt động/Đóng cửa) - only if no distance
-        String statusText = store.getDisplayStatus();
-        if (statusText != null && statusText.contains("km")) {
-            // If status contains distance, show only "Hoạt động" or "Đóng cửa"
-            holder.tvStoreStatus.setText(store.isActive() ? "Hoạt động" : "Đóng cửa");
+        // Show operating hours and status (Đang mở/Đóng cửa) based on current time
+        boolean isOpenNow = store.isOpenNow();
+        String operatingHoursText = store.getOperatingHoursText();
+        
+        // Display operating hours
+        if (holder.tvOperatingHours != null) {
+            if (operatingHoursText != null && !operatingHoursText.isEmpty()) {
+                holder.tvOperatingHours.setText(operatingHoursText);
+                holder.tvOperatingHours.setVisibility(View.VISIBLE);
+            } else {
+                holder.tvOperatingHours.setVisibility(View.GONE);
+            }
+        }
+        
+        // Show status (Đang mở/Đóng cửa) based on operating hours and current time
+        if (store.getOperatingHours() != null) {
+            // Use operating hours to determine status
+            holder.tvStoreStatus.setText(isOpenNow ? "Đang mở" : "Đóng cửa");
+            // Set status badge color based on isOpenNow
+            if (isOpenNow) {
+                holder.statusBadge.setCardBackgroundColor(Color.parseColor("#4CAF50")); // Green
+            } else {
+                holder.statusBadge.setCardBackgroundColor(Color.parseColor("#FF5252")); // Red
+            }
         } else {
-            holder.tvStoreStatus.setText(statusText);
+            // Fallback to isActive if no operating hours
+            String statusText = store.getDisplayStatus();
+            if (statusText != null && statusText.contains("km")) {
+                holder.tvStoreStatus.setText(store.isActive() ? "Hoạt động" : "Đóng cửa");
+            } else {
+                holder.tvStoreStatus.setText(statusText);
+            }
+            
+            // Set status badge color
+            if (store.isActive()) {
+                holder.statusBadge.setCardBackgroundColor(Color.parseColor("#4CAF50")); // Green
+            } else {
+                holder.statusBadge.setCardBackgroundColor(Color.parseColor("#FF5252")); // Red
+            }
         }
 
         // Show "Gần nhất" badge for first item if enabled
@@ -91,13 +123,6 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             holder.nearestBadge.setVisibility(
                 (showNearestBadge && position == 0) ? View.VISIBLE : View.GONE
             );
-        }
-
-        // Set status badge color
-        if (store.isActive()) {
-            holder.statusBadge.setCardBackgroundColor(Color.parseColor("#4CAF50")); // Green
-        } else {
-            holder.statusBadge.setCardBackgroundColor(Color.parseColor("#FF5252")); // Red
         }
 
         // Edit button - only show if listener is available
@@ -157,7 +182,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
     }
 
     static class StoreViewHolder extends RecyclerView.ViewHolder {
-        TextView tvStoreName, tvStoreAddress, tvStoreStatus, tvStoreDistance;
+        TextView tvStoreName, tvStoreAddress, tvStoreStatus, tvStoreDistance, tvOperatingHours;
         CardView statusBadge, nearestBadge, btnEditStore, btnDeleteStore, btnInventory;
 
         public StoreViewHolder(@NonNull View itemView) {
@@ -166,6 +191,7 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             tvStoreAddress = itemView.findViewById(R.id.tvStoreAddress);
             tvStoreStatus = itemView.findViewById(R.id.tvStoreStatus);
             tvStoreDistance = itemView.findViewById(R.id.tvStoreDistance);
+            tvOperatingHours = itemView.findViewById(R.id.tvOperatingHours);
             statusBadge = itemView.findViewById(R.id.statusBadge);
             nearestBadge = itemView.findViewById(R.id.nearestBadge);
             btnEditStore = itemView.findViewById(R.id.btnEditStore);

@@ -176,7 +176,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="16dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -193,6 +193,15 @@
                 android:checked="true" />
 
         </LinearLayout>
+
+        <!-- Operating Hours Button -->
+        <Button
+            android:id="@+id/btnOperatingHours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thời Gian Hoạt Động"
+            android:layout_marginBottom="24dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
         <!-- Action Buttons -->
         <LinearLayout
