@@ -284,6 +284,13 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
     
+    @POST("orders/{orderId}/cancel")
+    Call<ApiResponse<Object>> cancelOrder(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("orderId") String orderId,
+        @Body java.util.Map<String, Object> body
+    );
+    
     // Change password request model
     class ChangePasswordRequest {
         private String currentPassword;

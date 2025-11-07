@@ -199,10 +199,29 @@ public class RegisterActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(RegisterActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        // Hiển thị message lỗi từ server
+                        String errorMsg = apiResponse.getMessage();
+                        if (errorMsg == null || errorMsg.isEmpty()) {
+                            errorMsg = "Đăng ký thất bại. Vui lòng thử lại.";
+                        }
+                        Toast.makeText(RegisterActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(RegisterActivity.this, "Đăng ký thất bại. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    // Xử lý lỗi HTTP khác (400, 409, etc.)
+                    String errorMsg = "Đăng ký thất bại. Vui lòng thử lại.";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            // Parse error message from server
+                            if (errorBody.contains("message")) {
+                                org.json.JSONObject jsonError = new org.json.JSONObject(errorBody);
+                                errorMsg = jsonError.optString("message", errorMsg);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(RegisterActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
 

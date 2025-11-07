@@ -50,9 +50,24 @@ exports.register = async (req, res, next) => {
 
     const { username, email, password, phoneNumber, address, firstName, lastName } = req.body;
 
-    const existing = await User.findOne({ $or: [{ username }, { email }] });
-    if (existing) {
-      return res.status(400).json({ success: false, message: 'Tên đăng nhập hoặc email đã tồn tại' });
+    // Kiểm tra username đã tồn tại
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).json({ success: false, message: 'Tên đăng nhập đã được sử dụng' });
+    }
+
+    // Kiểm tra email đã tồn tại
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ success: false, message: 'Email đã được đăng ký' });
+    }
+
+    // Kiểm tra số điện thoại đã tồn tại (nếu có)
+    if (phoneNumber) {
+      const existingPhone = await User.findOne({ phoneNumber });
+      if (existingPhone) {
+        return res.status(400).json({ success: false, message: 'Số điện thoại đã được đăng ký' });
+      }
     }
 
     const user = await User.create({

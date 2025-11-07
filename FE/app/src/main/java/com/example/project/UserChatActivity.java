@@ -127,7 +127,7 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
         
         Log.d(TAG, "Loading messages for userId: " + userId);
         
-        apiService.getChatMessages(token, userId, null, null).enqueue(new Callback<ApiResponse<ChatMessage[]>>() {
+        apiService.getChatMessages(token, userId, 100, null).enqueue(new Callback<ApiResponse<ChatMessage[]>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<ChatMessage[]>> call, Response<ApiResponse<ChatMessage[]>> response) {
                     if (progressBar != null) progressBar.setVisibility(View.GONE);

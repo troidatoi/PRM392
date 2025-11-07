@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
         apiService = RetrofitClient.getInstance().getApiService();
         
         // Test network connection
-        NetworkTest.testConnection("http://10.0.2.2:5000/api/health");
+        NetworkTest.testConnection("http://10.0.2.2:5001/api/health");
 
         // Initialize views
         tilEmail = findViewById(R.id.tilEmail);
@@ -154,34 +154,29 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     } else {
+                        // Hiển thị message lỗi từ server
                         String errorMsg = apiResponse.getMessage();
                         if (errorMsg == null || errorMsg.isEmpty()) {
                             errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
                         }
-                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    // Handle error response
+                    // Xử lý lỗi HTTP khác (401, 400, etc.)
                     String errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
-                    if (response.errorBody() != null) {
-                        try {
-                            // Try to parse error response
-                            Gson gson = new Gson();
-                            String errorBodyString = response.errorBody().string();
-                            ApiResponse<?> errorResponse = gson.fromJson(errorBodyString, ApiResponse.class);
-                            if (errorResponse != null && errorResponse.getMessage() != null && !errorResponse.getMessage().isEmpty()) {
-                                errorMsg = errorResponse.getMessage();
-                            } else {
-                                errorMsg = "Lỗi: " + response.code() + " - " + response.message();
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            // Parse error message from server
+                            if (errorBody.contains("message")) {
+                                org.json.JSONObject jsonError = new org.json.JSONObject(errorBody);
+                                errorMsg = jsonError.optString("message", errorMsg);
                             }
-                        } catch (IOException e) {
-                            // If parsing fails, use default message
-                            errorMsg = "Lỗi: " + response.code() + " - " + response.message();
                         }
-                    } else {
-                        errorMsg = "Lỗi: " + response.code() + " - " + response.message();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
 
