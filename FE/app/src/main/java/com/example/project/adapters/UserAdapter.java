@@ -48,12 +48,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = userList.get(position);
+        android.util.Log.d("UserAdapter", "Binding user at position " + position + ": " + (user.getUsername() != null ? user.getUsername() : user.getEmail()));
         holder.bind(user);
     }
 
     @Override
     public int getItemCount() {
-        return userList.size();
+        int count = userList.size();
+        android.util.Log.d("UserAdapter", "getItemCount: " + count);
+        return count;
     }
 
     public class UserViewHolder extends RecyclerView.ViewHolder {

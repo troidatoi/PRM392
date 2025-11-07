@@ -55,7 +55,9 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     @Override
     public void onBindViewHolder(@NonNull StoreViewHolder holder, int position) {
+        android.util.Log.d("StoreAdapter", "onBindViewHolder position=" + position + " of " + storeList.size());
         Store store = storeList.get(position);
+        android.util.Log.d("StoreAdapter", "Binding store: " + store.getName());
 
         holder.tvStoreName.setText(store.getName());
         holder.tvStoreAddress.setText(store.getFullAddress());
@@ -138,7 +140,9 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     @Override
     public int getItemCount() {
-        return storeList.size();
+        int count = storeList.size();
+        android.util.Log.d("StoreAdapter", "getItemCount() returning: " + count);
+        return count;
     }
 
     public void updateStores(List<Store> newStores) {

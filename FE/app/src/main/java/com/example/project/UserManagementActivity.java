@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -167,11 +168,18 @@ public class UserManagementActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<User[]> apiResponse = response.body();
                     if (apiResponse.isSuccess() && apiResponse.getUsers() != null) {
+                        android.util.Log.d("UserManagement", "API returned " + apiResponse.getUsers().length + " users");
+                        
                         userList.clear();
                         userList.addAll(java.util.Arrays.asList(apiResponse.getUsers()));
                         
+                        android.util.Log.d("UserManagement", "UserList size after adding: " + userList.size());
+                        
                         // Apply current filter
                         applyFilter();
+                        
+                        // Update RecyclerView height dynamically
+                        updateRecyclerViewHeight();
                         
                         // Update user count
                         tvUserCount.setText("Total: " + userList.size() + " users");
@@ -309,6 +317,8 @@ public class UserManagementActivity extends AppCompatActivity {
     private void applyFilter() {
         filteredUserList.clear();
 
+        android.util.Log.d("UserManagement", "Applying filter: " + currentFilter + ", userList size: " + userList.size());
+
         for (User user : userList) {
             boolean matches = false;
 
@@ -337,6 +347,8 @@ public class UserManagementActivity extends AppCompatActivity {
             }
         }
 
+        android.util.Log.d("UserManagement", "Filtered list size: " + filteredUserList.size());
+
         userAdapter.notifyDataSetChanged();
 
         // Update UI
@@ -347,6 +359,9 @@ public class UserManagementActivity extends AppCompatActivity {
             emptyStateCard.setVisibility(View.GONE);
             recyclerViewUsers.setVisibility(View.VISIBLE);
         }
+        
+        // Update RecyclerView height after filtering
+        updateRecyclerViewHeight();
     }
 
     private void filterUsers(String query) {
@@ -385,6 +400,9 @@ public class UserManagementActivity extends AppCompatActivity {
             emptyStateCard.setVisibility(View.GONE);
             recyclerViewUsers.setVisibility(View.VISIBLE);
         }
+        
+        // Update RecyclerView height after search
+        updateRecyclerViewHeight();
     }
 
     private void onUserClick(User user) {
@@ -425,6 +443,39 @@ public class UserManagementActivity extends AppCompatActivity {
         }
         emptyStateCard.setVisibility(View.VISIBLE);
         recyclerViewUsers.setVisibility(View.GONE);
+    }
+
+    private void updateRecyclerViewHeight() {
+        if (recyclerViewUsers == null || userAdapter == null || filteredUserList.isEmpty()) {
+            return;
+        }
+
+        recyclerViewUsers.post(() -> {
+            int totalHeight = 0;
+            
+            // Measure all items
+            for (int i = 0; i < userAdapter.getItemCount(); i++) {
+                RecyclerView.ViewHolder holder = userAdapter.createViewHolder(recyclerViewUsers, 0);
+                userAdapter.onBindViewHolder((UserAdapter.UserViewHolder) holder, i);
+                
+                holder.itemView.measure(
+                    View.MeasureSpec.makeMeasureSpec(recyclerViewUsers.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                );
+                
+                totalHeight += holder.itemView.getMeasuredHeight();
+            }
+            
+            // Add extra padding for comfortable scrolling (200dp)
+            float density = getResources().getDisplayMetrics().density;
+            int extraPadding = (int) (200 * density);
+            totalHeight += extraPadding;
+            
+            // Set the calculated height
+            ViewGroup.LayoutParams params = recyclerViewUsers.getLayoutParams();
+            params.height = totalHeight;
+            recyclerViewUsers.setLayoutParams(params);
+        });
     }
 
     @Override

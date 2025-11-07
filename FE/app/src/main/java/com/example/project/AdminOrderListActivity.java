@@ -78,31 +78,25 @@ public class AdminOrderListActivity extends AppCompatActivity {
         AuthManager authManager = AuthManager.getInstance(this);
         ApiService api = RetrofitClient.getInstance().getApiService();
         api.getAllOrders(authManager.getAuthHeader(), status, page, pageSize)
-                .enqueue(new Callback<com.example.project.models.ApiResponse<Object>>() {
+                .enqueue(new Callback<ApiService.OrderResponse>() {
             @Override
-            public void onResponse(Call<com.example.project.models.ApiResponse<Object>> call, Response<com.example.project.models.ApiResponse<Object>> response) {
+            public void onResponse(Call<ApiService.OrderResponse> call, Response<ApiService.OrderResponse> response) {
                 isLoading = false;
                 progressBar.setVisibility(View.GONE);
                 if(response.isSuccessful() && response.body()!=null && response.body().isSuccess()){
                     if(page==1) orders.clear();
-                    List list = (List)response.body().getData();
+                    List<ApiService.OrderData> list = response.body().getData();
                     NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
-                    if(list!=null) for(Object o: list){
-                        if (!(o instanceof java.util.Map)) continue;
-                        java.util.Map m = (java.util.Map) o;
-                        String id = m.get("_id")+"";
-                        String orderNumber = m.get("orderNumber") == null ? "" : String.valueOf(m.get("orderNumber"));
-                        if (orderNumber.isEmpty()) orderNumber = m.get("orderNo") == null ? "" : String.valueOf(m.get("orderNo"));
-                        String status = m.get("orderStatus")+"";
-                        String date = m.get("orderDate")+"";
+                    if(list!=null) for(ApiService.OrderData orderData: list){
+                        String id = orderData.getId();
+                        String orderNumber = orderData.getOrderNumber() != null ? orderData.getOrderNumber() : "";
+                        String status = orderData.getStatus();
+                        String date = orderData.getCreatedAt();
                         String summary = "";
-                        String amount = m.get("finalAmount")+"";
-                        long amountNum = 0L;
-                        try {
-                            Object amt = m.get("finalAmount");
-                            if (amt instanceof Number) amountNum = ((Number) amt).longValue();
-                            else if (amt instanceof String) amountNum = (long) Double.parseDouble((String)amt);
-                        } catch(Exception ignored){}
+                        if (orderData.getItems() != null && !orderData.getItems().isEmpty()) {
+                            summary = orderData.getItems().size() + " sản phẩm";
+                        }
+                        long amountNum = (long)orderData.getTotalAmount();
                         String amountFormatted = fmt.format(amountNum) + " ₫";
                         orders.add(new Order(id, orderNumber, date, status, summary, amountFormatted, Order.mapStatusColor(status)));
                     }
@@ -115,7 +109,7 @@ public class AdminOrderListActivity extends AppCompatActivity {
                 }
             }
             @Override
-            public void onFailure(Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+            public void onFailure(Call<ApiService.OrderResponse> call, Throwable t) {
                 isLoading = false;
                 progressBar.setVisibility(View.GONE);
                 tvEmptyState.setText("Lỗi kết nối: "+t.getMessage());
