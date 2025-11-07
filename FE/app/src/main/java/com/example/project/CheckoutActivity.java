@@ -1,5 +1,7 @@
 package com.example.project;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -642,7 +644,15 @@ public class CheckoutActivity extends AppCompatActivity {
 
 		// Get selected payment method
 		int selectedPaymentId = rgPaymentMethod.getCheckedRadioButtonId();
-		String paymentMethod = "vnpay"; // Chỉ dùng VNPay
+		String paymentMethod = "cash"; // Default: COD
+		
+		if (selectedPaymentId == R.id.rbCOD) {
+			paymentMethod = "cash";
+		} else if (selectedPaymentId == R.id.rbBankTransfer) {
+			paymentMethod = "bank_transfer";
+		} else if (selectedPaymentId == R.id.rbPayOS) {
+			paymentMethod = "payos";
+		}
 
 		// Show confirmation dialog
 		showConfirmationDialog(receiverName, receiverPhone, shippingAddress + "\n" + cityForApi, paymentMethod);
@@ -700,14 +710,30 @@ public class CheckoutActivity extends AppCompatActivity {
 		String cityForApi = (district.isEmpty() ? "" : (district + ", ")) + city;
 		shipping.put("city", cityForApi);
 		body.put("shippingAddress", shipping);
-		body.put("paymentMethod", "vnpay");
+		body.put("paymentMethod", paymentMethod);
 		body.put("notes", "");
 
 		api.createOrders(auth.getAuthHeader(), body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
 			@Override
 			public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
 				if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-					String message = "Đơn hàng đã được tạo và đang chờ thanh toán VNPay.";
+					// Nếu là PayOS, tạo payment link sau khi tạo order thành công
+					if ("payos".equals(paymentMethod)) {
+						handlePayOSPayment(response.body().getData());
+						return;
+					}
+					
+					// Các phương thức thanh toán khác
+					String message = "Đơn hàng đã được tạo thành công.";
+					String title = "Thành công";
+					if ("cash".equals(paymentMethod)) {
+						title = "Đặt hàng thành công";
+						message = "Đơn hàng của bạn đã được tạo. Vui lòng chuẩn bị tiền mặt khi nhận hàng.";
+					} else if ("bank_transfer".equals(paymentMethod)) {
+						title = "Đặt hàng thành công";
+						message = "Đơn hàng của bạn đã được tạo. Vui lòng chuyển khoản theo thông tin được gửi.";
+					}
+					
 					try {
 						Object data = response.body().getData();
 						if (data instanceof java.util.Map) {
@@ -717,13 +743,13 @@ public class CheckoutActivity extends AppCompatActivity {
 								java.util.Map summary = (java.util.Map) summaryObj;
 								Object totalOrders = summary.get("totalOrders");
 								Object totalAmount = summary.get("totalAmount");
-								message = "Tạo " + String.valueOf(totalOrders) + " đơn hàng. Tổng: " + formatCurrency(totalAmount) + " VNĐ";
+								message += "\n\nTạo " + String.valueOf(totalOrders) + " đơn hàng. Tổng: " + formatCurrency(totalAmount) + " VNĐ";
 							}
 						}
 					} catch (Exception ignored) {}
 
 					new AlertDialog.Builder(CheckoutActivity.this)
-						.setTitle("Thanh toán VNPay")
+						.setTitle(title)
 						.setMessage(message)
 						.setPositiveButton("OK", (dialog, which) -> finish())
 						.setCancelable(false)
@@ -754,6 +780,181 @@ public class CheckoutActivity extends AppCompatActivity {
 		if (v instanceof Number) val = ((Number) v).longValue();
 		NumberFormat fmt = NumberFormat.getInstance(new Locale("vi", "VN"));
 		return fmt.format(val);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		if (requestCode == 1001) { // PayOS Payment Activity
+			if (resultCode == RESULT_OK && data != null) {
+				String paymentStatus = data.getStringExtra("paymentStatus");
+				String orderId = data.getStringExtra("orderId");
+				String code = data.getStringExtra("code");
+				String orderCode = data.getStringExtra("orderCode");
+				
+				if ("success".equals(paymentStatus) && orderId != null) {
+					// Thanh toán thành công - cập nhật Payment status
+					confirmPaymentSuccess(orderId, code, orderCode);
+				} else if ("cancelled".equals(paymentStatus)) {
+					// Đã hủy thanh toán
+					new AlertDialog.Builder(this)
+						.setTitle("Đã hủy thanh toán")
+						.setMessage("Bạn đã hủy thanh toán. Đơn hàng vẫn được tạo và đang chờ thanh toán.")
+						.setPositiveButton("OK", (dialog, which) -> finish())
+						.show();
+				}
+			} else if (resultCode == RESULT_CANCELED) {
+				// User đã hủy
+				Toast.makeText(this, "Đã hủy thanh toán", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
+	/**
+	 * Xác nhận thanh toán thành công và cập nhật Payment status
+	 */
+	private void confirmPaymentSuccess(String orderId, String code, String orderCode) {
+		com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+		com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+		
+		java.util.Map<String, Object> body = new java.util.HashMap<>();
+		body.put("code", code);
+		body.put("orderCode", orderCode);
+		body.put("status", "completed");
+		
+		api.confirmPayOSPayment(auth.getAuthHeader(), orderId, body).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+			@Override
+			public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+				if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+					// Thanh toán thành công - chuyển đến trang chi tiết đơn hàng
+					new AlertDialog.Builder(CheckoutActivity.this)
+						.setTitle("Thanh toán thành công")
+						.setMessage("Đơn hàng của bạn đã được thanh toán thành công!")
+						.setPositiveButton("OK", (dialog, which) -> {
+							// Chuyển đến trang chi tiết đơn hàng để xem lại thông tin
+							Intent intent = new Intent(CheckoutActivity.this, OrderDetailActivity.class);
+							intent.putExtra("ORDER_ID", orderId);
+							startActivity(intent);
+							finish(); // Đóng CheckoutActivity sau khi chuyển
+						})
+						.setCancelable(false)
+						.show();
+				} else {
+					// Lỗi khi cập nhật payment status
+					android.util.Log.e("CheckoutActivity", "Error confirming payment: " + (response.errorBody() != null ? response.errorBody().toString() : "Unknown"));
+					new AlertDialog.Builder(CheckoutActivity.this)
+						.setTitle("Thanh toán thành công")
+						.setMessage("Thanh toán đã được xử lý. Đơn hàng của bạn sẽ được cập nhật sớm.")
+						.setPositiveButton("OK", (dialog, which) -> {
+							// Vẫn chuyển đến trang chi tiết đơn hàng để xem lại thông tin
+							Intent intent = new Intent(CheckoutActivity.this, OrderDetailActivity.class);
+							intent.putExtra("ORDER_ID", orderId);
+							startActivity(intent);
+							finish(); // Đóng CheckoutActivity sau khi chuyển
+						})
+						.show();
+				}
+			}
+
+			@Override
+			public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+				android.util.Log.e("CheckoutActivity", "Error confirming payment: " + t.getMessage(), t);
+				// Vẫn hiển thị thành công vì PayOS đã xác nhận
+				new AlertDialog.Builder(CheckoutActivity.this)
+					.setTitle("Thanh toán thành công")
+					.setMessage("Thanh toán đã được xử lý. Đơn hàng của bạn sẽ được cập nhật sớm.")
+					.setPositiveButton("OK", (dialog, which) -> {
+						// Vẫn chuyển đến trang chi tiết đơn hàng để xem lại thông tin
+						Intent intent = new Intent(CheckoutActivity.this, OrderDetailActivity.class);
+						intent.putExtra("ORDER_ID", orderId);
+						startActivity(intent);
+						finish(); // Đóng CheckoutActivity sau khi chuyển
+					})
+					.show();
+			}
+		});
+	}
+
+	/**
+	 * Xử lý thanh toán PayOS sau khi tạo order thành công
+	 */
+	private void handlePayOSPayment(Object orderData) {
+		try {
+			if (!(orderData instanceof java.util.Map)) {
+				Toast.makeText(this, "Lỗi dữ liệu đơn hàng", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			java.util.Map data = (java.util.Map) orderData;
+			java.util.List orders = (java.util.List) data.get("orders");
+			
+			if (orders == null || orders.isEmpty()) {
+				Toast.makeText(this, "Không tìm thấy đơn hàng", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			// Lấy order đầu tiên để tạo payment link
+			java.util.Map firstOrder = (java.util.Map) orders.get(0);
+			java.util.Map order = (java.util.Map) firstOrder.get("order");
+			
+			if (order == null) {
+				Toast.makeText(this, "Lỗi dữ liệu đơn hàng", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			String orderId = String.valueOf(order.get("_id"));
+			
+			// Tạo payment link
+			com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+			com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+			
+			java.util.Map<String, Object> paymentBody = new java.util.HashMap<>();
+			// Return URL và Cancel URL sẽ được backend tự động tạo từ FRONTEND_URL trong .env
+			// Có thể để trống hoặc override nếu cần
+
+			api.createPayOSPaymentLink(auth.getAuthHeader(), orderId, paymentBody).enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+				@Override
+				public void onResponse(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, retrofit2.Response<com.example.project.models.ApiResponse<Object>> response) {
+					if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+						try {
+							Object data = response.body().getData();
+							if (data instanceof java.util.Map) {
+								java.util.Map d = (java.util.Map) data;
+								java.util.Map paymentLink = (java.util.Map) d.get("paymentLink");
+								
+								if (paymentLink != null) {
+									String checkoutUrl = String.valueOf(paymentLink.get("checkoutUrl"));
+									
+									// Mở WebView Activity để thanh toán PayOS trong app
+									Intent paymentIntent = new Intent(CheckoutActivity.this, PayOSPaymentActivity.class);
+									paymentIntent.putExtra("checkoutUrl", checkoutUrl);
+									paymentIntent.putExtra("orderId", orderId);
+									startActivityForResult(paymentIntent, 1001);
+									return;
+								}
+							}
+						} catch (Exception e) {
+							android.util.Log.e("CheckoutActivity", "Error parsing PayOS response: " + e.getMessage(), e);
+						}
+					}
+					
+					// Nếu không tạo được payment link, vẫn hiển thị thông báo thành công
+					Toast.makeText(CheckoutActivity.this, "Đơn hàng đã được tạo. Vui lòng thanh toán sau.", Toast.LENGTH_LONG).show();
+					finish();
+				}
+
+				@Override
+				public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+					android.util.Log.e("CheckoutActivity", "Error creating PayOS payment link: " + t.getMessage(), t);
+					Toast.makeText(CheckoutActivity.this, "Đơn hàng đã được tạo. Lỗi tạo link thanh toán: " + t.getMessage(), Toast.LENGTH_LONG).show();
+					finish();
+				}
+			});
+		} catch (Exception e) {
+			android.util.Log.e("CheckoutActivity", "Error handling PayOS payment: " + e.getMessage(), e);
+			Toast.makeText(this, "Lỗi xử lý thanh toán PayOS: " + e.getMessage(), Toast.LENGTH_LONG).show();
+		}
 	}
 }
 

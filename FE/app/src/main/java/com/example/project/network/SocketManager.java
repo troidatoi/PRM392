@@ -73,7 +73,7 @@ public class SocketManager {
             Log.d(TAG, "Connecting with token: " + token.substring(0, Math.min(20, token.length())) + "...");
             
             // Socket server URL - using port 5001 (same as API server)
-            String serverUrl = "http://10.0.2.2:5001"; // For Android emulator
+            String serverUrl = "http://10.0.2.2:5000"; // For Android emulator
             // String serverUrl = "http://YOUR_SERVER_IP:5001"; // For real device
             
             IO.Options options = new IO.Options();

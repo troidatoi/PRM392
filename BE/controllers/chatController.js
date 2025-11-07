@@ -43,7 +43,8 @@ exports.getChatHistory = async (req, res, next) => {
       sentAt: msg.sentAt.getTime(), // Convert Date to timestamp
       isRead: msg.isRead,
       isEdited: msg.isEdited,
-      isDeleted: msg.isDeleted
+      isDeleted: msg.isDeleted,
+      isFromAdmin: msg.isFromAdmin || false // Thêm field isFromAdmin
     }));
 
     res.status(200).json({
@@ -75,6 +76,7 @@ exports.getConversations = async (req, res, next) => {
         $sort: { sentAt: -1 }
       },
       {
+        // Group theo roomId để mỗi room là 1 conversation riêng biệt
         $group: {
           _id: '$roomId', // Group theo roomId thay vì user
           lastMessage: { $first: '$$ROOT' },
@@ -107,7 +109,16 @@ exports.getConversations = async (req, res, next) => {
         }
       },
       {
-        $unwind: '$user'
+        $unwind: {
+          path: '$user',
+          preserveNullAndEmptyArrays: false // Chỉ lấy conversations có user hợp lệ
+        }
+      },
+      {
+        // Loại trừ admin và staff - chỉ lấy customers
+        $match: {
+          'user.role': { $nin: ['admin', 'staff'] }
+        }
       },
       {
         $project: {

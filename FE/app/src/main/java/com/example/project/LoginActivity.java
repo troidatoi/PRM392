@@ -18,6 +18,9 @@ import com.example.project.utils.NetworkTest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -181,7 +184,12 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
                 btnLogin.setEnabled(true);
                 btnLogin.setText("Đăng nhập");
-                Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                String errorMsg = "Lỗi kết nối: " + t.getMessage();
+                if (t.getMessage() == null || t.getMessage().contains("Failed to connect")) {
+                    errorMsg = "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng và đảm bảo backend đang chạy.";
+                }
+                Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                t.printStackTrace();
             }
         });
     }

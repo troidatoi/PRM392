@@ -239,6 +239,21 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
     
+    // PayOS endpoints
+    @POST("payos/orders/{orderId}/create-link")
+    Call<ApiResponse<Object>> createPayOSPaymentLink(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("orderId") String orderId,
+        @Body java.util.Map<String, Object> body
+    );
+    
+    @POST("payos/orders/{orderId}/confirm-payment")
+    Call<ApiResponse<Object>> confirmPayOSPayment(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("orderId") String orderId,
+        @Body java.util.Map<String, Object> body
+    );
+    
     @GET("orders/user/{userId}")
     Call<ApiResponse<Object>> getUserOrders(
         @Header("Authorization") String token,

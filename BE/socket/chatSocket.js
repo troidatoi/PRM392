@@ -65,6 +65,9 @@ const setupChatSocket = (io) => {
       try {
         const { roomId, message, messageType = 'text', attachments = [], metadata = {} } = data;
 
+        // Xác định isFromAdmin dựa trên role của user
+        const isFromAdmin = socket.user.role === 'admin' || socket.user.role === 'staff';
+        
         // Tạo message mới trong database
         const newMessage = await ChatMessage.create({
           user: socket.userId,
@@ -73,12 +76,13 @@ const setupChatSocket = (io) => {
           messageType,
           attachments,
           metadata,
-          sentAt: new Date()
+          sentAt: new Date(),
+          isFromAdmin: isFromAdmin // Set isFromAdmin khi tạo
         });
 
         // Populate thông tin user
         await newMessage.populate('user', 'username email avatar');
-
+        
         // Gửi message tới room
         io.to(roomId).emit('message:received', {
           _id: newMessage._id,
@@ -88,7 +92,8 @@ const setupChatSocket = (io) => {
           attachments: newMessage.attachments,
           metadata: newMessage.metadata,
           sentAt: newMessage.sentAt.getTime(), // Convert Date to timestamp
-          isRead: newMessage.isRead
+          isRead: newMessage.isRead,
+          isFromAdmin: isFromAdmin // Thêm field isFromAdmin
         });
 
         console.log(`Message sent to room ${roomId}`);

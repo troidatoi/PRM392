@@ -31,6 +31,9 @@ public class ChatMessage {
     @SerializedName("isDeleted")
     private boolean isDeleted;
     
+    @SerializedName("isFromAdmin")
+    private Boolean isFromAdmin; // null nếu không có từ backend
+    
     // Legacy fields for compatibility
     private String messageId;
     private String senderId;
@@ -242,6 +245,14 @@ public class ChatMessage {
 
     public void setFromUser(boolean fromUser) {
         isFromUser = fromUser;
+    }
+    
+    public Boolean getIsFromAdmin() {
+        return isFromAdmin;
+    }
+    
+    public void setIsFromAdmin(Boolean isFromAdmin) {
+        this.isFromAdmin = isFromAdmin;
     }
 
     public String getMessageId() {

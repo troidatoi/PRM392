@@ -733,8 +733,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadBikes() {
-        // Call API to get all bikes
-        apiService.getBikes(1, 100, null, null, null, null, null, null, null).enqueue(new Callback<ApiResponse<Bike[]>>() {
+        // Call API to get only available bikes for customers
+        apiService.getBikes(1, 100, null, "available", null, null, null, null, null).enqueue(new Callback<ApiResponse<Bike[]>>() {
             @Override
             public void onResponse(Call<ApiResponse<Bike[]>> call, Response<ApiResponse<Bike[]>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
