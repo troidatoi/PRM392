@@ -36,6 +36,8 @@ const userSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     trim: true,
+    sparse: true, // Cho phép multiple null values nhưng unique khi có giá trị
+    unique: true,
     match: [/^[0-9]{10,11}$/, 'Số điện thoại không hợp lệ']
   },
   address: {

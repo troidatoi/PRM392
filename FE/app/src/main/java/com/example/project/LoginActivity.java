@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         apiService = RetrofitClient.getInstance().getApiService();
         
         // Test network connection
-        NetworkTest.testConnection("http://10.0.2.2:5000/api/health");
+        NetworkTest.testConnection("http://10.0.2.2:5001/api/health");
 
         // Initialize views
         tilEmail = findViewById(R.id.tilEmail);
@@ -151,10 +151,29 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(LoginActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        // Hiển thị message lỗi từ server
+                        String errorMsg = apiResponse.getMessage();
+                        if (errorMsg == null || errorMsg.isEmpty()) {
+                            errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
+                        }
+                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thất bại. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    // Xử lý lỗi HTTP khác (401, 400, etc.)
+                    String errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            // Parse error message from server
+                            if (errorBody.contains("message")) {
+                                org.json.JSONObject jsonError = new org.json.JSONObject(errorBody);
+                                errorMsg = jsonError.optString("message", errorMsg);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
 

@@ -33,7 +33,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     private TextView tvSubtotal, tvShippingFee, tvTotal;
     private RecyclerView rvOrderItems;
     private View loadingView;
-    private Button btnConfirmOrder, btnShipOrder, btnDelivered;
+    private Button btnConfirmOrder, btnShipOrder, btnDelivered, btnCancelOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +76,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
         btnShipOrder = findViewById(R.id.btnShipOrder);
         btnDelivered = findViewById(R.id.btnDelivered);
+        btnCancelOrder = findViewById(R.id.btnCancelOrder);
     }
 
     private void setupListeners() {
@@ -91,6 +92,38 @@ public class OrderDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // TODO: Implement contact support functionality
                 // For example: open chat, call support, or send email
+            }
+        });
+
+        // Admin: Xác nhận đơn hàng (Pending -> Confirmed)
+        btnConfirmOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateOrderStatus("confirmed");
+            }
+        });
+
+        // Admin: Giao hàng (Confirmed -> Shipped)
+        btnShipOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateOrderStatus("shipped");
+            }
+        });
+
+        // User: Xác nhận đã nhận hàng (Shipped -> Delivered)
+        btnDelivered.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateOrderStatus("delivered");
+            }
+        });
+
+        // User: Hủy đơn hàng
+        btnCancelOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCancelOrderDialog();
             }
         });
     }
@@ -187,19 +220,35 @@ public class OrderDetailActivity extends AppCompatActivity {
                         AuthManager auth = AuthManager.getInstance(OrderDetailActivity.this);
                         boolean isAdmin = auth.getCurrentUser() != null && "admin".equalsIgnoreCase(auth.getCurrentUser().getRole());
                         if (isAdmin) {
+                            // Admin: Hiển thị các nút thay đổi trạng thái, ẩn nút liên hệ hỗ trợ
+                            btnContactSupport.setVisibility(View.GONE);
                             if ((status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận"))) {
                                 btnConfirmOrder.setVisibility(View.VISIBLE);
                             } else { btnConfirmOrder.setVisibility(View.GONE); }
                             if ((status.equalsIgnoreCase("confirmed") || mapStatusText(status).equals("Đã xác nhận"))) {
                                 btnShipOrder.setVisibility(View.VISIBLE);
                             } else { btnShipOrder.setVisibility(View.GONE); }
-                            btnDelivered.setVisibility(View.GONE);
+                            // Admin có thể xác nhận đã giao hàng khi đơn đang giao
+                            if ((status.equalsIgnoreCase("shipped") || mapStatusText(status).equals("Đang giao hàng"))) {
+                                btnDelivered.setVisibility(View.VISIBLE);
+                            } else { btnDelivered.setVisibility(View.GONE); }
+                            // Admin không có nút hủy
+                            btnCancelOrder.setVisibility(View.GONE);
                         } else {
+                            // User: Ẩn nút liên hệ hỗ trợ
+                            btnContactSupport.setVisibility(View.GONE);
                             if ((status.equalsIgnoreCase("shipped") || mapStatusText(status).equals("Đang giao hàng"))) {
                                 btnDelivered.setVisibility(View.VISIBLE);
                             } else { btnDelivered.setVisibility(View.GONE); }
                             btnConfirmOrder.setVisibility(View.GONE);
                             btnShipOrder.setVisibility(View.GONE);
+                            // User có thể hủy đơn khi đơn đang ở trạng thái Pending hoặc Confirmed
+                            if ((status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận") ||
+                                status.equalsIgnoreCase("confirmed") || mapStatusText(status).equals("Đã xác nhận"))) {
+                                btnCancelOrder.setVisibility(View.VISIBLE);
+                            } else {
+                                btnCancelOrder.setVisibility(View.GONE);
+                            }
                         }
                     } catch(Exception e) {
                         showErr("Lỗi dữ liệu đơn hàng. Thử lại sau.");
@@ -223,6 +272,119 @@ public class OrderDetailActivity extends AppCompatActivity {
         android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_LONG).show();
         new Handler().postDelayed(this::finish, 1200);
     }
+
+    // Thay đổi trạng thái đơn hàng
+    private void updateOrderStatus(String newStatus) {
+        String orderId = getIntent().getStringExtra("ORDER_ID");
+        if (orderId == null || orderId.isEmpty()) {
+            android.widget.Toast.makeText(this, "Không tìm thấy ID đơn hàng", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Hiển thị dialog xác nhận
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xác nhận")
+                .setMessage("Bạn có chắc muốn thay đổi trạng thái đơn hàng?")
+                .setPositiveButton("Đồng ý", (dialog, which) -> {
+                    performUpdateOrderStatus(orderId, newStatus);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void performUpdateOrderStatus(String orderId, String newStatus) {
+        showLoading(true);
+        AuthManager auth = AuthManager.getInstance(this);
+        ApiService api = RetrofitClient.getInstance().getApiService();
+
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("status", newStatus);
+
+        api.updateOrderStatus(auth.getAuthHeader(), orderId, body).enqueue(new retrofit2.Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ApiResponse<Object>> call, retrofit2.Response<ApiResponse<Object>> response) {
+                showLoading(false);
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    android.widget.Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                    // Reload order data để hiển thị trạng thái mới
+                    loadOrderData();
+                } else {
+                    android.widget.Toast.makeText(OrderDetailActivity.this, "Cập nhật thất bại. Vui lòng thử lại!", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ApiResponse<Object>> call, Throwable t) {
+                showLoading(false);
+                android.widget.Toast.makeText(OrderDetailActivity.this, "Lỗi mạng: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Hiển thị dialog nhập lý do hủy đơn hàng
+    private void showCancelOrderDialog() {
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Nhập lý do hủy đơn hàng");
+        input.setMinLines(3);
+        input.setMaxLines(5);
+        input.setPadding(50, 30, 50, 30);
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Hủy đơn hàng")
+                .setMessage("Bạn có chắc muốn hủy đơn hàng này?")
+                .setView(input)
+                .setPositiveButton("Hủy đơn hàng", (dialog, which) -> {
+                    String reason = input.getText().toString().trim();
+                    if (reason.isEmpty()) {
+                        android.widget.Toast.makeText(OrderDetailActivity.this, "Vui lòng nhập lý do hủy đơn", android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    performCancelOrder(reason);
+                })
+                .setNegativeButton("Đóng", null)
+                .show();
+    }
+
+    // Thực hiện hủy đơn hàng
+    private void performCancelOrder(String reason) {
+        String orderId = getIntent().getStringExtra("ORDER_ID");
+        if (orderId == null || orderId.isEmpty()) {
+            android.widget.Toast.makeText(this, "Không tìm thấy ID đơn hàng", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        showLoading(true);
+        AuthManager auth = AuthManager.getInstance(this);
+        ApiService api = RetrofitClient.getInstance().getApiService();
+
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("reason", reason);
+
+        api.cancelOrder(auth.getAuthHeader(), orderId, body).enqueue(new retrofit2.Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ApiResponse<Object>> call, retrofit2.Response<ApiResponse<Object>> response) {
+                showLoading(false);
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    android.widget.Toast.makeText(OrderDetailActivity.this, "Hủy đơn hàng thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                    // Reload order data để hiển thị trạng thái mới
+                    loadOrderData();
+                } else {
+                    String errorMsg = "Hủy đơn hàng thất bại. Vui lòng thử lại!";
+                    if (response.body() != null && response.body().getMessage() != null) {
+                        errorMsg = response.body().getMessage();
+                    }
+                    android.widget.Toast.makeText(OrderDetailActivity.this, errorMsg, android.widget.Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ApiResponse<Object>> call, Throwable t) {
+                showLoading(false);
+                android.widget.Toast.makeText(OrderDetailActivity.this, "Lỗi mạng: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private String val(java.util.Map m, String key) { Object v = m.get(key); return v == null ? "" : String.valueOf(v); }
     private long valN(java.util.Map m, String... keys) {
         for (String key : keys) {

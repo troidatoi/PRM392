@@ -672,17 +672,18 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void setupStoreStock() {
-        // TODO: Load real store stock data from database
-        productStockList = new ArrayList<>();
-        productStockList.add(new ProductStock(1, "Chi nhánh Quận 1", "123 Nguyễn Huệ, Q.1, TP.HCM", 24, "Còn hàng"));
-        productStockList.add(new ProductStock(2, "Chi nhánh Quận 3", "456 Võ Văn Tần, Q.3, TP.HCM", 8, "Sắp hết"));
-        productStockList.add(new ProductStock(3, "Chi nhánh Bình Thạnh", "789 Điện Biên Phủ, Q.Bình Thạnh", 15, "Còn hàng"));
-        productStockList.add(new ProductStock(4, "Chi nhánh Quận 7", "321 Nguyễn Thị Thập, Q.7, TP.HCM", 0, "Hết hàng"));
-        productStockList.add(new ProductStock(5, "Chi nhánh Thủ Đức", "555 Võ Văn Ngân, TP.Thủ Đức", 12, "Còn hàng"));
-
-        stockAdapter = new ProductStockAdapter(productStockList);
-        rvStoreStock.setLayoutManager(new LinearLayoutManager(this));
-        rvStoreStock.setAdapter(stockAdapter);
+        // If we have bikeId, load from API
+        if (bikeId != null && !bikeId.isEmpty()) {
+            loadProductInventory(bikeId);
+        } else {
+            // Show empty state or fallback UI
+            productStockList = new ArrayList<>();
+            productStockList.add(new ProductStock(1, "Không có thông tin", "Vui lòng thử lại sau", 0, "Không rõ"));
+            
+            stockAdapter = new ProductStockAdapter(productStockList);
+            rvStoreStock.setLayoutManager(new LinearLayoutManager(this));
+            rvStoreStock.setAdapter(stockAdapter);
+        }
     }
     
     private void loadProductInventory(String productId) {
@@ -738,21 +739,40 @@ public class ProductDetailActivity extends AppCompatActivity {
                         rvStoreStock.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this));
                         rvStoreStock.setAdapter(stockAdapter);
                     } else {
-                        // No inventory found, use dummy data
-                        setupStoreStock();
+                        // No inventory found, show empty state
+                        productStockList = new ArrayList<>();
+                        productStockList.add(new ProductStock(1, "Hiện tại chưa có hàng", 
+                            "Sản phẩm này hiện tại chưa có tại các cửa hàng", 0, "Chưa có"));
+                        
+                        stockAdapter = new ProductStockAdapter(productStockList);
+                        rvStoreStock.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this));
+                        rvStoreStock.setAdapter(stockAdapter);
                     }
                 } else {
-                    // Failed to load, use dummy data
-                    setupStoreStock();
+                    // API response not successful
+                    productStockList = new ArrayList<>();
+                    productStockList.add(new ProductStock(1, "Hiện tại chưa có hàng", 
+                        "Sản phẩm này hiện tại chưa có tại các cửa hàng", 0, "Chưa có"));
+                    
+                    stockAdapter = new ProductStockAdapter(productStockList);
+                    rvStoreStock.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this));
+                    rvStoreStock.setAdapter(stockAdapter);
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<java.util.List<Object>>> call, Throwable t) {
-                // Error loading, use dummy data
+                // Error loading, show error state
                 Toast.makeText(ProductDetailActivity.this, 
                     "Không thể tải thông tin tồn kho", Toast.LENGTH_SHORT).show();
-                setupStoreStock();
+                
+                productStockList = new ArrayList<>();
+                productStockList.add(new ProductStock(1, "Lỗi kết nối", 
+                    "Không thể kết nối đến máy chủ", 0, "Lỗi"));
+                
+                stockAdapter = new ProductStockAdapter(productStockList);
+                rvStoreStock.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this));
+                rvStoreStock.setAdapter(stockAdapter);
             }
         });
     }

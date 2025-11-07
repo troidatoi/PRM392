@@ -521,23 +521,49 @@ const getAllOrders = async (req, res) => {
     const query = {};
     if (status) query.orderStatus = status;
     const skip = (page - 1) * limit;
+    
     const orders = await Order.find(query)
-      .populate('user', 'username email')
-      .populate('store', 'name')
-      .populate('orderDetails', 'product quantity price totalPrice')
+      .populate('user', 'username email phoneNumber')
+      .populate('store', 'name address')
       .sort({ orderDate: -1 })
       .skip(skip)
       .limit(parseInt(limit));
+    
     const total = await Order.countDocuments(query);
+    
+    // Transform orders to include items
+    const ordersWithItems = await Promise.all(orders.map(async (order) => {
+      const orderDetails = await OrderDetail.find({ order: order._id })
+        .populate('product', 'name images price');
+      
+      return {
+        _id: order._id,
+        orderNumber: order.orderNumber,
+        userId: order.user?._id,
+        user: order.user,
+        status: order.orderStatus,
+        totalAmount: order.totalAmount,
+        shippingAddress: order.shippingAddress,
+        paymentMethod: order.paymentMethod,
+        createdAt: order.orderDate,
+        updatedAt: order.updatedAt,
+        items: orderDetails.map(detail => ({
+          product: detail.product,
+          quantity: detail.quantity,
+          price: detail.price,
+          totalPrice: detail.totalPrice
+        }))
+      };
+    }));
+    
     res.json({
       success: true,
-      data: orders,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / limit)
-      }
+      message: 'Lấy danh sách đơn hàng thành công',
+      data: ordersWithItems,
+      count: ordersWithItems.length,
+      total: total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit)
     });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
