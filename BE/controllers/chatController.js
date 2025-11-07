@@ -21,16 +21,12 @@ exports.getChatHistory = async (req, res, next) => {
       query.sentAt = { $lt: new Date(before) };
     }
 
-    // Lấy tin nhắn mới nhất trước (descending), sau đó reverse để hiển thị đúng thứ tự
     const messages = await ChatMessage.find(query)
       .populate('user', 'username email avatar')
-      .sort({ sentAt: -1 }) // Descending order (newest first) - để lấy N tin nhắn mới nhất
+      .sort({ sentAt: 1 }) // Ascending order (oldest first)
       .limit(parseInt(limit));
 
     console.log(`Found ${messages.length} messages in room ${roomId}`);
-
-    // Reverse array để hiển thị đúng thứ tự (oldest first) cho client
-    messages.reverse();
 
     // Convert sentAt to timestamp for consistency with Socket.IO
     const formattedMessages = messages.map(msg => ({
@@ -64,12 +60,13 @@ exports.getConversations = async (req, res, next) => {
   try {
     console.log('GET /api/chat/conversations - Admin:', req.user.role);
     
-    // Lấy danh sách unique rooms (conversations)
+    // Lấy danh sách unique rooms (mỗi room = 1 conversation với 1 customer)
+    // Chỉ lấy messages có roomId bắt đầu bằng "admin_"
     const conversations = await ChatMessage.aggregate([
       {
         $match: {
           isDeleted: false,
-          roomId: { $regex: '^admin_' } // Chỉ lấy các room của admin
+          roomId: { $regex: /^admin_/ } // Chỉ lấy messages trong admin rooms
         }
       },
       {
@@ -78,7 +75,7 @@ exports.getConversations = async (req, res, next) => {
       {
         // Group theo roomId để mỗi room là 1 conversation riêng biệt
         $group: {
-          _id: '$roomId', // Group theo roomId thay vì user
+          _id: '$roomId',
           lastMessage: { $first: '$$ROOT' },
           unreadCount: {
             $sum: {
@@ -89,22 +86,30 @@ exports.getConversations = async (req, res, next) => {
         }
       },
       {
+        // Extract userId từ roomId: "admin_userId" -> userId
         $addFields: {
-          // Extract userId from roomId (admin_userId)
-          userId: { $substr: ['$_id', 6, -1] }
+          extractedUserId: {
+            $arrayElemAt: [
+              { $split: ['$_id', '_'] },
+              1
+            ]
+          }
         }
       },
       {
-        $addFields: {
-          // Convert string to ObjectId
-          userObjectId: { $toObjectId: '$userId' }
-        }
-      },
-      {
+        // Lookup user từ extracted userId (userId của customer trong room)
         $lookup: {
           from: 'users',
-          localField: 'userObjectId',
-          foreignField: '_id',
+          let: { userIdStr: '$extractedUserId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$_id', { $toObjectId: '$$userIdStr' }]
+                }
+              }
+            }
+          ],
           as: 'user'
         }
       },
@@ -125,9 +130,7 @@ exports.getConversations = async (req, res, next) => {
           'user.password': 0,
           'user.passwordHash': 0,
           'user.resetPasswordToken': 0,
-          'user.resetPasswordExpire': 0,
-          userId: 0,
-          userObjectId: 0
+          'user.resetPasswordExpire': 0
         }
       },
       {
