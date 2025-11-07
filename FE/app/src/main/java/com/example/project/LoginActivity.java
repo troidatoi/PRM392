@@ -18,6 +18,9 @@ import com.example.project.utils.NetworkTest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+
+import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -151,10 +154,34 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(LoginActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        String errorMsg = apiResponse.getMessage();
+                        if (errorMsg == null || errorMsg.isEmpty()) {
+                            errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
+                        }
+                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Đăng nhập thất bại. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    // Handle error response
+                    String errorMsg = "Đăng nhập thất bại. Vui lòng thử lại.";
+                    if (response.errorBody() != null) {
+                        try {
+                            // Try to parse error response
+                            Gson gson = new Gson();
+                            String errorBodyString = response.errorBody().string();
+                            ApiResponse<?> errorResponse = gson.fromJson(errorBodyString, ApiResponse.class);
+                            if (errorResponse != null && errorResponse.getMessage() != null && !errorResponse.getMessage().isEmpty()) {
+                                errorMsg = errorResponse.getMessage();
+                            } else {
+                                errorMsg = "Lỗi: " + response.code() + " - " + response.message();
+                            }
+                        } catch (IOException e) {
+                            // If parsing fails, use default message
+                            errorMsg = "Lỗi: " + response.code() + " - " + response.message();
+                        }
+                    } else {
+                        errorMsg = "Lỗi: " + response.code() + " - " + response.message();
+                    }
+                    Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -162,7 +189,12 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
                 btnLogin.setEnabled(true);
                 btnLogin.setText("Đăng nhập");
-                Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                String errorMsg = "Lỗi kết nối: " + t.getMessage();
+                if (t.getMessage() == null || t.getMessage().contains("Failed to connect")) {
+                    errorMsg = "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng và đảm bảo backend đang chạy.";
+                }
+                Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                t.printStackTrace();
             }
         });
     }

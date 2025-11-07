@@ -77,26 +77,39 @@ exports.login = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Login validation errors:', errors.array());
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
     const { usernameOrEmail, password } = req.body;
+    console.log('Login attempt for:', usernameOrEmail);
+    
     const user = await User.findOne({
       $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
     });
 
     if (!user) {
+      console.log('User not found:', usernameOrEmail);
       return res.status(401).json({ success: false, message: 'Tài khoản không tồn tại' });
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      console.log('User account is inactive:', usernameOrEmail);
+      return res.status(403).json({ success: false, message: 'Tài khoản đã bị khóa' });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log('Password mismatch for user:', usernameOrEmail);
       return res.status(401).json({ success: false, message: 'Mật khẩu không đúng' });
     }
 
+    console.log('Login successful for user:', usernameOrEmail);
     await user.updateLastLogin();
     sendTokenResponse(user, 200, res);
   } catch (err) {
+    console.error('Login error:', err);
     next(err);
   }
 };

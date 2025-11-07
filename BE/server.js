@@ -47,7 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://yourdomain.com'] 
-    : ['http://localhost:3000', 'http://localhost:3001'],
+    : true, // Allow all origins in development (including Android emulator)
   credentials: true
 }));
 
