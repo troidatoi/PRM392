@@ -14,10 +14,10 @@ async function getResetTokenForUser() {
   }
 
   try {
-    if (!process.env.MONGO_URI) {
-        throw new Error('MONGO_URI not found in .env file');
+    if (!process.env.MONGODB_URI) {
+        throw new Error('MONGODB_URI not found in .env file');
     }
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('🔗 Connected to MongoDB');
     
     const user = await User.findOne({ email });
