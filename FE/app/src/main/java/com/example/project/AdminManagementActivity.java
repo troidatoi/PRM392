@@ -32,6 +32,7 @@ public class AdminManagementActivity extends AppCompatActivity {
     private ImageView iconDashboard, iconUserManagement, iconProductManagement, iconStoreManagement, iconOrderManagement, iconChatManagement;
     private TextView tvDashboard, tvUserManagement, tvProductManagement, tvStoreManagement, tvOrderManagement, tvChatManagement;
     private CardView cardDashboard, cardUserManagement, cardProductManagement, cardStoreManagement, cardOrderManagement, cardChatManagement;
+    private CardView cardInventoryTurnover;
     
     // Chart views
     private TextView tvYAxisMax, tvYAxisMid2, tvYAxisMid1;
@@ -120,6 +121,7 @@ public class AdminManagementActivity extends AppCompatActivity {
         cardStoreManagement = findViewById(R.id.cardStoreManagement);
         cardOrderManagement = findViewById(R.id.cardOrderManagement);
         cardChatManagement = findViewById(R.id.cardChatManagement);
+        cardInventoryTurnover = findViewById(R.id.cardInventoryTurnover);
         
         // Initialize chart views
         initChartViews();
@@ -983,7 +985,13 @@ public class AdminManagementActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        // No management buttons in new design - only bottom navigation
+        // Inventory Turnover Card
+        if (cardInventoryTurnover != null) {
+            cardInventoryTurnover.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminManagementActivity.this, InventoryTurnoverActivity.class);
+                startActivity(intent);
+            });
+        }
 
         // Bottom navigation actions
         if (navDashboard != null) {

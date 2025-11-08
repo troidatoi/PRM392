@@ -244,6 +244,12 @@
             android:exported="false"
             android:theme="@style/Theme.Project" />
 
+        <!-- Inventory Turnover Activity -->
+        <activity
+            android:name=".InventoryTurnoverActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Project" />
+
         <!-- Store List Activity -->
         <activity
             android:name=".StoreListActivity"

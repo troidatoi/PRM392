@@ -198,6 +198,17 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
 
+    @GET("inventory/turnover-ratio")
+    Call<InventoryTurnoverResponse> getInventoryTurnover(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("storeId") String storeId,
+        @retrofit2.http.Query("limit") Integer limit,
+        @retrofit2.http.Query("minStock") Integer minStock,
+        @retrofit2.http.Query("sortBy") String sortBy
+    );
+
     // Store endpoints
     @GET("stores")
     Call<StoreResponse> getStores(
@@ -2048,5 +2059,114 @@ public interface ApiService {
         public void setStoreCount(int storeCount) {
             this.storeCount = storeCount;
         }
+    }
+    
+    // Inventory Turnover Response
+    class InventoryTurnoverResponse {
+        private boolean success;
+        private String message;
+        private InventoryTurnoverData data;
+        
+        public boolean isSuccess() { return success; }
+        public void setSuccess(boolean success) { this.success = success; }
+        
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+        
+        public InventoryTurnoverData getData() { return data; }
+        public void setData(InventoryTurnoverData data) { this.data = data; }
+    }
+    
+    class InventoryTurnoverData {
+        private List<ProductTurnover> products;
+        private Summary summary;
+        private Period period;
+        
+        public List<ProductTurnover> getProducts() { return products; }
+        public void setProducts(List<ProductTurnover> products) { this.products = products; }
+        
+        public Summary getSummary() { return summary; }
+        public void setSummary(Summary summary) { this.summary = summary; }
+        
+        public Period getPeriod() { return period; }
+        public void setPeriod(Period period) { this.period = period; }
+    }
+    
+    class ProductTurnover {
+        private String productId;
+        private String productName;
+        private String productBrand;
+        private String productCategory;
+        private String imageUrl;
+        private int currentStock;
+        private int totalStockAcrossStores;
+        private int totalQuantitySold;
+        private int totalOrders;
+        private double turnoverRatio;
+        private double daysToSellOut;
+        private double totalRevenue;
+        private double averagePrice;
+        
+        public String getProductId() { return productId; }
+        public void setProductId(String productId) { this.productId = productId; }
+        
+        public String getProductName() { return productName; }
+        public void setProductName(String productName) { this.productName = productName; }
+        
+        public String getProductBrand() { return productBrand; }
+        public void setProductBrand(String productBrand) { this.productBrand = productBrand; }
+        
+        public String getProductCategory() { return productCategory; }
+        public void setProductCategory(String productCategory) { this.productCategory = productCategory; }
+        
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+        
+        public int getCurrentStock() { return currentStock; }
+        public void setCurrentStock(int currentStock) { this.currentStock = currentStock; }
+        
+        public int getTotalStockAcrossStores() { return totalStockAcrossStores; }
+        public void setTotalStockAcrossStores(int totalStockAcrossStores) { this.totalStockAcrossStores = totalStockAcrossStores; }
+        
+        public int getTotalQuantitySold() { return totalQuantitySold; }
+        public void setTotalQuantitySold(int totalQuantitySold) { this.totalQuantitySold = totalQuantitySold; }
+        
+        public int getTotalOrders() { return totalOrders; }
+        public void setTotalOrders(int totalOrders) { this.totalOrders = totalOrders; }
+        
+        public double getTurnoverRatio() { return turnoverRatio; }
+        public void setTurnoverRatio(double turnoverRatio) { this.turnoverRatio = turnoverRatio; }
+        
+        public double getDaysToSellOut() { return daysToSellOut; }
+        public void setDaysToSellOut(double daysToSellOut) { this.daysToSellOut = daysToSellOut; }
+        
+        public double getTotalRevenue() { return totalRevenue; }
+        public void setTotalRevenue(double totalRevenue) { this.totalRevenue = totalRevenue; }
+        
+        public double getAveragePrice() { return averagePrice; }
+        public void setAveragePrice(double averagePrice) { this.averagePrice = averagePrice; }
+    }
+    
+    class Summary {
+        private double averageTurnoverRatio;
+        private int totalProducts;
+        private int fastMovingProducts;
+        private int slowMovingProducts;
+        private int outOfStockProducts;
+        
+        public double getAverageTurnoverRatio() { return averageTurnoverRatio; }
+        public void setAverageTurnoverRatio(double averageTurnoverRatio) { this.averageTurnoverRatio = averageTurnoverRatio; }
+        
+        public int getTotalProducts() { return totalProducts; }
+        public void setTotalProducts(int totalProducts) { this.totalProducts = totalProducts; }
+        
+        public int getFastMovingProducts() { return fastMovingProducts; }
+        public void setFastMovingProducts(int fastMovingProducts) { this.fastMovingProducts = fastMovingProducts; }
+        
+        public int getSlowMovingProducts() { return slowMovingProducts; }
+        public void setSlowMovingProducts(int slowMovingProducts) { this.slowMovingProducts = slowMovingProducts; }
+        
+        public int getOutOfStockProducts() { return outOfStockProducts; }
+        public void setOutOfStockProducts(int outOfStockProducts) { this.outOfStockProducts = outOfStockProducts; }
     }
 }

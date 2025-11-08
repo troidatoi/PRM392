@@ -35,7 +35,7 @@ public class ProductManagementActivity extends AppCompatActivity {
     private RecyclerView rvProducts;
     private LinearLayout emptyState;
     private TextView tvBikeCount;
-    private CardView btnBack, btnAddProduct;
+    private CardView btnBack, btnAddProduct, btnTurnoverStats;
     private EditText etSearch;
     private ProgressBar progressBar;
     private ProductCardAdapter productAdapter;
@@ -71,6 +71,7 @@ public class ProductManagementActivity extends AppCompatActivity {
         // Buttons
         btnBack = findViewById(R.id.btnBack);
         btnAddProduct = findViewById(R.id.btnAddProduct);
+        btnTurnoverStats = findViewById(R.id.btnTurnoverStats);
         
         // Search
         etSearch = findViewById(R.id.etSearch);
@@ -206,6 +207,14 @@ public class ProductManagementActivity extends AppCompatActivity {
             Intent intent = new Intent(ProductManagementActivity.this, CreateBikeActivity.class);
             startActivityForResult(intent, 1001);
         });
+        
+        // Turnover stats button
+        if (btnTurnoverStats != null) {
+            btnTurnoverStats.setOnClickListener(v -> {
+                Intent intent = new Intent(ProductManagementActivity.this, InventoryTurnoverActivity.class);
+                startActivity(intent);
+            });
+        }
 
         // Search functionality
         if (etSearch != null) {
