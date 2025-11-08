@@ -4,19 +4,19 @@ const OrderDetail = require('../models/OrderDetail');
 const Inventory = require('../models/Inventory');
 
 /**
- * Cron job để tự động hủy payment và order sau 24h nếu payment vẫn pending
- * Chạy mỗi giờ để check và cleanup
+ * Cron job để tự động hủy payment và order sau 10 phút nếu payment vẫn pending
+ * Chạy mỗi 10 phút để check và cleanup
  */
 const cleanupPendingPayments = async () => {
   try {
     const now = new Date();
-    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000); // 10 phút = 10 * 60 * 1000ms
 
-    // Tìm tất cả payment pending đã tạo hơn 24h trước
+    // Tìm tất cả payment pending đã tạo hơn 10 phút trước
     const pendingPayments = await Payment.find({
       paymentStatus: 'pending',
       paymentMethod: { $in: ['payos', 'vnpay'] }, // Chỉ xử lý online payment
-      createdAt: { $lt: twentyFourHoursAgo }
+      createdAt: { $lt: tenMinutesAgo }
     }).populate('order');
 
     if (pendingPayments.length === 0) {
@@ -46,7 +46,7 @@ const cleanupPendingPayments = async () => {
         // Cancel payment - dùng 'cancelled' vì đây là timeout/hết hạn, không phải lỗi kỹ thuật
         currentPayment.paymentStatus = 'cancelled';
         currentPayment.processedAt = new Date();
-        currentPayment.notes = 'Tự động hủy sau 24h không thanh toán';
+        currentPayment.notes = 'Tự động hủy sau 10 phút không thanh toán';
         await currentPayment.save();
         console.log(`[Payment Cleanup] Đã hủy payment ${currentPayment._id}`);
 
@@ -71,7 +71,7 @@ const cleanupPendingPayments = async () => {
 
           // Cancel order
           order.orderStatus = 'cancelled';
-          order.notes = 'Tự động hủy: Thanh toán không hoàn tất sau 24h';
+          order.notes = 'Tự động hủy: Thanh toán không hoàn tất sau 10 phút';
           await order.save();
           
           console.log(`[Payment Cleanup] Đã hủy order ${order._id} và restore inventory`);

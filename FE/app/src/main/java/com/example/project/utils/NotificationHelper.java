@@ -246,7 +246,8 @@ public class NotificationHelper {
                 return;
             }
 
-            // Nếu không có payment pending, xóa badge
+            // Nếu không có payment pending hợp lệ, xóa badge
+            // (Payment pending hợp lệ = payment status = 'pending' và order chưa bị hủy)
             if (pendingCount <= 0) {
                 Log.d(TAG, "No pending payments, removing badge");
                 removePaymentBadge(context);

@@ -417,6 +417,8 @@ public class OrderDetailActivity extends AppCompatActivity {
                 showLoading(false);
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     android.widget.Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                    // Cập nhật payment badge nếu order status thay đổi (có thể ảnh hưởng đến pending payments)
+                    updatePaymentBadge();
                     // Reload order data để hiển thị trạng thái mới
                     loadOrderData();
                 } else {
@@ -641,6 +643,8 @@ public class OrderDetailActivity extends AppCompatActivity {
                 showLoading(false);
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     android.widget.Toast.makeText(OrderDetailActivity.this, "Hủy đơn hàng thành công!", android.widget.Toast.LENGTH_SHORT).show();
+                    // Cập nhật payment badge ngay lập tức khi hủy đơn (để thông báo biến mất ngay)
+                    updatePaymentBadge();
                     // Reload order data để hiển thị trạng thái mới
                     loadOrderData();
                 } else {

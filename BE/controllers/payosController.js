@@ -513,14 +513,23 @@ const getPendingPayments = async (req, res) => {
       });
     });
 
-    // Lọc chỉ lấy những order còn ở trạng thái awaiting_payment hoặc pending
+    // Lọc chỉ lấy những payment pending với order chưa bị hủy
+    // Chỉ hiển thị thông báo khi:
+    // 1. Payment status = 'pending'
+    // 2. Order status = 'awaiting_payment' hoặc 'pending' (chưa bị hủy)
     const validPayments = pendingPayments.filter(payment => {
-      const isValid = payment.order && 
-             (payment.order.orderStatus === 'awaiting_payment' || 
-              payment.order.orderStatus === 'pending');
+      // Kiểm tra payment có order không
+      if (!payment.order) {
+        console.log(`[GetPendingPayments] Payment ${payment._id} filtered out - no order`);
+        return false;
+      }
       
-      if (!isValid && payment.order) {
-        console.log(`[GetPendingPayments] Payment ${payment._id} filtered out - order status: ${payment.order.orderStatus}`);
+      // Kiểm tra order status - loại bỏ cancelled và các status khác
+      const orderStatus = payment.order.orderStatus;
+      const isValid = orderStatus === 'awaiting_payment' || orderStatus === 'pending';
+      
+      if (!isValid) {
+        console.log(`[GetPendingPayments] Payment ${payment._id} filtered out - order status: ${orderStatus} (order cancelled or other status)`);
       }
       
       return isValid;

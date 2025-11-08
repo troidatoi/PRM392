@@ -105,22 +105,22 @@ server.listen(PORT, () => {
   console.log(`WebSocket server is ready`);
   
   // Start payment cleanup cron job
-  // Chạy mỗi giờ để check và cleanup payment pending sau 24h
-  const CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 giờ = 60 phút * 60 giây * 1000ms
+  // Chạy mỗi 10 phút để check và cleanup payment pending sau 10 phút
+  const CLEANUP_INTERVAL = 10 * 60 * 1000; // 10 phút = 10 * 60 giây * 1000ms
   
-  // Chạy ngay lần đầu sau khi server start (đợi 5 phút để DB sẵn sàng)
+  // Chạy ngay lần đầu sau khi server start (đợi 10 phút để DB sẵn sàng)
   setTimeout(() => {
     console.log('[Payment Cleanup] Bắt đầu cleanup job lần đầu...');
     cleanupPendingPayments();
-  }, 5 * 60 * 1000); // 5 phút
+  }, 10 * 60 * 1000); // 10 phút
   
-  // Sau đó chạy định kỳ mỗi giờ
+  // Sau đó chạy định kỳ mỗi 10 phút
   setInterval(() => {
     console.log('[Payment Cleanup] Chạy cleanup job định kỳ...');
     cleanupPendingPayments();
   }, CLEANUP_INTERVAL);
   
-  console.log('[Payment Cleanup] Cron job đã được khởi động - chạy mỗi giờ');
+  console.log('[Payment Cleanup] Cron job đã được khởi động - chạy mỗi 10 phút (cleanup payment pending sau 10 phút)');
 });
 
 // Handle unhandled promise rejections
