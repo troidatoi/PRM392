@@ -8,7 +8,10 @@ const {
   cancelOrder,
   getOrdersByStore,
   estimateShipping,
-  getTotalRevenue
+  getTotalRevenue,
+  getOrdersByBike,
+  getTopBikesByOrders,
+  getRevenueByStore
 } = require('../controllers/orderController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -27,8 +30,17 @@ router.get('/store/:storeId', protect, getOrdersByStore);
 // Get total revenue (admin only) - must be before /:orderId
 router.get('/revenue/total', protect, authorize('admin'), getTotalRevenue);
 
+// Get revenue by store (admin only) - must be before /:orderId
+router.get('/revenue/by-store', protect, authorize('admin'), getRevenueByStore);
+
 // Get orders by day of week (admin only) - must be before /:orderId
 router.get('/by-day-of-week', protect, authorize('admin'), require('../controllers/orderController').getOrdersByDayOfWeek);
+
+// Get orders by bike (admin only) - must be before /:orderId
+router.get('/by-bike', protect, authorize('admin'), getOrdersByBike);
+
+// Get top bikes by orders (admin only) - must be before /:orderId
+router.get('/top-bikes', protect, authorize('admin'), getTopBikesByOrders);
 
 // Get all orders (admin only) - must be before /:orderId
 router.get('/', protect, authorize('admin'), require('../controllers/orderController').getAllOrders);

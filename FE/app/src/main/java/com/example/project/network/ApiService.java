@@ -309,6 +309,16 @@ public interface ApiService {
         @retrofit2.http.Query("status") String status
     );
     
+    @GET("orders/top-bikes")
+    Call<TopBikesResponse> getTopBikes(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("limit") Integer limit,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("storeId") String storeId,
+        @retrofit2.http.Query("status") String status
+    );
+    
     @PUT("orders/{orderId}/status")
     Call<ApiResponse<Object>> updateOrderStatus(
         @Header("Authorization") String token,
@@ -1658,6 +1668,209 @@ public interface ApiService {
         
         public void setAverageOrderValue(double averageOrderValue) {
             this.averageOrderValue = averageOrderValue;
+        }
+    }
+    
+    // Top Bikes Response class
+    class TopBikesResponse {
+        private boolean success;
+        private String message;
+        private TopBikesData data;
+        
+        public TopBikesResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public TopBikesData getData() {
+            return data;
+        }
+        
+        public void setData(TopBikesData data) {
+            this.data = data;
+        }
+    }
+    
+    // Top Bikes Data class
+    class TopBikesData {
+        private List<TopBike> topBikes;
+        private int limit;
+        private Period period;
+        
+        public TopBikesData() {}
+        
+        public List<TopBike> getTopBikes() {
+            return topBikes;
+        }
+        
+        public void setTopBikes(List<TopBike> topBikes) {
+            this.topBikes = topBikes;
+        }
+        
+        public int getLimit() {
+            return limit;
+        }
+        
+        public void setLimit(int limit) {
+            this.limit = limit;
+        }
+        
+        public Period getPeriod() {
+            return period;
+        }
+        
+        public void setPeriod(Period period) {
+            this.period = period;
+        }
+    }
+    
+    // Top Bike class
+    class TopBike {
+        private String bikeId;
+        private String bikeName;
+        private String bikeBrand;
+        private BikeImage bikeImage;
+        private double bikePrice;
+        private String bikeCategory;
+        private int totalOrders;
+        private int totalQuantity;
+        private double totalRevenue;
+        private double averageQuantity;
+        
+        public TopBike() {}
+        
+        public String getBikeId() {
+            return bikeId;
+        }
+        
+        public void setBikeId(String bikeId) {
+            this.bikeId = bikeId;
+        }
+        
+        public String getBikeName() {
+            return bikeName;
+        }
+        
+        public void setBikeName(String bikeName) {
+            this.bikeName = bikeName;
+        }
+        
+        public String getBikeBrand() {
+            return bikeBrand;
+        }
+        
+        public void setBikeBrand(String bikeBrand) {
+            this.bikeBrand = bikeBrand;
+        }
+        
+        public BikeImage getBikeImage() {
+            return bikeImage;
+        }
+        
+        public void setBikeImage(BikeImage bikeImage) {
+            this.bikeImage = bikeImage;
+        }
+        
+        // Helper method to get image URL
+        public String getBikeImageUrl() {
+            if (bikeImage != null && bikeImage.getUrl() != null) {
+                return bikeImage.getUrl();
+            }
+            return null;
+        }
+        
+        public double getBikePrice() {
+            return bikePrice;
+        }
+        
+        public void setBikePrice(double bikePrice) {
+            this.bikePrice = bikePrice;
+        }
+        
+        public String getBikeCategory() {
+            return bikeCategory;
+        }
+        
+        public void setBikeCategory(String bikeCategory) {
+            this.bikeCategory = bikeCategory;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public int getTotalQuantity() {
+            return totalQuantity;
+        }
+        
+        public void setTotalQuantity(int totalQuantity) {
+            this.totalQuantity = totalQuantity;
+        }
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public double getAverageQuantity() {
+            return averageQuantity;
+        }
+        
+        public void setAverageQuantity(double averageQuantity) {
+            this.averageQuantity = averageQuantity;
+        }
+    }
+    
+    // Bike Image class
+    class BikeImage {
+        private String url;
+        private String alt;
+        private String _id;
+        
+        public BikeImage() {}
+        
+        public String getUrl() {
+            return url;
+        }
+        
+        public void setUrl(String url) {
+            this.url = url;
+        }
+        
+        public String getAlt() {
+            return alt;
+        }
+        
+        public void setAlt(String alt) {
+            this.alt = alt;
+        }
+        
+        public String get_id() {
+            return _id;
+        }
+        
+        public void set_id(String _id) {
+            this._id = _id;
         }
     }
 }

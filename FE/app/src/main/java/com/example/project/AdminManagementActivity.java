@@ -39,6 +39,9 @@ public class AdminManagementActivity extends AppCompatActivity {
     private TextView tvXAxisCN, tvXAxisT2, tvXAxisT3, tvXAxisT4, tvXAxisT5, tvXAxisT6, tvXAxisT7;
     private LinearLayout barCN, barT2, barT3, barT4, barT5, barT6, barT7;
     
+    // Top bikes views
+    private LinearLayout topBikesContainer;
+    
     private ApiService apiService;
     private AuthManager authManager;
 
@@ -150,6 +153,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         barT5 = findViewById(R.id.barT5);
         barT6 = findViewById(R.id.barT6);
         barT7 = findViewById(R.id.barT7);
+        
+        // Initialize top bikes container
+        topBikesContainer = findViewById(R.id.topBikesContainer);
     }
 
     private void setActiveTab(CardView activeCard, ImageView activeIcon, TextView activeText) {
@@ -232,6 +238,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         
         // Call API to get orders by day of week
         loadOrdersByDayOfWeek(authHeader);
+        
+        // Call API to get top bikes
+        loadTopBikes(authHeader);
     }
     
     private void loadTotalUsers(String authHeader) {
@@ -534,6 +543,236 @@ public class AdminManagementActivity extends AppCompatActivity {
         params.height = height;
         barView.setLayoutParams(params);
         barView.setVisibility(View.VISIBLE);
+    }
+    
+    private void loadTopBikes(String authHeader) {
+        Call<ApiService.TopBikesResponse> call = apiService.getTopBikes(
+            authHeader,
+            5,  // limit
+            null,  // startDate
+            null,  // endDate
+            null,  // storeId
+            null   // status
+        );
+        
+        call.enqueue(new Callback<ApiService.TopBikesResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.TopBikesResponse> call, Response<ApiService.TopBikesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.TopBikesResponse topBikesResponse = response.body();
+                    
+                    if (topBikesResponse.isSuccess() && topBikesResponse.getData() != null) {
+                        List<ApiService.TopBike> topBikes = topBikesResponse.getData().getTopBikes();
+                        if (topBikes != null && topBikes.size() > 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    displayTopBikes(topBikes);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.TopBikesResponse> call, Throwable t) {
+                android.util.Log.e("AdminDashboard", "Failed to load top bikes: " + t.getMessage());
+            }
+        });
+    }
+    
+    private void displayTopBikes(List<ApiService.TopBike> topBikes) {
+        if (topBikesContainer == null || topBikes == null || topBikes.size() == 0) {
+            return;
+        }
+        
+        // Clear existing views
+        topBikesContainer.removeAllViews();
+        
+        // Find max orders for percentage calculation
+        int maxOrders = 0;
+        for (ApiService.TopBike bike : topBikes) {
+            if (bike.getTotalOrders() > maxOrders) {
+                maxOrders = bike.getTotalOrders();
+            }
+        }
+        
+        if (maxOrders == 0) {
+            maxOrders = 1; // Avoid division by zero
+        }
+        
+        // Create items for each bike
+        for (int i = 0; i < topBikes.size(); i++) {
+            ApiService.TopBike bike = topBikes.get(i);
+            View itemView = createTopBikeItem(bike, i + 1, maxOrders);
+            topBikesContainer.addView(itemView);
+            
+            // Add margin between items
+            if (i < topBikes.size() - 1) {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) itemView.getLayoutParams();
+                params.bottomMargin = 16;
+                itemView.setLayoutParams(params);
+            }
+        }
+    }
+    
+    private View createTopBikeItem(ApiService.TopBike bike, int rank, int maxOrders) {
+        // Create main container
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.HORIZONTAL);
+        container.setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16));
+        container.setBackgroundColor(0xFFF8F9FA);
+        
+        // Add rounded corners effect with padding
+        android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+        drawable.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        drawable.setColor(0xFFF8F9FA);
+        drawable.setCornerRadius(dpToPx(12));
+        drawable.setStroke(dpToPx(1), 0xFFE5E7EB);
+        container.setBackground(drawable);
+        
+        LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        container.setLayoutParams(containerParams);
+        
+        // Rank badge - circular
+        TextView rankText = new TextView(this);
+        rankText.setText(String.valueOf(rank));
+        rankText.setTextSize(14);
+        rankText.setTypeface(null, android.graphics.Typeface.BOLD);
+        rankText.setTextColor(0xFFFFFFFF);
+        rankText.setGravity(android.view.Gravity.CENTER);
+        
+        // Set rank badge color
+        int rankColor;
+        switch (rank) {
+            case 1:
+                rankColor = 0xFFFFD700; // Gold
+                break;
+            case 2:
+                rankColor = 0xFFC0C0C0; // Silver
+                break;
+            case 3:
+                rankColor = 0xFFCD7F32; // Bronze
+                break;
+            default:
+                rankColor = 0xFF2196F3; // Blue
+                break;
+        }
+        
+        // Create circular background
+        android.graphics.drawable.GradientDrawable rankDrawable = new android.graphics.drawable.GradientDrawable();
+        rankDrawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        rankDrawable.setColor(rankColor);
+        rankText.setBackground(rankDrawable);
+        
+        LinearLayout.LayoutParams rankParams = new LinearLayout.LayoutParams(
+            dpToPx(40),
+            dpToPx(40)
+        );
+        rankParams.rightMargin = dpToPx(12);
+        rankText.setLayoutParams(rankParams);
+        container.addView(rankText);
+        
+        // Bike info container
+        LinearLayout infoContainer = new LinearLayout(this);
+        infoContainer.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams infoParams = new LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            1.0f
+        );
+        infoContainer.setLayoutParams(infoParams);
+        
+        // Bike name
+        TextView bikeName = new TextView(this);
+        bikeName.setText(bike.getBikeName() != null ? bike.getBikeName() : "N/A");
+        bikeName.setTextSize(16);
+        bikeName.setTypeface(null, android.graphics.Typeface.BOLD);
+        bikeName.setTextColor(0xFF1E293B);
+        infoContainer.addView(bikeName);
+        
+        // Bike brand
+        TextView bikeBrand = new TextView(this);
+        bikeBrand.setText(bike.getBikeBrand() != null ? bike.getBikeBrand() : "");
+        bikeBrand.setTextSize(12);
+        bikeBrand.setTextColor(0xFF94A3B8);
+        bikeBrand.setPadding(0, 2, 0, 8);
+        infoContainer.addView(bikeBrand);
+        
+        // Progress bar container - use FrameLayout to overlay
+        android.widget.FrameLayout progressContainer = new android.widget.FrameLayout(this);
+        LinearLayout.LayoutParams progressContainerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            dpToPx(8)
+        );
+        progressContainerParams.topMargin = dpToPx(4);
+        progressContainer.setLayoutParams(progressContainerParams);
+        
+        // Progress bar background
+        View progressBarBg = new View(this);
+        progressBarBg.setBackgroundColor(0xFFE5E7EB);
+        android.widget.FrameLayout.LayoutParams progressBgParams = new android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBarBg.setLayoutParams(progressBgParams);
+        progressContainer.addView(progressBarBg);
+        
+        // Progress bar fill
+        View progressBar = new View(this);
+        float percentage = (float) bike.getTotalOrders() / maxOrders;
+        android.widget.FrameLayout.LayoutParams progressParams = new android.widget.FrameLayout.LayoutParams(
+            (int) (getScreenWidth() * 0.5f * percentage),
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBar.setLayoutParams(progressParams);
+        progressBar.setBackgroundColor(rankColor);
+        progressContainer.addView(progressBar);
+        
+        infoContainer.addView(progressContainer);
+        
+        container.addView(infoContainer);
+        
+        // Stats container
+        LinearLayout statsContainer = new LinearLayout(this);
+        statsContainer.setOrientation(LinearLayout.VERTICAL);
+        statsContainer.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams statsParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        statsContainer.setLayoutParams(statsParams);
+        
+        // Total orders
+        TextView ordersText = new TextView(this);
+        ordersText.setText(String.valueOf(bike.getTotalOrders()));
+        ordersText.setTextSize(18);
+        ordersText.setTypeface(null, android.graphics.Typeface.BOLD);
+        ordersText.setTextColor(0xFF1E293B);
+        statsContainer.addView(ordersText);
+        
+        TextView ordersLabel = new TextView(this);
+        ordersLabel.setText("đơn hàng");
+        ordersLabel.setTextSize(11);
+        ordersLabel.setTextColor(0xFF94A3B8);
+        statsContainer.addView(ordersLabel);
+        
+        container.addView(statsContainer);
+        
+        return container;
+    }
+    
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+    
+    private int getScreenWidth() {
+        return getResources().getDisplayMetrics().widthPixels;
     }
     
     private void showError(String message) {
