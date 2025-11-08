@@ -44,7 +44,7 @@ const orderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+    enum: ['awaiting_payment', 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
     default: 'pending'
   },
   orderDate: {
@@ -88,6 +88,7 @@ const orderSchema = new mongoose.Schema({
 // Virtual for order status in Vietnamese
 orderSchema.virtual('statusText').get(function() {
   const statusMap = {
+    'awaiting_payment': 'Chờ thanh toán',
     'pending': 'Chờ xác nhận',
     'confirmed': 'Đã xác nhận',
     'shipped': 'Đang giao hàng',

@@ -95,7 +95,7 @@ Hệ thống cho phép người dùng mua xe đạp điện từ nhiều cửa h
   store: ObjectId,       // Cửa hàng (1 order = 1 store)
   paymentMethod: String,  // Phương thức thanh toán
   shippingAddress: Object, // Địa chỉ giao hàng
-  orderStatus: String,   // pending/confirmed/shipped/delivered/cancelled
+  orderStatus: String,   // awaiting_payment/pending/confirmed/shipped/delivered/cancelled
   totalAmount: Number,   // Tổng tiền
   shippingFee: Number,   // Phí vận chuyển
   discountAmount: Number, // Số tiền giảm giá
@@ -481,9 +481,9 @@ GET /api/inventory/store/:storeId/out-of-stock
 
 ### 4. Order Status Flow
 ```
-pending → confirmed → shipped → delivered
-                ↓
-            cancelled
+awaiting_payment → pending → confirmed → shipped → delivered
+        ↓              ↓
+    cancelled      cancelled
 ```
 
 ### 5. Error Handling

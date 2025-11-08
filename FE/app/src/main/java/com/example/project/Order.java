@@ -78,6 +78,7 @@ public class Order {
     public static String mapStatusText(String st) {
         if(st==null) return "";
         switch(st.toLowerCase()) {
+            case "awaiting_payment": return "Chờ thanh toán";
             case "pending": return "Chờ xác nhận";
             case "confirmed": return "Đã xác nhận";
             case "shipped": return "Đang giao hàng";
@@ -89,6 +90,7 @@ public class Order {
     public static String mapStatusColor(String st) {
         if(st==null) return "#2196F3";
         switch(st.toLowerCase()) {
+            case "awaiting_payment": return "#FF9800";
             case "pending": return "#FFC107";
             case "confirmed": return "#64B5F6";
             case "shipped": return "#2196F3";

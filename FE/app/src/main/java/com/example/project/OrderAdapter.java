@@ -64,7 +64,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         // Admin ---
         if (isAdmin) {
             // Xác nhận
-            if (order.getStatus().equalsIgnoreCase("Chờ xác nhận") || order.getStatus().equalsIgnoreCase("pending")) {
+            if (order.getStatus().equalsIgnoreCase("Chờ xác nhận") || order.getStatus().equalsIgnoreCase("pending") ||
+                order.getStatus().equalsIgnoreCase("Chờ thanh toán") || order.getStatus().equalsIgnoreCase("awaiting_payment")) {
                 holder.btnConfirmOrder.setVisibility(View.VISIBLE);
             } else {
                 holder.btnConfirmOrder.setVisibility(View.GONE);
