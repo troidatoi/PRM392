@@ -21,7 +21,19 @@ router.post('/estimate', protect, estimateShipping);
 // Get user orders
 router.get('/user/:userId', protect, getUserOrders);
 
-// Get order details
+// Get orders by store
+router.get('/store/:storeId', protect, getOrdersByStore);
+
+// Get total revenue (admin only) - must be before /:orderId
+router.get('/revenue/total', protect, authorize('admin'), getTotalRevenue);
+
+// Get orders by day of week (admin only) - must be before /:orderId
+router.get('/by-day-of-week', protect, authorize('admin'), require('../controllers/orderController').getOrdersByDayOfWeek);
+
+// Get all orders (admin only) - must be before /:orderId
+router.get('/', protect, authorize('admin'), require('../controllers/orderController').getAllOrders);
+
+// Get order details - must be last to avoid matching other routes
 router.get('/:orderId', protect, getOrderDetails);
 
 // Update order status
@@ -29,14 +41,5 @@ router.put('/:orderId/status', protect, updateOrderStatus);
 
 // Cancel order
 router.post('/:orderId/cancel', protect, cancelOrder);
-
-// Get orders by store
-router.get('/store/:storeId', protect, getOrdersByStore);
-
-// Get all orders (admin only)
-router.get('/', protect, authorize('admin'), require('../controllers/orderController').getAllOrders);
-
-// Get total revenue (admin only)
-router.get('/revenue/total', protect, authorize('admin'), getTotalRevenue);
 
 module.exports = router;

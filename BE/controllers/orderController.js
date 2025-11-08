@@ -729,6 +729,122 @@ const getTotalRevenue = async (req, res) => {
   }
 };
 
+// Get orders by day of week
+const getOrdersByDayOfWeek = async (req, res) => {
+  try {
+    const { startDate, endDate, storeId, status } = req.query;
+    
+    // Build query
+    const query = {};
+    
+    // Filter by status if provided
+    if (status) {
+      query.orderStatus = status;
+    }
+    
+    // Filter by store if provided
+    if (storeId) {
+      query.store = mongoose.Types.ObjectId.isValid(storeId) 
+        ? new mongoose.Types.ObjectId(storeId) 
+        : storeId;
+    }
+    
+    // Filter by date range if provided
+    if (startDate || endDate) {
+      query.orderDate = {};
+      if (startDate) {
+        query.orderDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.orderDate.$lte = end;
+      }
+    } else {
+      // Default to last 7 days if no date range provided
+      const defaultEndDate = new Date();
+      const defaultStartDate = new Date();
+      defaultStartDate.setDate(defaultStartDate.getDate() - 7);
+      query.orderDate = {
+        $gte: defaultStartDate,
+        $lte: defaultEndDate
+      };
+    }
+    
+    // Get orders grouped by day of week
+    const ordersByDay = await Order.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: { $dayOfWeek: '$orderDate' },
+          totalOrders: { $sum: 1 },
+          totalRevenue: { $sum: '$finalAmount' },
+          averageOrderValue: { $avg: '$finalAmount' }
+        }
+      },
+      { $sort: { '_id': 1 } }
+    ]);
+    
+    // Map day of week numbers to Vietnamese names
+    // MongoDB $dayOfWeek: 1=Sunday, 2=Monday, ..., 7=Saturday
+    const dayNames = {
+      1: 'Chủ nhật',
+      2: 'Thứ hai',
+      3: 'Thứ ba',
+      4: 'Thứ tư',
+      5: 'Thứ năm',
+      6: 'Thứ sáu',
+      7: 'Thứ bảy'
+    };
+    
+    // Format result
+    const formattedData = ordersByDay.map(item => ({
+      dayOfWeek: item._id,
+      dayName: dayNames[item._id] || `Ngày ${item._id}`,
+      totalOrders: item.totalOrders,
+      totalRevenue: item.totalRevenue,
+      averageOrderValue: item.averageOrderValue || 0
+    }));
+    
+    // Fill in missing days with zero values
+    const completeData = [];
+    for (let day = 1; day <= 7; day++) {
+      const existing = formattedData.find(item => item.dayOfWeek === day);
+      if (existing) {
+        completeData.push(existing);
+      } else {
+        completeData.push({
+          dayOfWeek: day,
+          dayName: dayNames[day],
+          totalOrders: 0,
+          totalRevenue: 0,
+          averageOrderValue: 0
+        });
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: 'Lấy đơn hàng theo ngày trong tuần thành công',
+      data: {
+        ordersByDay: completeData,
+        period: {
+          startDate: startDate || null,
+          endDate: endDate || null,
+          storeId: storeId || null,
+          status: status || null
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createOrders,
   getUserOrders,
@@ -738,5 +854,6 @@ module.exports = {
   getOrdersByStore,
   getAllOrders,
   estimateShipping,
-  getTotalRevenue
+  getTotalRevenue,
+  getOrdersByDayOfWeek
 };

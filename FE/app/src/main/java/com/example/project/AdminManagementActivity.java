@@ -2,6 +2,8 @@ package com.example.project;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +18,7 @@ import com.example.project.utils.AdminNavHelper;
 import com.example.project.utils.AuthManager;
 
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -24,11 +27,17 @@ import retrofit2.Response;
 
 public class AdminManagementActivity extends AppCompatActivity {
 
-    private TextView tvTotalSales, tvTotalSalesLabel, tvOrderUser, tvTotalProducts, tvTotalUsers, tvTotalUsersLabel;
+    private TextView tvTotalSales, tvTotalSalesLabel, tvOrderUser, tvOrderUserLabel, tvTotalProducts, tvTotalProductsLabel, tvTotalUsers, tvTotalUsersLabel;
     private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
     private ImageView iconDashboard, iconUserManagement, iconProductManagement, iconStoreManagement, iconOrderManagement, iconChatManagement;
     private TextView tvDashboard, tvUserManagement, tvProductManagement, tvStoreManagement, tvOrderManagement, tvChatManagement;
     private CardView cardDashboard, cardUserManagement, cardProductManagement, cardStoreManagement, cardOrderManagement, cardChatManagement;
+    
+    // Chart views
+    private TextView tvYAxisMax, tvYAxisMid2, tvYAxisMid1;
+    private View barViewCN, barViewT2, barViewT3, barViewT4, barViewT5, barViewT6, barViewT7;
+    private TextView tvXAxisCN, tvXAxisT2, tvXAxisT3, tvXAxisT4, tvXAxisT5, tvXAxisT6, tvXAxisT7;
+    private LinearLayout barCN, barT2, barT3, barT4, barT5, barT6, barT7;
     
     private ApiService apiService;
     private AuthManager authManager;
@@ -53,7 +62,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         tvTotalSales = findViewById(R.id.tvTotalSales);
         tvTotalSalesLabel = findViewById(R.id.tvTotalSalesLabel);
         tvOrderUser = findViewById(R.id.tvOrderUser);
+        tvOrderUserLabel = findViewById(R.id.tvOrderUserLabel);
         tvTotalProducts = findViewById(R.id.tvTotalProducts);
+        tvTotalProductsLabel = findViewById(R.id.tvTotalProductsLabel);
         tvTotalUsers = findViewById(R.id.tvTotalUsers);
         tvTotalUsersLabel = findViewById(R.id.tvTotalUsersLabel);
         
@@ -61,6 +72,14 @@ public class AdminManagementActivity extends AppCompatActivity {
         if (tvTotalSalesLabel != null) {
             tvTotalSalesLabel.setText("Tổng doanh thu");
             tvTotalSalesLabel.setVisibility(android.view.View.VISIBLE);
+        }
+        if (tvOrderUserLabel != null) {
+            tvOrderUserLabel.setText("Tổng đơn hàng");
+            tvOrderUserLabel.setVisibility(android.view.View.VISIBLE);
+        }
+        if (tvTotalProductsLabel != null) {
+            tvTotalProductsLabel.setText("Tổng số xe");
+            tvTotalProductsLabel.setVisibility(android.view.View.VISIBLE);
         }
         if (tvTotalUsersLabel != null) {
             tvTotalUsersLabel.setText("Tổng người dùng");
@@ -95,9 +114,42 @@ public class AdminManagementActivity extends AppCompatActivity {
         cardStoreManagement = findViewById(R.id.cardStoreManagement);
         cardOrderManagement = findViewById(R.id.cardOrderManagement);
         cardChatManagement = findViewById(R.id.cardChatManagement);
+        
+        // Initialize chart views
+        initChartViews();
 
         // Mark current tab active with gradient background
         setActiveTab(cardDashboard, iconDashboard, tvDashboard);
+    }
+    
+    private void initChartViews() {
+        tvYAxisMax = findViewById(R.id.tvYAxisMax);
+        tvYAxisMid2 = findViewById(R.id.tvYAxisMid2);
+        tvYAxisMid1 = findViewById(R.id.tvYAxisMid1);
+        
+        barViewCN = findViewById(R.id.barViewCN);
+        barViewT2 = findViewById(R.id.barViewT2);
+        barViewT3 = findViewById(R.id.barViewT3);
+        barViewT4 = findViewById(R.id.barViewT4);
+        barViewT5 = findViewById(R.id.barViewT5);
+        barViewT6 = findViewById(R.id.barViewT6);
+        barViewT7 = findViewById(R.id.barViewT7);
+        
+        tvXAxisCN = findViewById(R.id.tvXAxisCN);
+        tvXAxisT2 = findViewById(R.id.tvXAxisT2);
+        tvXAxisT3 = findViewById(R.id.tvXAxisT3);
+        tvXAxisT4 = findViewById(R.id.tvXAxisT4);
+        tvXAxisT5 = findViewById(R.id.tvXAxisT5);
+        tvXAxisT6 = findViewById(R.id.tvXAxisT6);
+        tvXAxisT7 = findViewById(R.id.tvXAxisT7);
+        
+        barCN = findViewById(R.id.barCN);
+        barT2 = findViewById(R.id.barT2);
+        barT3 = findViewById(R.id.barT3);
+        barT4 = findViewById(R.id.barT4);
+        barT5 = findViewById(R.id.barT5);
+        barT6 = findViewById(R.id.barT6);
+        barT7 = findViewById(R.id.barT7);
     }
 
     private void setActiveTab(CardView activeCard, ImageView activeIcon, TextView activeText) {
@@ -154,10 +206,6 @@ public class AdminManagementActivity extends AppCompatActivity {
                         // Display total orders
                         int totalOrders = revenueData.getTotalOrders();
                         tvOrderUser.setText(String.valueOf(totalOrders));
-                        
-                        // TODO: Load total products from other API
-                        // For now, keep default value
-                        tvTotalProducts.setText("0");
                     } else {
                         // Show error message
                         showError("Không thể tải dữ liệu thống kê");
@@ -178,6 +226,12 @@ public class AdminManagementActivity extends AppCompatActivity {
         
         // Call API to get total users
         loadTotalUsers(authHeader);
+        
+        // Call API to get total bikes
+        loadTotalBikes();
+        
+        // Call API to get orders by day of week
+        loadOrdersByDayOfWeek(authHeader);
     }
     
     private void loadTotalUsers(String authHeader) {
@@ -217,6 +271,43 @@ public class AdminManagementActivity extends AppCompatActivity {
         });
     }
     
+    private void loadTotalBikes() {
+        Call<ApiService.TotalBikesResponse> call = apiService.getTotalBikes(
+            null,  // status
+            null,  // category
+            null   // brand
+        );
+        
+        call.enqueue(new Callback<ApiService.TotalBikesResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.TotalBikesResponse> call, Response<ApiService.TotalBikesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.TotalBikesResponse bikesResponse = response.body();
+                    
+                    if (bikesResponse.isSuccess() && bikesResponse.getData() != null) {
+                        ApiService.TotalBikesData bikesData = bikesResponse.getData();
+                        
+                        // Display total bikes
+                        int totalBikes = bikesData.getTotalBikes();
+                        tvTotalProducts.setText(String.valueOf(totalBikes));
+                    } else {
+                        // Show default value on error
+                        tvTotalProducts.setText("0");
+                    }
+                } else {
+                    // Show default value on error
+                    tvTotalProducts.setText("0");
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.TotalBikesResponse> call, Throwable t) {
+                // Show default value on error
+                tvTotalProducts.setText("0");
+            }
+        });
+    }
+    
     private String formatRevenue(double revenue) {
         // Format VND with thousand separators
         NumberFormat formatter = NumberFormat.getNumberInstance(Locale.getDefault());
@@ -252,6 +343,197 @@ public class AdminManagementActivity extends AppCompatActivity {
             // Format with thousand separators for small amounts
             return formatter.format(revenue);
         }
+    }
+    
+    private void loadOrdersByDayOfWeek(String authHeader) {
+        Call<ApiService.OrdersByDayOfWeekResponse> call = apiService.getOrdersByDayOfWeek(
+            authHeader,
+            null,  // startDate
+            null,  // endDate
+            null,  // storeId
+            null   // status
+        );
+        
+        call.enqueue(new Callback<ApiService.OrdersByDayOfWeekResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.OrdersByDayOfWeekResponse> call, Response<ApiService.OrdersByDayOfWeekResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.OrdersByDayOfWeekResponse ordersResponse = response.body();
+                    
+                    if (ordersResponse.isSuccess() && ordersResponse.getData() != null) {
+                        List<ApiService.OrderByDay> ordersByDay = ordersResponse.getData().getOrdersByDay();
+                        if (ordersByDay != null && ordersByDay.size() == 7) {
+                            // Run on UI thread
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateChart(ordersByDay);
+                                }
+                            });
+                        } else {
+                            android.util.Log.e("AdminDashboard", "OrdersByDay size is not 7: " + (ordersByDay != null ? ordersByDay.size() : "null"));
+                        }
+                    } else {
+                        android.util.Log.e("AdminDashboard", "Response not successful or data is null");
+                    }
+                } else {
+                    android.util.Log.e("AdminDashboard", "Response not successful: " + response.code());
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.OrdersByDayOfWeekResponse> call, Throwable t) {
+                android.util.Log.e("AdminDashboard", "API call failed: " + t.getMessage());
+                t.printStackTrace();
+            }
+        });
+    }
+    
+    private void updateChart(List<ApiService.OrderByDay> ordersByDay) {
+        if (ordersByDay == null || ordersByDay.size() != 7) {
+            android.util.Log.e("AdminDashboard", "Invalid ordersByDay data");
+            return;
+        }
+        
+        // Find max value for scaling
+        int maxOrders = 0;
+        for (ApiService.OrderByDay day : ordersByDay) {
+            int totalOrders = day.getTotalOrders();
+            if (totalOrders > maxOrders) {
+                maxOrders = totalOrders;
+            }
+        }
+        
+        // If all values are 0, set a default max for display
+        if (maxOrders == 0) {
+            maxOrders = 10; // Default max for empty chart
+        }
+        
+        android.util.Log.d("AdminDashboard", "Max orders: " + maxOrders);
+        for (int i = 0; i < ordersByDay.size(); i++) {
+            android.util.Log.d("AdminDashboard", ordersByDay.get(i).getDayName() + ": " + ordersByDay.get(i).getTotalOrders());
+        }
+        
+        // Update Y-axis labels
+        if (tvYAxisMax != null) {
+            tvYAxisMax.setText(String.valueOf(maxOrders));
+        }
+        if (tvYAxisMid2 != null) {
+            tvYAxisMid2.setText(String.valueOf((int) (maxOrders * 0.75)));
+        }
+        if (tvYAxisMid1 != null) {
+            tvYAxisMid1.setText(String.valueOf((int) (maxOrders * 0.5)));
+        }
+        
+        // Update X-axis labels - fixed labels: CN T2 T3 T4 T5 T6 T7
+        if (tvXAxisCN != null) {
+            tvXAxisCN.setText("CN");
+        }
+        if (tvXAxisT2 != null) {
+            tvXAxisT2.setText("T2");
+        }
+        if (tvXAxisT3 != null) {
+            tvXAxisT3.setText("T3");
+        }
+        if (tvXAxisT4 != null) {
+            tvXAxisT4.setText("T4");
+        }
+        if (tvXAxisT5 != null) {
+            tvXAxisT5.setText("T5");
+        }
+        if (tvXAxisT6 != null) {
+            tvXAxisT6.setText("T6");
+        }
+        if (tvXAxisT7 != null) {
+            tvXAxisT7.setText("T7");
+        }
+        
+        // Update bar heights
+        // Wait for layout to be measured
+        // Create final variables for inner class
+        final int finalMaxOrders = maxOrders;
+        final int ordersCN = ordersByDay.get(0).getTotalOrders();
+        final int ordersT2 = ordersByDay.get(1).getTotalOrders();
+        final int ordersT3 = ordersByDay.get(2).getTotalOrders();
+        final int ordersT4 = ordersByDay.get(3).getTotalOrders();
+        final int ordersT5 = ordersByDay.get(4).getTotalOrders();
+        final int ordersT6 = ordersByDay.get(5).getTotalOrders();
+        final int ordersT7 = ordersByDay.get(6).getTotalOrders();
+        
+        // Use ViewTreeObserver to wait for layout to be measured
+        if (barCN != null) {
+            barCN.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    // Remove listener to avoid multiple calls
+                    barCN.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    
+                    int containerHeight = barCN.getHeight();
+                    android.util.Log.d("AdminDashboard", "Container height: " + containerHeight);
+                    
+                    if (containerHeight > 0) {
+                        updateBarHeight(barViewCN, ordersCN, finalMaxOrders, containerHeight);
+                        updateBarHeight(barViewT2, ordersT2, finalMaxOrders, containerHeight);
+                        updateBarHeight(barViewT3, ordersT3, finalMaxOrders, containerHeight);
+                        updateBarHeight(barViewT4, ordersT4, finalMaxOrders, containerHeight);
+                        updateBarHeight(barViewT5, ordersT5, finalMaxOrders, containerHeight);
+                        updateBarHeight(barViewT6, ordersT6, finalMaxOrders, containerHeight);
+                        updateBarHeight(barViewT7, ordersT7, finalMaxOrders, containerHeight);
+                    } else {
+                        // If height is still 0, try again after a short delay
+                        barCN.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                int containerHeight = barCN.getHeight();
+                                if (containerHeight > 0) {
+                                    updateBarHeight(barViewCN, ordersCN, finalMaxOrders, containerHeight);
+                                    updateBarHeight(barViewT2, ordersT2, finalMaxOrders, containerHeight);
+                                    updateBarHeight(barViewT3, ordersT3, finalMaxOrders, containerHeight);
+                                    updateBarHeight(barViewT4, ordersT4, finalMaxOrders, containerHeight);
+                                    updateBarHeight(barViewT5, ordersT5, finalMaxOrders, containerHeight);
+                                    updateBarHeight(barViewT6, ordersT6, finalMaxOrders, containerHeight);
+                                    updateBarHeight(barViewT7, ordersT7, finalMaxOrders, containerHeight);
+                                }
+                            }
+                        }, 100);
+                    }
+                }
+            });
+        }
+    }
+    
+    private void updateBarHeight(View barView, int value, int maxValue, int containerHeight) {
+        if (barView == null) {
+            return;
+        }
+        
+        if (maxValue == 0) {
+            ViewGroup.LayoutParams params = barView.getLayoutParams();
+            params.height = 0;
+            barView.setLayoutParams(params);
+            return;
+        }
+        
+        // Calculate height as percentage of container
+        float percentage = (float) value / maxValue;
+        int height = (int) (containerHeight * percentage);
+        
+        // Ensure minimum height for visibility if value > 0
+        if (value > 0 && height < 8) {
+            height = 8;
+        }
+        
+        // Ensure bar is visible even if value is 0 (show as very small bar)
+        if (value == 0) {
+            height = 0;
+        }
+        
+        android.util.Log.d("AdminDashboard", "Updating bar: value=" + value + ", maxValue=" + maxValue + ", height=" + height + ", containerHeight=" + containerHeight);
+        
+        ViewGroup.LayoutParams params = barView.getLayoutParams();
+        params.height = height;
+        barView.setLayoutParams(params);
+        barView.setVisibility(View.VISIBLE);
     }
     
     private void showError(String message) {

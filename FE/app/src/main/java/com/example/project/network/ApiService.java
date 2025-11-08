@@ -75,6 +75,13 @@ public interface ApiService {
                                        @retrofit2.http.Query("search") String search,
                                        @retrofit2.http.Query("sortBy") String sortBy);
     
+    @GET("bikes/count/total")
+    Call<TotalBikesResponse> getTotalBikes(
+        @retrofit2.http.Query("status") String status,
+        @retrofit2.http.Query("category") String category,
+        @retrofit2.http.Query("brand") String brand
+    );
+    
     @GET("bikes/{id}")
     Call<ApiResponse<Bike>> getBikeById(@retrofit2.http.Path("id") String bikeId);
     
@@ -291,6 +298,15 @@ public interface ApiService {
         @retrofit2.http.Query("startDate") String startDate,
         @retrofit2.http.Query("endDate") String endDate,
         @retrofit2.http.Query("storeId") String storeId
+    );
+    
+    @GET("orders/by-day-of-week")
+    Call<OrdersByDayOfWeekResponse> getOrdersByDayOfWeek(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("storeId") String storeId,
+        @retrofit2.http.Query("status") String status
     );
     
     @PUT("orders/{orderId}/status")
@@ -1360,6 +1376,288 @@ public interface ApiService {
         
         public void setIsActive(Boolean isActive) {
             this.isActive = isActive;
+        }
+    }
+    
+    // Total Bikes Response class
+    class TotalBikesResponse {
+        private boolean success;
+        private String message;
+        private TotalBikesData data;
+        
+        public TotalBikesResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public TotalBikesData getData() {
+            return data;
+        }
+        
+        public void setData(TotalBikesData data) {
+            this.data = data;
+        }
+    }
+    
+    // Total Bikes Data class
+    class TotalBikesData {
+        private int totalBikes;
+        private int availableBikes;
+        private int unavailableBikes;
+        private List<BikesByStatus> bikesByStatus;
+        private List<BikesByCategory> bikesByCategory;
+        private BikeFilters filters;
+        
+        public TotalBikesData() {}
+        
+        public int getTotalBikes() {
+            return totalBikes;
+        }
+        
+        public void setTotalBikes(int totalBikes) {
+            this.totalBikes = totalBikes;
+        }
+        
+        public int getAvailableBikes() {
+            return availableBikes;
+        }
+        
+        public void setAvailableBikes(int availableBikes) {
+            this.availableBikes = availableBikes;
+        }
+        
+        public int getUnavailableBikes() {
+            return unavailableBikes;
+        }
+        
+        public void setUnavailableBikes(int unavailableBikes) {
+            this.unavailableBikes = unavailableBikes;
+        }
+        
+        public List<BikesByStatus> getBikesByStatus() {
+            return bikesByStatus;
+        }
+        
+        public void setBikesByStatus(List<BikesByStatus> bikesByStatus) {
+            this.bikesByStatus = bikesByStatus;
+        }
+        
+        public List<BikesByCategory> getBikesByCategory() {
+            return bikesByCategory;
+        }
+        
+        public void setBikesByCategory(List<BikesByCategory> bikesByCategory) {
+            this.bikesByCategory = bikesByCategory;
+        }
+        
+        public BikeFilters getFilters() {
+            return filters;
+        }
+        
+        public void setFilters(BikeFilters filters) {
+            this.filters = filters;
+        }
+    }
+    
+    // Bikes By Status class
+    class BikesByStatus {
+        private String status;
+        private int count;
+        
+        public BikesByStatus() {}
+        
+        public String getStatus() {
+            return status;
+        }
+        
+        public void setStatus(String status) {
+            this.status = status;
+        }
+        
+        public int getCount() {
+            return count;
+        }
+        
+        public void setCount(int count) {
+            this.count = count;
+        }
+    }
+    
+    // Bikes By Category class
+    class BikesByCategory {
+        private String category;
+        private int count;
+        
+        public BikesByCategory() {}
+        
+        public String getCategory() {
+            return category;
+        }
+        
+        public void setCategory(String category) {
+            this.category = category;
+        }
+        
+        public int getCount() {
+            return count;
+        }
+        
+        public void setCount(int count) {
+            this.count = count;
+        }
+    }
+    
+    // Bike Filters class
+    class BikeFilters {
+        private String status;
+        private String category;
+        private String brand;
+        
+        public BikeFilters() {}
+        
+        public String getStatus() {
+            return status;
+        }
+        
+        public void setStatus(String status) {
+            this.status = status;
+        }
+        
+        public String getCategory() {
+            return category;
+        }
+        
+        public void setCategory(String category) {
+            this.category = category;
+        }
+        
+        public String getBrand() {
+            return brand;
+        }
+        
+        public void setBrand(String brand) {
+            this.brand = brand;
+        }
+    }
+    
+    // Orders By Day Of Week Response class
+    class OrdersByDayOfWeekResponse {
+        private boolean success;
+        private String message;
+        private OrdersByDayOfWeekData data;
+        
+        public OrdersByDayOfWeekResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public OrdersByDayOfWeekData getData() {
+            return data;
+        }
+        
+        public void setData(OrdersByDayOfWeekData data) {
+            this.data = data;
+        }
+    }
+    
+    // Orders By Day Of Week Data class
+    class OrdersByDayOfWeekData {
+        private List<OrderByDay> ordersByDay;
+        private Period period;
+        
+        public OrdersByDayOfWeekData() {}
+        
+        public List<OrderByDay> getOrdersByDay() {
+            return ordersByDay;
+        }
+        
+        public void setOrdersByDay(List<OrderByDay> ordersByDay) {
+            this.ordersByDay = ordersByDay;
+        }
+        
+        public Period getPeriod() {
+            return period;
+        }
+        
+        public void setPeriod(Period period) {
+            this.period = period;
+        }
+    }
+    
+    // Order By Day class
+    class OrderByDay {
+        private int dayOfWeek;
+        private String dayName;
+        private int totalOrders;
+        private double totalRevenue;
+        private double averageOrderValue;
+        
+        public OrderByDay() {}
+        
+        public int getDayOfWeek() {
+            return dayOfWeek;
+        }
+        
+        public void setDayOfWeek(int dayOfWeek) {
+            this.dayOfWeek = dayOfWeek;
+        }
+        
+        public String getDayName() {
+            return dayName;
+        }
+        
+        public void setDayName(String dayName) {
+            this.dayName = dayName;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public double getAverageOrderValue() {
+            return averageOrderValue;
+        }
+        
+        public void setAverageOrderValue(double averageOrderValue) {
+            this.averageOrderValue = averageOrderValue;
         }
     }
 }
