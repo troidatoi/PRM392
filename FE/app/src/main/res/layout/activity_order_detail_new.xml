@@ -684,7 +684,7 @@
 
                     </LinearLayout>
 
-                    <!-- Timeline đúng 5 dòng, mỗi dòng 1 LinearLayout + dot + Text -->
+                    <!-- Timeline đúng 6 dòng, mỗi dòng 1 LinearLayout + dot + Text -->
                     <LinearLayout
                         android:id="@+id/timelineLayout"
                         android:layout_width="match_parent"
@@ -692,6 +692,14 @@
                         android:orientation="vertical"
                         android:padding="20dp"
                         android:background="#FFFFFF">
+                        <!-- Awaiting Payment -->
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                            <View android:id="@+id/dotAwaitingPayment" android:layout_width="16dp" android:layout_height="16dp"
+                                android:layout_gravity="center_vertical" android:background="@drawable/circle_shape"/>
+                            <TextView android:id="@+id/tvStatusAwaitingPayment" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Chờ thanh toán" android:textSize="15sp" android:textStyle="bold"
+                                android:layout_marginStart="16dp" />
+                        </LinearLayout>
                         <!-- Pending -->
                         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
                             <View android:id="@+id/dotPending" android:layout_width="16dp" android:layout_height="16dp"
@@ -771,6 +779,19 @@
                 android:text="Đã nhận được hàng"
                 android:textColor="#FFF"
                 android:backgroundTint="#4CAF50"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnContinuePayment"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Tiếp tục thanh toán"
+                android:textColor="#FFF"
+                android:backgroundTint="#FF9800"
                 android:layout_marginTop="8dp"
                 android:visibility="gone"
                 android:textAllCaps="false"

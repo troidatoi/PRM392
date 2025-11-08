@@ -46,6 +46,9 @@ const createPaymentLink = async (req, res) => {
       });
     }
 
+    // Nếu đã có payment record với status pending, tái sử dụng thay vì tạo mới
+    // Chỉ cập nhật payment link mới từ PayOS
+
     // Check payment method
     if (order.paymentMethod !== 'payos') {
       return res.status(400).json({
@@ -90,8 +93,10 @@ const createPaymentLink = async (req, res) => {
     });
 
     // Create or update Payment record
+    // Tái sử dụng payment record cũ nếu đã tồn tại và status là pending
     let payment = existingPayment;
     if (!payment) {
+      // Tạo payment record mới
       payment = new Payment({
         order: orderId,
         user: order.user,
@@ -103,9 +108,15 @@ const createPaymentLink = async (req, res) => {
         currency: 'VND'
       });
     } else {
-      payment.paymentStatus = 'pending';
+      // Tái sử dụng payment record cũ
+      // Cập nhật transactionId và gatewayResponse với payment link mới
+      payment.transactionId = orderCode.toString();
       payment.gatewayTransactionId = paymentLinkData.data.orderCode?.toString();
       payment.gatewayResponse = paymentLinkData.data;
+      // Đảm bảo status là pending (có thể đã bị failed trước đó)
+      if (payment.paymentStatus !== 'completed') {
+        payment.paymentStatus = 'pending';
+      }
     }
 
     await payment.save();
@@ -465,11 +476,81 @@ const confirmPayment = async (req, res) => {
   }
 };
 
+/**
+ * Lấy danh sách payment pending của user
+ * Dùng để hiển thị thông báo thanh toán chưa hoàn tất
+ */
+const getPendingPayments = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Lấy tất cả payment pending của user
+    const pendingPayments = await Payment.find({
+      user: userId,
+      paymentStatus: 'pending',
+      paymentMethod: { $in: ['payos', 'vnpay'] } // Chỉ lấy online payment
+    })
+    .populate({
+      path: 'order',
+      select: 'orderNumber orderStatus totalAmount finalAmount shippingAddress createdAt',
+      populate: {
+        path: 'store',
+        select: 'name'
+      }
+    })
+    .sort({ createdAt: -1 });
+
+    console.log(`[GetPendingPayments] User ${userId}: Found ${pendingPayments.length} pending payments`);
+    
+    // Log chi tiết từng payment để debug
+    pendingPayments.forEach((payment, index) => {
+      console.log(`[GetPendingPayments] Payment ${index + 1}:`, {
+        paymentId: payment._id,
+        orderId: payment.order?._id,
+        orderStatus: payment.order?.orderStatus,
+        paymentMethod: payment.paymentMethod,
+        createdAt: payment.createdAt
+      });
+    });
+
+    // Lọc chỉ lấy những order còn ở trạng thái awaiting_payment hoặc pending
+    const validPayments = pendingPayments.filter(payment => {
+      const isValid = payment.order && 
+             (payment.order.orderStatus === 'awaiting_payment' || 
+              payment.order.orderStatus === 'pending');
+      
+      if (!isValid && payment.order) {
+        console.log(`[GetPendingPayments] Payment ${payment._id} filtered out - order status: ${payment.order.orderStatus}`);
+      }
+      
+      return isValid;
+    });
+
+    console.log(`[GetPendingPayments] User ${userId}: ${validPayments.length} valid payments after filtering`);
+
+    res.json({
+      success: true,
+      message: 'Lấy danh sách payment pending thành công',
+      data: {
+        payments: validPayments,
+        count: validPayments.length
+      }
+    });
+  } catch (error) {
+    console.error('Get pending payments error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi lấy danh sách payment pending'
+    });
+  }
+};
+
 module.exports = {
   createPaymentLink,
   handleWebhook,
   verifyPayment,
   cancelPaymentLink,
-  confirmPayment
+  confirmPayment,
+  getPendingPayments
 };
 

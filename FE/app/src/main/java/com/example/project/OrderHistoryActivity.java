@@ -1,5 +1,6 @@
 package com.example.project;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -40,6 +41,96 @@ public class OrderHistoryActivity extends AppCompatActivity {
         setupFilters();
         applyFilter("all");
         setupClickListeners();
+        
+        // Cập nhật payment badge
+        updatePaymentBadge();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Cập nhật payment badge khi resume
+        updatePaymentBadge();
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Cập nhật payment badge khi vào background
+        updatePaymentBadge();
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Start service để cập nhật badge khi app vào background
+        Intent serviceIntent = new Intent(this, PaymentBadgeService.class);
+        startService(serviceIntent);
+    }
+    
+    /**
+     * Cập nhật payment badge từ API
+     */
+    private void updatePaymentBadge() {
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.models.User user = auth.getCurrentUser();
+        
+        if (user == null) {
+            com.example.project.utils.NotificationHelper.removePaymentBadge(this);
+            return;
+        }
+
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        
+        api.getPendingPayments(auth.getAuthHeader(), user.getId())
+            .enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+                @Override
+                public void onResponse(
+                    retrofit2.Call<com.example.project.models.ApiResponse<Object>> call,
+                    retrofit2.Response<com.example.project.models.ApiResponse<Object>> response
+                ) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        try {
+                            Object data = response.body().getData();
+                            java.util.Map dataMap = (java.util.Map) data;
+                            
+                            int pendingCount = 0;
+                            String firstOrderId = null;
+                            
+                            if (dataMap != null) {
+                                if (dataMap.get("count") instanceof Number) {
+                                    pendingCount = ((Number) dataMap.get("count")).intValue();
+                                }
+                                
+                                java.util.List payments = (java.util.List) dataMap.get("payments");
+                                if (payments != null && !payments.isEmpty()) {
+                                    java.util.Map firstPayment = (java.util.Map) payments.get(0);
+                                    if (firstPayment != null) {
+                                        java.util.Map orderMap = (java.util.Map) firstPayment.get("order");
+                                        if (orderMap != null && orderMap.get("_id") != null) {
+                                            firstOrderId = orderMap.get("_id").toString();
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            com.example.project.utils.NotificationHelper.updatePaymentBadge(
+                                OrderHistoryActivity.this, pendingCount, firstOrderId);
+                            
+                        } catch (Exception e) {
+                            android.util.Log.e("OrderHistory", "Error updating payment badge: " + e.getMessage());
+                            com.example.project.utils.NotificationHelper.removePaymentBadge(OrderHistoryActivity.this);
+                        }
+                    } else {
+                        com.example.project.utils.NotificationHelper.removePaymentBadge(OrderHistoryActivity.this);
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                    android.util.Log.e("OrderHistory", "Error fetching pending payments: " + t.getMessage());
+                }
+            });
     }
 
     private void initViews() {

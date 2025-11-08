@@ -1,5 +1,6 @@
 package com.example.project;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -33,7 +34,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     private TextView tvSubtotal, tvShippingFee, tvTotal;
     private RecyclerView rvOrderItems;
     private View loadingView;
-    private Button btnConfirmOrder, btnShipOrder, btnDelivered, btnCancelOrder;
+    private Button btnConfirmOrder, btnShipOrder, btnDelivered, btnCancelOrder, btnContinuePayment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,96 @@ public class OrderDetailActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         loadOrderData();
+        
+        // Cập nhật payment badge khi vào activity
+        updatePaymentBadge();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Cập nhật payment badge khi resume
+        updatePaymentBadge();
+    }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Cập nhật payment badge khi vào background để notification hiển thị ngay
+        updatePaymentBadge();
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Start service để cập nhật badge khi app vào background
+        Intent serviceIntent = new Intent(this, PaymentBadgeService.class);
+        startService(serviceIntent);
+    }
+    
+    /**
+     * Cập nhật payment badge từ API
+     */
+    private void updatePaymentBadge() {
+        AuthManager auth = AuthManager.getInstance(this);
+        com.example.project.models.User user = auth.getCurrentUser();
+        
+        if (user == null) {
+            com.example.project.utils.NotificationHelper.removePaymentBadge(this);
+            return;
+        }
+
+        ApiService api = RetrofitClient.getInstance().getApiService();
+        
+        api.getPendingPayments(auth.getAuthHeader(), user.getId())
+            .enqueue(new retrofit2.Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(
+                    retrofit2.Call<ApiResponse<Object>> call,
+                    retrofit2.Response<ApiResponse<Object>> response
+                ) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        try {
+                            Object data = response.body().getData();
+                            java.util.Map dataMap = (java.util.Map) data;
+                            
+                            int pendingCount = 0;
+                            String firstOrderId = null;
+                            
+                            if (dataMap != null) {
+                                if (dataMap.get("count") instanceof Number) {
+                                    pendingCount = ((Number) dataMap.get("count")).intValue();
+                                }
+                                
+                                java.util.List payments = (java.util.List) dataMap.get("payments");
+                                if (payments != null && !payments.isEmpty()) {
+                                    java.util.Map firstPayment = (java.util.Map) payments.get(0);
+                                    if (firstPayment != null) {
+                                        java.util.Map orderMap = (java.util.Map) firstPayment.get("order");
+                                        if (orderMap != null && orderMap.get("_id") != null) {
+                                            firstOrderId = orderMap.get("_id").toString();
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            com.example.project.utils.NotificationHelper.updatePaymentBadge(
+                                OrderDetailActivity.this, pendingCount, firstOrderId);
+                            
+                        } catch (Exception e) {
+                            android.util.Log.e("OrderDetail", "Error updating payment badge: " + e.getMessage());
+                            com.example.project.utils.NotificationHelper.removePaymentBadge(OrderDetailActivity.this);
+                        }
+                    } else {
+                        com.example.project.utils.NotificationHelper.removePaymentBadge(OrderDetailActivity.this);
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<ApiResponse<Object>> call, Throwable t) {
+                    android.util.Log.e("OrderDetail", "Error fetching pending payments: " + t.getMessage());
+                }
+            });
     }
 
     private void initViews() {
@@ -77,6 +168,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         btnShipOrder = findViewById(R.id.btnShipOrder);
         btnDelivered = findViewById(R.id.btnDelivered);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
+        btnContinuePayment = findViewById(R.id.btnContinuePayment);
     }
 
     private void setupListeners() {
@@ -116,6 +208,14 @@ public class OrderDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 updateOrderStatus("delivered");
+            }
+        });
+
+        // User: Tiếp tục thanh toán
+        btnContinuePayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showContinuePaymentDialog();
             }
         });
 
@@ -243,6 +343,15 @@ public class OrderDetailActivity extends AppCompatActivity {
                             } else { btnDelivered.setVisibility(View.GONE); }
                             btnConfirmOrder.setVisibility(View.GONE);
                             btnShipOrder.setVisibility(View.GONE);
+                            
+                            // Hiển thị nút "Tiếp tục thanh toán" chỉ khi order status = awaiting_payment và payment method = payos
+                            if ((status.equalsIgnoreCase("awaiting_payment") || mapStatusText(status).equals("Chờ thanh toán")) &&
+                                (payment != null && payment.equalsIgnoreCase("payos"))) {
+                                btnContinuePayment.setVisibility(View.VISIBLE);
+                            } else {
+                                btnContinuePayment.setVisibility(View.GONE);
+                            }
+                            
                             // User có thể hủy đơn khi đơn đang ở trạng thái awaiting_payment, Pending hoặc Confirmed
                             if ((status.equalsIgnoreCase("awaiting_payment") || mapStatusText(status).equals("Chờ thanh toán") ||
                                 status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận") ||
@@ -321,6 +430,170 @@ public class OrderDetailActivity extends AppCompatActivity {
                 android.widget.Toast.makeText(OrderDetailActivity.this, "Lỗi mạng: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Hiển thị dialog xác nhận tiếp tục thanh toán
+    private void showContinuePaymentDialog() {
+        String orderId = getIntent().getStringExtra("ORDER_ID");
+        if (orderId == null || orderId.isEmpty()) {
+            android.widget.Toast.makeText(this, "Lỗi: Không tìm thấy đơn hàng", android.widget.Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Lấy thông tin đơn hàng từ UI
+        String receiverName = tvReceiverName.getText().toString();
+        String receiverPhone = tvReceiverPhone.getText().toString();
+        String shippingAddress = tvShippingAddress.getText().toString();
+        String paymentMethod = tvPaymentMethod.getText().toString();
+        String totalAmount = tvTotal.getText().toString();
+        
+        String message = "Người nhận: " + receiverName + "\n" +
+                "Số điện thoại: " + receiverPhone + "\n" +
+                "Địa chỉ: " + shippingAddress + "\n" +
+                "Phương thức thanh toán: " + paymentMethod + "\n" +
+                "Tổng tiền: " + totalAmount + "\n\n" +
+                "Xác nhận tiếp tục thanh toán?";
+        
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Xác Nhận Thanh Toán")
+                .setMessage(message)
+                .setPositiveButton("Xác nhận", (dialog, which) -> {
+                    performContinuePayment(orderId);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+    
+    // Thực hiện tiếp tục thanh toán
+    private void performContinuePayment(String orderId) {
+        AuthManager auth = AuthManager.getInstance(this);
+        ApiService api = RetrofitClient.getInstance().getApiService();
+        
+        // Tạo payment link - backend sẽ tái sử dụng payment record cũ
+        java.util.Map<String, Object> paymentBody = new java.util.HashMap<>();
+        
+        api.createPayOSPaymentLink(auth.getAuthHeader(), orderId, paymentBody)
+            .enqueue(new retrofit2.Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(
+                    retrofit2.Call<ApiResponse<Object>> call,
+                    retrofit2.Response<ApiResponse<Object>> response
+                ) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        try {
+                            Object data = response.body().getData();
+                            if (data instanceof java.util.Map) {
+                                java.util.Map d = (java.util.Map) data;
+                                java.util.Map paymentLink = (java.util.Map) d.get("paymentLink");
+                                
+                                if (paymentLink != null) {
+                                    String checkoutUrl = String.valueOf(paymentLink.get("checkoutUrl"));
+                                    
+                                    // Mở WebView Activity để thanh toán PayOS trong app
+                                    Intent paymentIntent = new Intent(OrderDetailActivity.this, PayOSPaymentActivity.class);
+                                    paymentIntent.putExtra("checkoutUrl", checkoutUrl);
+                                    paymentIntent.putExtra("orderId", orderId);
+                                    startActivityForResult(paymentIntent, 1001);
+                                    return;
+                                }
+                            }
+                        } catch (Exception e) {
+                            android.util.Log.e("OrderDetail", "Error parsing PayOS response: " + e.getMessage(), e);
+                        }
+                    }
+                    
+                    // Nếu không tạo được payment link
+                    android.widget.Toast.makeText(OrderDetailActivity.this, 
+                        "Lỗi tạo link thanh toán. Vui lòng thử lại sau.", 
+                        android.widget.Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<ApiResponse<Object>> call, Throwable t) {
+                    android.util.Log.e("OrderDetail", "Error creating PayOS payment link: " + t.getMessage(), t);
+                    android.widget.Toast.makeText(OrderDetailActivity.this, 
+                        "Lỗi kết nối. Vui lòng thử lại sau.", 
+                        android.widget.Toast.LENGTH_LONG).show();
+                }
+            });
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == 1001) {
+            if (resultCode == RESULT_OK) {
+                // Thanh toán thành công
+                String orderId = getIntent().getStringExtra("ORDER_ID");
+                if (orderId != null && data != null) {
+                    String code = data.getStringExtra("code");
+                    String orderCode = data.getStringExtra("orderCode");
+                    
+                    // Xác nhận thanh toán thành công với backend
+                    confirmPaymentSuccess(orderId, code, orderCode);
+                } else {
+                    // Reload order data nếu không có data
+                    if (orderId != null) {
+                        loadOrderData();
+                        updatePaymentBadge();
+                    }
+                }
+            } else if (resultCode == RESULT_CANCELED) {
+                // User đã hủy thanh toán - cập nhật badge ngay
+                updatePaymentBadge();
+                android.widget.Toast.makeText(this, "Đã hủy thanh toán", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
+    /**
+     * Xác nhận thanh toán thành công và cập nhật Payment status
+     */
+    private void confirmPaymentSuccess(String orderId, String code, String orderCode) {
+        AuthManager auth = AuthManager.getInstance(this);
+        ApiService api = RetrofitClient.getInstance().getApiService();
+        
+        java.util.Map<String, Object> body = new java.util.HashMap<>();
+        body.put("code", code);
+        body.put("orderCode", orderCode);
+        body.put("status", "completed");
+        
+        api.confirmPayOSPayment(auth.getAuthHeader(), orderId, body)
+            .enqueue(new retrofit2.Callback<ApiResponse<Object>>() {
+                @Override
+                public void onResponse(
+                    retrofit2.Call<ApiResponse<Object>> call,
+                    retrofit2.Response<ApiResponse<Object>> response
+                ) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        // Thanh toán thành công - reload order data
+                        loadOrderData();
+                        updatePaymentBadge();
+                        android.widget.Toast.makeText(OrderDetailActivity.this, 
+                            "Thanh toán thành công!", 
+                            android.widget.Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Vẫn reload order data vì PayOS đã xác nhận
+                        loadOrderData();
+                        updatePaymentBadge();
+                        android.widget.Toast.makeText(OrderDetailActivity.this, 
+                            "Thanh toán đã được xử lý. Đơn hàng sẽ được cập nhật sớm.", 
+                            android.widget.Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<ApiResponse<Object>> call, Throwable t) {
+                    android.util.Log.e("OrderDetail", "Error confirming payment: " + t.getMessage(), t);
+                    // Vẫn reload order data vì PayOS đã xác nhận
+                    loadOrderData();
+                    updatePaymentBadge();
+                    android.widget.Toast.makeText(OrderDetailActivity.this, 
+                        "Thanh toán đã được xử lý. Đơn hàng sẽ được cập nhật sớm.", 
+                        android.widget.Toast.LENGTH_LONG).show();
+                }
+            });
     }
 
     // Hiển thị dialog nhập lý do hủy đơn hàng
@@ -405,17 +678,13 @@ public class OrderDetailActivity extends AppCompatActivity {
     private String mapPaymentText(String p) { if (p==null) return ""; if (p.toLowerCase().contains("vnpay")) return "VNPay"; if (p.toLowerCase().contains("cod")) return "💵 COD"; return p;}
 
     private void updateTimeline(String status, String created, String updated) {
-        String[] keys = {"pending", "confirmed", "shipped", "delivered", "cancelled"};
+        String[] keys = {"awaiting_payment", "pending", "confirmed", "shipped", "delivered", "cancelled"};
         int idxActive = 0;
-        // Map awaiting_payment to pending view (index 0) since there's no separate view for it
-        if (status != null && status.equalsIgnoreCase("awaiting_payment")) {
-            idxActive = 0; // Map to pending position
-        } else {
-            for(int i=0;i<keys.length;i++) if(keys[i].equalsIgnoreCase(status)) idxActive = i;
-        }
-        int[] dotIds = {R.id.dotPending, R.id.dotConfirmed, R.id.dotShipped, R.id.dotDelivered, R.id.dotCancelled};
-        int[] tvIds = {R.id.tvStatusPending, R.id.tvStatusConfirmed, R.id.tvStatusShipped, R.id.tvStatusDelivered, R.id.tvStatusCancelled};
-        for (int i = 0; i < 5; i++) {
+        for(int i=0;i<keys.length;i++) if(keys[i].equalsIgnoreCase(status)) idxActive = i;
+        
+        int[] dotIds = {R.id.dotAwaitingPayment, R.id.dotPending, R.id.dotConfirmed, R.id.dotShipped, R.id.dotDelivered, R.id.dotCancelled};
+        int[] tvIds = {R.id.tvStatusAwaitingPayment, R.id.tvStatusPending, R.id.tvStatusConfirmed, R.id.tvStatusShipped, R.id.tvStatusDelivered, R.id.tvStatusCancelled};
+        for (int i = 0; i < 6; i++) {
             android.widget.TextView tv = findViewById(tvIds[i]);
             View dot = findViewById(dotIds[i]);
             if (tv == null || dot == null) continue;
@@ -441,7 +710,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         for (android.widget.TextView t : all) {
             if (t.getText() == null) continue;
             String txt = t.getText().toString().trim();
-            if (txt.equals("Chờ xác nhận") || txt.equals("Đã xác nhận") || txt.equals("Đang giao hàng") || txt.equals("Đã giao") || txt.equals("Đã hủy")) return t;
+            if (txt.equals("Chờ thanh toán") || txt.equals("Chờ xác nhận") || txt.equals("Đã xác nhận") || txt.equals("Đang giao hàng") || txt.equals("Đã giao") || txt.equals("Đã hủy")) return t;
             if (t.getText().hashCode() == h) return t;
         }
         return null;

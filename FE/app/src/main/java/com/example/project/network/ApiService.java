@@ -269,6 +269,12 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
     
+    @GET("payos/users/{userId}/pending-payments")
+    Call<ApiResponse<Object>> getPendingPayments(
+        @Header("Authorization") String token,
+        @retrofit2.http.Path("userId") String userId
+    );
+    
     @GET("orders/user/{userId}")
     Call<ApiResponse<Object>> getUserOrders(
         @Header("Authorization") String token,

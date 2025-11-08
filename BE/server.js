@@ -7,6 +7,7 @@ const passport = require('passport');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 const setupChatSocket = require('./socket/chatSocket');
+const cleanupPendingPayments = require('./jobs/paymentCleanupJob');
 
 // Load env vars
 dotenv.config();
@@ -102,6 +103,24 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   console.log(`WebSocket server is ready`);
+  
+  // Start payment cleanup cron job
+  // Chạy mỗi giờ để check và cleanup payment pending sau 24h
+  const CLEANUP_INTERVAL = 60 * 60 * 1000; // 1 giờ = 60 phút * 60 giây * 1000ms
+  
+  // Chạy ngay lần đầu sau khi server start (đợi 5 phút để DB sẵn sàng)
+  setTimeout(() => {
+    console.log('[Payment Cleanup] Bắt đầu cleanup job lần đầu...');
+    cleanupPendingPayments();
+  }, 5 * 60 * 1000); // 5 phút
+  
+  // Sau đó chạy định kỳ mỗi giờ
+  setInterval(() => {
+    console.log('[Payment Cleanup] Chạy cleanup job định kỳ...');
+    cleanupPendingPayments();
+  }, CLEANUP_INTERVAL);
+  
+  console.log('[Payment Cleanup] Cron job đã được khởi động - chạy mỗi giờ');
 });
 
 // Handle unhandled promise rejections

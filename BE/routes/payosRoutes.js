@@ -5,7 +5,8 @@ const {
   handleWebhook,
   verifyPayment,
   cancelPaymentLink,
-  confirmPayment
+  confirmPayment,
+  getPendingPayments
 } = require('../controllers/payosController');
 const { protect } = require('../middleware/auth');
 
@@ -20,6 +21,9 @@ router.post('/orders/:orderId/cancel-link', protect, cancelPaymentLink);
 
 // Confirm payment success (from frontend after payment)
 router.post('/orders/:orderId/confirm-payment', protect, confirmPayment);
+
+// Get pending payments for user (for notifications)
+router.get('/users/:userId/pending-payments', protect, getPendingPayments);
 
 // Webhook endpoint (no auth required - PayOS will call this)
 // PayOS gửi JSON body, đã được parse bởi express.json() middleware ở server.js

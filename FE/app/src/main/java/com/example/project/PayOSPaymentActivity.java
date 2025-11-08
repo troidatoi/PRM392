@@ -159,9 +159,77 @@ public class PayOSPaymentActivity extends AppCompatActivity {
         resultIntent.putExtra("orderId", orderId);
         setResult(RESULT_CANCELED, resultIntent);
         
+        // Cập nhật payment badge ngay khi hủy thanh toán
+        updatePaymentBadge();
+        
         // Hiển thị thông báo và đóng activity
         Toast.makeText(this, "Đã hủy thanh toán", Toast.LENGTH_SHORT).show();
         finish();
+    }
+    
+    /**
+     * Cập nhật payment badge từ API
+     */
+    private void updatePaymentBadge() {
+        com.example.project.utils.AuthManager auth = com.example.project.utils.AuthManager.getInstance(this);
+        com.example.project.models.User user = auth.getCurrentUser();
+        
+        if (user == null) {
+            com.example.project.utils.NotificationHelper.removePaymentBadge(this);
+            return;
+        }
+
+        com.example.project.network.ApiService api = com.example.project.network.RetrofitClient.getInstance().getApiService();
+        
+        api.getPendingPayments(auth.getAuthHeader(), user.getId())
+            .enqueue(new retrofit2.Callback<com.example.project.models.ApiResponse<Object>>() {
+                @Override
+                public void onResponse(
+                    retrofit2.Call<com.example.project.models.ApiResponse<Object>> call,
+                    retrofit2.Response<com.example.project.models.ApiResponse<Object>> response
+                ) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        try {
+                            Object data = response.body().getData();
+                            java.util.Map dataMap = (java.util.Map) data;
+                            
+                            int pendingCount = 0;
+                            String firstOrderId = null;
+                            
+                            if (dataMap != null) {
+                                if (dataMap.get("count") instanceof Number) {
+                                    pendingCount = ((Number) dataMap.get("count")).intValue();
+                                }
+                                
+                                java.util.List payments = (java.util.List) dataMap.get("payments");
+                                if (payments != null && !payments.isEmpty()) {
+                                    java.util.Map firstPayment = (java.util.Map) payments.get(0);
+                                    if (firstPayment != null) {
+                                        java.util.Map orderMap = (java.util.Map) firstPayment.get("order");
+                                        if (orderMap != null && orderMap.get("_id") != null) {
+                                            firstOrderId = orderMap.get("_id").toString();
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            com.example.project.utils.NotificationHelper.updatePaymentBadge(
+                                PayOSPaymentActivity.this, pendingCount, firstOrderId);
+                            
+                        } catch (Exception e) {
+                            android.util.Log.e("PayOSPayment", "Error updating payment badge: " + e.getMessage());
+                            com.example.project.utils.NotificationHelper.removePaymentBadge(PayOSPaymentActivity.this);
+                        }
+                    } else {
+                        com.example.project.utils.NotificationHelper.removePaymentBadge(PayOSPaymentActivity.this);
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<com.example.project.models.ApiResponse<Object>> call, Throwable t) {
+                    android.util.Log.e("PayOSPayment", "Error fetching pending payments: " + t.getMessage());
+                }
+            });
     }
 
     @Override
@@ -183,6 +251,9 @@ public class PayOSPaymentActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        // Cập nhật payment badge khi activity bị destroy (khi user thoát)
+        updatePaymentBadge();
+        
         if (webView != null) {
             webView.destroy();
         }
