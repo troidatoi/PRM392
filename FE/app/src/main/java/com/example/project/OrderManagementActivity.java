@@ -250,7 +250,7 @@ public class OrderManagementActivity extends AppCompatActivity {
             String status = order.getStatus();
             if (status != null) {
                 status = status.toLowerCase();
-                if (status.equals("pending")) {
+                if (status.equals("pending") || status.equals("awaiting_payment")) {
                     pendingCount++;
                 } else if (status.equals("delivered") || status.equals("completed")) {
                     completedCount++;

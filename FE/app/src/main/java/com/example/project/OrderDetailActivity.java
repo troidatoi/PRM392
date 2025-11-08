@@ -222,7 +222,8 @@ public class OrderDetailActivity extends AppCompatActivity {
                         if (isAdmin) {
                             // Admin: Hiển thị các nút thay đổi trạng thái, ẩn nút liên hệ hỗ trợ
                             btnContactSupport.setVisibility(View.GONE);
-                            if ((status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận"))) {
+                            if ((status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận") ||
+                                status.equalsIgnoreCase("awaiting_payment") || mapStatusText(status).equals("Chờ thanh toán"))) {
                                 btnConfirmOrder.setVisibility(View.VISIBLE);
                             } else { btnConfirmOrder.setVisibility(View.GONE); }
                             if ((status.equalsIgnoreCase("confirmed") || mapStatusText(status).equals("Đã xác nhận"))) {
@@ -242,8 +243,9 @@ public class OrderDetailActivity extends AppCompatActivity {
                             } else { btnDelivered.setVisibility(View.GONE); }
                             btnConfirmOrder.setVisibility(View.GONE);
                             btnShipOrder.setVisibility(View.GONE);
-                            // User có thể hủy đơn khi đơn đang ở trạng thái Pending hoặc Confirmed
-                            if ((status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận") ||
+                            // User có thể hủy đơn khi đơn đang ở trạng thái awaiting_payment, Pending hoặc Confirmed
+                            if ((status.equalsIgnoreCase("awaiting_payment") || mapStatusText(status).equals("Chờ thanh toán") ||
+                                status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận") ||
                                 status.equalsIgnoreCase("confirmed") || mapStatusText(status).equals("Đã xác nhận"))) {
                                 btnCancelOrder.setVisibility(View.VISIBLE);
                             } else {
@@ -398,14 +400,19 @@ public class OrderDetailActivity extends AppCompatActivity {
         try { OffsetDateTime odt = OffsetDateTime.parse(iso); return odt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));} catch (Exception e) {return iso;}
     }
     private String formatCurrency(long v) { java.text.NumberFormat fmt = java.text.NumberFormat.getInstance(new Locale("vi", "VN")); return fmt.format(v) + " ₫"; }
-    private String statusToColor(String status) { if (status==null) return "#2196F3"; switch(status.toLowerCase()) {case "pending":return "#FFC107";case "confirmed":return "#64B5F6";case "shipped":return "#2196F3";case "delivered":return "#4CAF50";case "cancelled":return "#F44336";default:return "#2196F3";} }
-    private String mapStatusText(String st) { if (st==null) return ""; switch(st.toLowerCase()) {case "pending":return "Chờ xác nhận";case "confirmed":return "Đã xác nhận";case "shipped":return "Đang giao";case "delivered":return "✓ Đã giao";case "cancelled":return "Đã hủy";default:return st;} }
+    private String statusToColor(String status) { if (status==null) return "#2196F3"; switch(status.toLowerCase()) {case "awaiting_payment":return "#FF9800";case "pending":return "#FFC107";case "confirmed":return "#64B5F6";case "shipped":return "#2196F3";case "delivered":return "#4CAF50";case "cancelled":return "#F44336";default:return "#2196F3";} }
+    private String mapStatusText(String st) { if (st==null) return ""; switch(st.toLowerCase()) {case "awaiting_payment":return "Chờ thanh toán";case "pending":return "Chờ xác nhận";case "confirmed":return "Đã xác nhận";case "shipped":return "Đang giao";case "delivered":return "✓ Đã giao";case "cancelled":return "Đã hủy";default:return st;} }
     private String mapPaymentText(String p) { if (p==null) return ""; if (p.toLowerCase().contains("vnpay")) return "VNPay"; if (p.toLowerCase().contains("cod")) return "💵 COD"; return p;}
 
     private void updateTimeline(String status, String created, String updated) {
         String[] keys = {"pending", "confirmed", "shipped", "delivered", "cancelled"};
         int idxActive = 0;
-        for(int i=0;i<keys.length;i++) if(keys[i].equalsIgnoreCase(status)) idxActive = i;
+        // Map awaiting_payment to pending view (index 0) since there's no separate view for it
+        if (status != null && status.equalsIgnoreCase("awaiting_payment")) {
+            idxActive = 0; // Map to pending position
+        } else {
+            for(int i=0;i<keys.length;i++) if(keys[i].equalsIgnoreCase(status)) idxActive = i;
+        }
         int[] dotIds = {R.id.dotPending, R.id.dotConfirmed, R.id.dotShipped, R.id.dotDelivered, R.id.dotCancelled};
         int[] tvIds = {R.id.tvStatusPending, R.id.tvStatusConfirmed, R.id.tvStatusShipped, R.id.tvStatusDelivered, R.id.tvStatusCancelled};
         for (int i = 0; i < 5; i++) {

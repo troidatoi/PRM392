@@ -221,8 +221,12 @@ const handleWebhook = async (req, res) => {
       payment.processedAt = new Date();
       await payment.save();
 
-      // Lưu ý: Không tự động đổi order status
-      // Order status chỉ được đổi khi admin xác nhận thủ công
+      // Chuyển order status từ awaiting_payment sang pending khi payment thành công
+      if (payment.order && payment.order.orderStatus === 'awaiting_payment') {
+        payment.order.orderStatus = 'pending';
+        await payment.order.save();
+        console.log(`Order ${payment.order._id} status updated from awaiting_payment to pending`);
+      }
 
       console.log(`Payment completed for orderCode: ${orderCode}`);
     } else {
@@ -295,8 +299,12 @@ const verifyPayment = async (req, res) => {
             payment.processedAt = new Date();
             await payment.save();
 
-            // Lưu ý: Không tự động đổi order status
-            // Order status chỉ được đổi khi admin xác nhận thủ công
+            // Chuyển order status từ awaiting_payment sang pending khi payment thành công
+            if (payment.order && payment.order.orderStatus === 'awaiting_payment') {
+              payment.order.orderStatus = 'pending';
+              await payment.order.save();
+              console.log(`Order ${payment.order._id} status updated from awaiting_payment to pending`);
+            }
           } else if (payOSData.status === 'CANCELLED' && payment.paymentStatus !== 'cancelled') {
             payment.paymentStatus = 'cancelled';
             payment.gatewayResponse = payOSData;
@@ -425,9 +433,12 @@ const confirmPayment = async (req, res) => {
 
     await payment.save();
 
-    // Lưu ý: Không tự động đổi order status khi payment thành công
-    // Order status chỉ được đổi khi admin xác nhận thủ công
-    // Payment và Order status là 2 việc độc lập
+    // Chuyển order status từ awaiting_payment sang pending khi payment thành công
+    if (payment.paymentStatus === 'completed' && order.orderStatus === 'awaiting_payment') {
+      order.orderStatus = 'pending';
+      await order.save();
+      console.log(`Order ${order._id} status updated from awaiting_payment to pending`);
+    }
 
     res.json({
       success: true,

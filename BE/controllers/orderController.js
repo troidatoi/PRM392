@@ -144,6 +144,11 @@ const createOrders = async (req, res) => {
       }
 
       // Create ONE order for THIS store
+      // Set status to awaiting_payment for online payment methods
+      const initialStatus = (paymentMethod === 'vnpay' || paymentMethod === 'payos') 
+        ? 'awaiting_payment' 
+        : 'pending';
+      
       const order = new Order({
         user: userId,
         store: storeData.store._id, // Mỗi order chỉ thuộc 1 cửa hàng
@@ -153,7 +158,8 @@ const createOrders = async (req, res) => {
         totalAmount: storeTotal,
         shippingFee: shippingFee,
         discountAmount: 0,
-        finalAmount: storeTotal + shippingFee
+        finalAmount: storeTotal + shippingFee,
+        orderStatus: initialStatus
       });
       
       await order.save();

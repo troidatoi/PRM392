@@ -261,6 +261,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
     private String statusToColor(String status) {
         if (status == null) return "#2196F3";
         switch (status.toLowerCase()) {
+            case "awaiting_payment": return "#FF9800"; // orange
             case "pending": return "#FFC107"; // amber
             case "confirmed": return "#64B5F6"; // light blue
             case "shipped": return "#2196F3"; // blue
