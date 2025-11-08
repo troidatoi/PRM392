@@ -50,3 +50,60 @@ exports.deleteUser = async (req, res, next) => {
     next(err);
   }
 };
+
+// Get total users count
+exports.getTotalUsers = async (req, res, next) => {
+  try {
+    const { role, isActive } = req.query;
+    
+    // Build query
+    const query = {};
+    if (role) {
+      query.role = role;
+    }
+    if (isActive !== undefined) {
+      query.isActive = isActive === 'true';
+    }
+    
+    // Count users
+    const totalUsers = await User.countDocuments(query);
+    
+    // Get count by role if no specific role is requested
+    let usersByRole = [];
+    if (!role) {
+      usersByRole = await User.aggregate([
+        {
+          $group: {
+            _id: '$role',
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1 } }
+      ]);
+    }
+    
+    // Get active vs inactive count
+    const activeUsers = await User.countDocuments({ ...query, isActive: true });
+    const inactiveUsers = await User.countDocuments({ ...query, isActive: false });
+    
+    res.json({
+      success: true,
+      message: 'Lấy tổng số người dùng thành công',
+      data: {
+        totalUsers,
+        activeUsers,
+        inactiveUsers,
+        usersByRole: usersByRole.map(item => ({
+          role: item._id,
+          count: item.count
+        })),
+        filters: {
+          role: role || null,
+          isActive: isActive !== undefined ? isActive === 'true' : null
+        }
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};

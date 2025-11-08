@@ -227,7 +227,7 @@
                         <!-- User Card -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
-                            android:layout_height="130dp"
+                            android:layout_height="140dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
                             app:cardCornerRadius="20dp"
@@ -240,6 +240,7 @@
                         android:orientation="vertical"
                         android:background="@drawable/gradient_card_blue"
                         android:padding="16dp"
+                        android:paddingBottom="20dp"
                         android:gravity="center">
 
                         <androidx.cardview.widget.CardView
@@ -270,11 +271,16 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
+                            android:id="@+id/tvTotalUsersLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Total Users"
-                            android:textSize="12sp"
-                            android:textColor="#BBDEFB" />
+                            android:text="Tổng người dùng"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:alpha="0.95"
+                            android:layout_marginTop="2dp"
+                            android:visibility="visible" />
 
                     </LinearLayout>
 

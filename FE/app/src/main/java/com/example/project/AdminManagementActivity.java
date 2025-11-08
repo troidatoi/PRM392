@@ -24,7 +24,7 @@ import retrofit2.Response;
 
 public class AdminManagementActivity extends AppCompatActivity {
 
-    private TextView tvTotalSales, tvTotalSalesLabel, tvOrderUser, tvTotalProducts, tvTotalUsers;
+    private TextView tvTotalSales, tvTotalSalesLabel, tvOrderUser, tvTotalProducts, tvTotalUsers, tvTotalUsersLabel;
     private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
     private ImageView iconDashboard, iconUserManagement, iconProductManagement, iconStoreManagement, iconOrderManagement, iconChatManagement;
     private TextView tvDashboard, tvUserManagement, tvProductManagement, tvStoreManagement, tvOrderManagement, tvChatManagement;
@@ -55,11 +55,16 @@ public class AdminManagementActivity extends AppCompatActivity {
         tvOrderUser = findViewById(R.id.tvOrderUser);
         tvTotalProducts = findViewById(R.id.tvTotalProducts);
         tvTotalUsers = findViewById(R.id.tvTotalUsers);
+        tvTotalUsersLabel = findViewById(R.id.tvTotalUsersLabel);
         
-        // Ensure label is visible and set text
+        // Ensure labels are visible and set text
         if (tvTotalSalesLabel != null) {
             tvTotalSalesLabel.setText("Tổng doanh thu");
             tvTotalSalesLabel.setVisibility(android.view.View.VISIBLE);
+        }
+        if (tvTotalUsersLabel != null) {
+            tvTotalUsersLabel.setText("Tổng người dùng");
+            tvTotalUsersLabel.setVisibility(android.view.View.VISIBLE);
         }
 
         // Bottom navigation views
@@ -150,10 +155,9 @@ public class AdminManagementActivity extends AppCompatActivity {
                         int totalOrders = revenueData.getTotalOrders();
                         tvOrderUser.setText(String.valueOf(totalOrders));
                         
-                        // TODO: Load total products and total users from other APIs
-                        // For now, keep default values
+                        // TODO: Load total products from other API
+                        // For now, keep default value
                         tvTotalProducts.setText("0");
-                        tvTotalUsers.setText("0");
                     } else {
                         // Show error message
                         showError("Không thể tải dữ liệu thống kê");
@@ -169,6 +173,46 @@ public class AdminManagementActivity extends AppCompatActivity {
                 // Show default values on error
                 tvTotalSales.setText("0");
                 tvOrderUser.setText("0");
+            }
+        });
+        
+        // Call API to get total users
+        loadTotalUsers(authHeader);
+    }
+    
+    private void loadTotalUsers(String authHeader) {
+        Call<ApiService.TotalUsersResponse> call = apiService.getTotalUsers(
+            authHeader,
+            null,  // role
+            null   // isActive
+        );
+        
+        call.enqueue(new Callback<ApiService.TotalUsersResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.TotalUsersResponse> call, Response<ApiService.TotalUsersResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.TotalUsersResponse usersResponse = response.body();
+                    
+                    if (usersResponse.isSuccess() && usersResponse.getData() != null) {
+                        ApiService.TotalUsersData usersData = usersResponse.getData();
+                        
+                        // Display total users
+                        int totalUsers = usersData.getTotalUsers();
+                        tvTotalUsers.setText(String.valueOf(totalUsers));
+                    } else {
+                        // Show default value on error
+                        tvTotalUsers.setText("0");
+                    }
+                } else {
+                    // Show default value on error
+                    tvTotalUsers.setText("0");
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.TotalUsersResponse> call, Throwable t) {
+                // Show default value on error
+                tvTotalUsers.setText("0");
             }
         });
     }

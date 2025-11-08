@@ -8,7 +8,8 @@ const {
   deleteBike,
   getFeaturedBikes,
   getCategories,
-  uploadImages
+  uploadImages,
+  getTotalBikes
 } = require('../controllers/bikeController');
 const { validateBike, validateBikeQuery, validateFeaturedQuery } = require('../middleware/validation');
 const { uploadMultiple, handleUploadError } = require('../middleware/upload');
@@ -36,6 +37,11 @@ router.get('/featured/list', validateFeaturedQuery, getFeaturedBikes);
 // @desc    Get all categories with count
 // @access  Public
 router.get('/categories/list', getCategories);
+
+// @route   GET /api/bikes/count/total
+// @desc    Get total bikes count
+// @access  Public
+router.get('/count/total', getTotalBikes);
 
 // @route   POST /api/bikes
 // @desc    Create new bike

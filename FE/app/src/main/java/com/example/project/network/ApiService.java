@@ -47,6 +47,13 @@ public interface ApiService {
     @GET("users")
     Call<ApiResponse<User[]>> getUsers(@Header("Authorization") String token);
     
+    @GET("users/count/total")
+    Call<TotalUsersResponse> getTotalUsers(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("role") String role,
+        @retrofit2.http.Query("isActive") String isActive
+    );
+    
     @GET("users/{id}")
     Call<ApiResponse<User>> getUser(@Header("Authorization") String token, @retrofit2.http.Path("id") String userId);
     
@@ -1221,6 +1228,138 @@ public interface ApiService {
         
         public void setStoreId(String storeId) {
             this.storeId = storeId;
+        }
+    }
+    
+    // Total Users Response class
+    class TotalUsersResponse {
+        private boolean success;
+        private String message;
+        private TotalUsersData data;
+        
+        public TotalUsersResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public TotalUsersData getData() {
+            return data;
+        }
+        
+        public void setData(TotalUsersData data) {
+            this.data = data;
+        }
+    }
+    
+    // Total Users Data class
+    class TotalUsersData {
+        private int totalUsers;
+        private int activeUsers;
+        private int inactiveUsers;
+        private List<UsersByRole> usersByRole;
+        private Filters filters;
+        
+        public TotalUsersData() {}
+        
+        public int getTotalUsers() {
+            return totalUsers;
+        }
+        
+        public void setTotalUsers(int totalUsers) {
+            this.totalUsers = totalUsers;
+        }
+        
+        public int getActiveUsers() {
+            return activeUsers;
+        }
+        
+        public void setActiveUsers(int activeUsers) {
+            this.activeUsers = activeUsers;
+        }
+        
+        public int getInactiveUsers() {
+            return inactiveUsers;
+        }
+        
+        public void setInactiveUsers(int inactiveUsers) {
+            this.inactiveUsers = inactiveUsers;
+        }
+        
+        public List<UsersByRole> getUsersByRole() {
+            return usersByRole;
+        }
+        
+        public void setUsersByRole(List<UsersByRole> usersByRole) {
+            this.usersByRole = usersByRole;
+        }
+        
+        public Filters getFilters() {
+            return filters;
+        }
+        
+        public void setFilters(Filters filters) {
+            this.filters = filters;
+        }
+    }
+    
+    // Users By Role class
+    class UsersByRole {
+        private String role;
+        private int count;
+        
+        public UsersByRole() {}
+        
+        public String getRole() {
+            return role;
+        }
+        
+        public void setRole(String role) {
+            this.role = role;
+        }
+        
+        public int getCount() {
+            return count;
+        }
+        
+        public void setCount(int count) {
+            this.count = count;
+        }
+    }
+    
+    // Filters class
+    class Filters {
+        private String role;
+        private Boolean isActive;
+        
+        public Filters() {}
+        
+        public String getRole() {
+            return role;
+        }
+        
+        public void setRole(String role) {
+            this.role = role;
+        }
+        
+        public Boolean getIsActive() {
+            return isActive;
+        }
+        
+        public void setIsActive(Boolean isActive) {
+            this.isActive = isActive;
         }
     }
 }

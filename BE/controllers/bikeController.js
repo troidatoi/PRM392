@@ -515,6 +515,91 @@ const uploadImages = async (req, res) => {
   }
 };
 
+// @desc    Get total bikes count
+// @route   GET /api/bikes/count/total
+// @access  Public
+const getTotalBikes = async (req, res) => {
+  try {
+    const { status, category, brand } = req.query;
+    
+    // Build query
+    const query = {};
+    if (status) {
+      query.status = status;
+    }
+    if (category) {
+      query.category = category;
+    }
+    if (brand) {
+      query.brand = new RegExp(brand, 'i');
+    }
+    
+    // Count bikes
+    const totalBikes = await Bike.countDocuments(query);
+    
+    // Get count by status if no specific status is requested
+    let bikesByStatus = [];
+    if (!status) {
+      bikesByStatus = await Bike.aggregate([
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1 } }
+      ]);
+    }
+    
+    // Get count by category if no specific category is requested
+    let bikesByCategory = [];
+    if (!category) {
+      bikesByCategory = await Bike.aggregate([
+        {
+          $group: {
+            _id: '$category',
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { count: -1 } }
+      ]);
+    }
+    
+    // Get available vs unavailable count
+    const availableBikes = await Bike.countDocuments({ ...query, status: 'available' });
+    const unavailableBikes = await Bike.countDocuments({ ...query, status: { $ne: 'available' } });
+    
+    res.json({
+      success: true,
+      message: 'Lấy tổng số xe thành công',
+      data: {
+        totalBikes,
+        availableBikes,
+        unavailableBikes,
+        bikesByStatus: bikesByStatus.map(item => ({
+          status: item._id,
+          count: item.count
+        })),
+        bikesByCategory: bikesByCategory.map(item => ({
+          category: item._id,
+          count: item.count
+        })),
+        filters: {
+          status: status || null,
+          category: category || null,
+          brand: brand || null
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching total bikes:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi lấy tổng số xe'
+    });
+  }
+};
+
 module.exports = {
   getBikes,
   getBikeById,
@@ -523,6 +608,7 @@ module.exports = {
   deleteBike,
   getFeaturedBikes,
   getCategories,
-  uploadImages
+  uploadImages,
+  getTotalBikes
 };
 

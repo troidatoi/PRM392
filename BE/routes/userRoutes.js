@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { listUsers, getUser, updateUser, deleteUser } = require('../controllers/userController');
+const { listUsers, getUser, updateUser, deleteUser, getTotalUsers } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(protect);
 router.use(authorize('admin', 'staff'));
 
+router.get('/count/total', getTotalUsers);
 router.get('/', listUsers);
 router.get('/:id', getUser);
 router.put(
