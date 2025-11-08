@@ -8,7 +8,8 @@ const {
   getLowStockItems,
   getOutOfStockItems,
   checkStockAvailability,
-  getProductInventory
+  getProductInventory,
+  getInventoryTurnover
 } = require('../controllers/inventoryController');
 const { protect } = require('../middleware/auth');
 
@@ -35,5 +36,8 @@ router.get('/store/:storeId/out-of-stock', getOutOfStockItems);
 
 // Check stock availability
 router.post('/check-availability', checkStockAvailability);
+
+// Get inventory turnover ratio
+router.get('/turnover-ratio', protect, getInventoryTurnover);
 
 module.exports = router;

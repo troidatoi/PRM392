@@ -576,12 +576,34 @@ const getAllOrders = async (req, res) => {
         paymentMethod: order.paymentMethod,
         createdAt: order.orderDate,
         updatedAt: order.updatedAt,
-        items: orderDetails.map(detail => ({
-          product: detail.product,
-          quantity: detail.quantity,
-          price: detail.price,
-          totalPrice: detail.totalPrice
-        }))
+        items: orderDetails.map(detail => {
+          // Transform images from objects to array of URLs
+          let imageUrls = [];
+          if (detail.product && detail.product.images) {
+            if (Array.isArray(detail.product.images)) {
+              imageUrls = detail.product.images.map(img => {
+                if (typeof img === 'string') {
+                  return img;
+                } else if (img && img.url) {
+                  return img.url;
+                }
+                return null;
+              }).filter(url => url !== null);
+            }
+          }
+          
+          return {
+            product: {
+              _id: detail.product?._id,
+              name: detail.product?.name,
+              images: imageUrls, // Array of strings (URLs)
+              price: detail.product?.price
+            },
+            quantity: detail.quantity,
+            price: detail.price,
+            totalPrice: detail.totalPrice
+          };
+        })
       };
     }));
     
@@ -851,6 +873,332 @@ const getOrdersByDayOfWeek = async (req, res) => {
   }
 };
 
+// @desc    Get total orders by bike
+// @route   GET /api/orders/by-bike
+// @access  Admin
+const getOrdersByBike = async (req, res) => {
+  try {
+    const { startDate, endDate, storeId, status } = req.query;
+    
+    // Build match query for orders
+    const orderMatch = {};
+    if (status) {
+      orderMatch.orderStatus = status;
+    }
+    if (storeId) {
+      orderMatch.store = mongoose.Types.ObjectId.isValid(storeId) 
+        ? new mongoose.Types.ObjectId(storeId) 
+        : storeId;
+    }
+    if (startDate || endDate) {
+      orderMatch.orderDate = {};
+      if (startDate) {
+        orderMatch.orderDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        orderMatch.orderDate.$lte = end;
+      }
+    }
+    
+    // Aggregate orders by bike
+    const ordersByBike = await Order.aggregate([
+      { $match: orderMatch },
+      { $unwind: '$orderDetails' },
+      {
+        $lookup: {
+          from: 'orderdetails',
+          localField: 'orderDetails',
+          foreignField: '_id',
+          as: 'detail'
+        }
+      },
+      { $unwind: '$detail' },
+      {
+        $group: {
+          _id: {
+            bike: '$detail.product',
+            order: '$_id'
+          },
+          quantity: { $first: '$detail.quantity' },
+          totalPrice: { $first: '$detail.totalPrice' }
+        }
+      },
+      {
+        $group: {
+          _id: '$_id.bike',
+          totalOrders: { $sum: 1 },
+          totalQuantity: { $sum: '$quantity' },
+          totalRevenue: { $sum: '$totalPrice' },
+          averageQuantity: { $avg: '$quantity' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'bikes',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'bike'
+        }
+      },
+      {
+        $unwind: {
+          path: '$bike',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          bikeId: '$_id',
+          bikeName: '$bike.name',
+          bikeBrand: '$bike.brand',
+          bikeImage: '$bike.images',
+          totalOrders: 1,
+          totalQuantity: 1,
+          totalRevenue: 1,
+          averageQuantity: 1
+        }
+      },
+      { $sort: { totalOrders: -1 } }
+    ]);
+    
+    res.json({
+      success: true,
+      message: 'Lấy tổng đơn hàng theo xe thành công',
+      data: {
+        ordersByBike: ordersByBike,
+        period: {
+          startDate: startDate || null,
+          endDate: endDate || null,
+          storeId: storeId || null,
+          status: status || null
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get top 5 bikes with most orders
+// @route   GET /api/orders/top-bikes
+// @access  Admin
+const getTopBikesByOrders = async (req, res) => {
+  try {
+    const { startDate, endDate, storeId, status, limit } = req.query;
+    const topLimit = parseInt(limit) || 5;
+    
+    // Build match query for orders
+    const orderMatch = {};
+    if (status) {
+      orderMatch.orderStatus = status;
+    }
+    if (storeId) {
+      orderMatch.store = mongoose.Types.ObjectId.isValid(storeId) 
+        ? new mongoose.Types.ObjectId(storeId) 
+        : storeId;
+    }
+    if (startDate || endDate) {
+      orderMatch.orderDate = {};
+      if (startDate) {
+        orderMatch.orderDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        orderMatch.orderDate.$lte = end;
+      }
+    }
+    
+    // Aggregate top bikes by orders
+    const topBikes = await Order.aggregate([
+      { $match: orderMatch },
+      { $unwind: '$orderDetails' },
+      {
+        $lookup: {
+          from: 'orderdetails',
+          localField: 'orderDetails',
+          foreignField: '_id',
+          as: 'detail'
+        }
+      },
+      { $unwind: '$detail' },
+      {
+        $group: {
+          _id: {
+            bike: '$detail.product',
+            order: '$_id'
+          },
+          quantity: { $first: '$detail.quantity' },
+          totalPrice: { $first: '$detail.totalPrice' }
+        }
+      },
+      {
+        $group: {
+          _id: '$_id.bike',
+          totalOrders: { $sum: 1 },
+          totalQuantity: { $sum: '$quantity' },
+          totalRevenue: { $sum: '$totalPrice' },
+          averageQuantity: { $avg: '$quantity' }
+        }
+      },
+      { $sort: { totalOrders: -1 } },
+      { $limit: topLimit },
+      {
+        $lookup: {
+          from: 'bikes',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'bike'
+        }
+      },
+      {
+        $unwind: {
+          path: '$bike',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          bikeId: '$_id',
+          bikeName: '$bike.name',
+          bikeBrand: '$bike.brand',
+          bikeImage: { $arrayElemAt: ['$bike.images', 0] },
+          bikePrice: '$bike.price',
+          bikeCategory: '$bike.category',
+          totalOrders: 1,
+          totalQuantity: 1,
+          totalRevenue: 1,
+          averageQuantity: 1
+        }
+      }
+    ]);
+    
+    res.json({
+      success: true,
+      message: `Lấy top ${topLimit} xe có nhiều đơn hàng nhất thành công`,
+      data: {
+        topBikes: topBikes,
+        limit: topLimit,
+        period: {
+          startDate: startDate || null,
+          endDate: endDate || null,
+          storeId: storeId || null,
+          status: status || null
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get revenue by store
+// @route   GET /api/orders/revenue/by-store
+// @access  Admin
+const getRevenueByStore = async (req, res) => {
+  try {
+    const { startDate, endDate, status } = req.query;
+    
+    // Build match query
+    const query = {};
+    if (status) {
+      query.orderStatus = status;
+    } else {
+      // Default to delivered orders for revenue
+      query.orderStatus = 'delivered';
+    }
+    
+    if (startDate || endDate) {
+      query.orderDate = {};
+      if (startDate) {
+        query.orderDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.orderDate.$lte = end;
+      }
+    }
+    
+    // Aggregate revenue by store
+    const revenueByStore = await Order.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: '$store',
+          totalRevenue: { $sum: '$finalAmount' },
+          totalOrders: { $sum: 1 },
+          averageOrderValue: { $avg: '$finalAmount' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'stores',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'store'
+        }
+      },
+      {
+        $unwind: {
+          path: '$store',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $project: {
+          storeId: '$_id',
+          storeName: '$store.name',
+          storeAddress: '$store.address',
+          storeCity: '$store.city',
+          totalRevenue: 1,
+          totalOrders: 1,
+          averageOrderValue: 1
+        }
+      },
+      { $sort: { totalRevenue: -1 } }
+    ]);
+    
+    // Calculate total across all stores
+    const totalRevenue = revenueByStore.reduce((sum, store) => sum + store.totalRevenue, 0);
+    const totalOrders = revenueByStore.reduce((sum, store) => sum + store.totalOrders, 0);
+    
+    res.json({
+      success: true,
+      message: 'Lấy doanh thu theo cửa hàng thành công',
+      data: {
+        revenueByStore: revenueByStore,
+        summary: {
+          totalRevenue: totalRevenue,
+          totalOrders: totalOrders,
+          storeCount: revenueByStore.length
+        },
+        period: {
+          startDate: startDate || null,
+          endDate: endDate || null,
+          status: status || null
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createOrders,
   getUserOrders,
@@ -861,5 +1209,8 @@ module.exports = {
   getAllOrders,
   estimateShipping,
   getTotalRevenue,
-  getOrdersByDayOfWeek
+  getOrdersByDayOfWeek,
+  getOrdersByBike,
+  getTopBikesByOrders,
+  getRevenueByStore
 };

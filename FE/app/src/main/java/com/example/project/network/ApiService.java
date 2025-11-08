@@ -198,6 +198,17 @@ public interface ApiService {
         @Body java.util.Map<String, Object> body
     );
 
+    @GET("inventory/turnover-ratio")
+    Call<InventoryTurnoverResponse> getInventoryTurnover(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("storeId") String storeId,
+        @retrofit2.http.Query("limit") Integer limit,
+        @retrofit2.http.Query("minStock") Integer minStock,
+        @retrofit2.http.Query("sortBy") String sortBy
+    );
+
     // Store endpoints
     @GET("stores")
     Call<StoreResponse> getStores(
@@ -306,9 +317,27 @@ public interface ApiService {
         @retrofit2.http.Query("storeId") String storeId
     );
     
+    @GET("orders/revenue/by-store")
+    Call<RevenueByStoreResponse> getRevenueByStore(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("status") String status
+    );
+    
     @GET("orders/by-day-of-week")
     Call<OrdersByDayOfWeekResponse> getOrdersByDayOfWeek(
         @Header("Authorization") String token,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("storeId") String storeId,
+        @retrofit2.http.Query("status") String status
+    );
+    
+    @GET("orders/top-bikes")
+    Call<TopBikesResponse> getTopBikes(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("limit") Integer limit,
         @retrofit2.http.Query("startDate") String startDate,
         @retrofit2.http.Query("endDate") String endDate,
         @retrofit2.http.Query("storeId") String storeId,
@@ -974,6 +1003,7 @@ public interface ApiService {
         private String bikeName;
         private int quantity;
         private double price;
+        private ProductInfo product; // Product object from backend
         
         public OrderItem() {}
         
@@ -986,6 +1016,10 @@ public interface ApiService {
         }
         
         public String getBikeName() {
+            // Return product name if available, otherwise bikeName
+            if (product != null && product.getName() != null) {
+                return product.getName();
+            }
             return bikeName;
         }
         
@@ -999,6 +1033,56 @@ public interface ApiService {
         
         public void setQuantity(int quantity) {
             this.quantity = quantity;
+        }
+        
+        public double getPrice() {
+            return price;
+        }
+        
+        public void setPrice(double price) {
+            this.price = price;
+        }
+        
+        public ProductInfo getProduct() {
+            return product;
+        }
+        
+        public void setProduct(ProductInfo product) {
+            this.product = product;
+        }
+    }
+    
+    // Product Info class for order items
+    class ProductInfo {
+        private String _id;
+        private String name;
+        private java.util.List<String> images;
+        private double price;
+        
+        public ProductInfo() {}
+        
+        public String getId() {
+            return _id;
+        }
+        
+        public void setId(String _id) {
+            this._id = _id;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public void setName(String name) {
+            this.name = name;
+        }
+        
+        public java.util.List<String> getImages() {
+            return images;
+        }
+        
+        public void setImages(java.util.List<String> images) {
+            this.images = images;
         }
         
         public double getPrice() {
@@ -1665,5 +1749,485 @@ public interface ApiService {
         public void setAverageOrderValue(double averageOrderValue) {
             this.averageOrderValue = averageOrderValue;
         }
+    }
+    
+    // Top Bikes Response class
+    class TopBikesResponse {
+        private boolean success;
+        private String message;
+        private TopBikesData data;
+        
+        public TopBikesResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public TopBikesData getData() {
+            return data;
+        }
+        
+        public void setData(TopBikesData data) {
+            this.data = data;
+        }
+    }
+    
+    // Top Bikes Data class
+    class TopBikesData {
+        private List<TopBike> topBikes;
+        private int limit;
+        private Period period;
+        
+        public TopBikesData() {}
+        
+        public List<TopBike> getTopBikes() {
+            return topBikes;
+        }
+        
+        public void setTopBikes(List<TopBike> topBikes) {
+            this.topBikes = topBikes;
+        }
+        
+        public int getLimit() {
+            return limit;
+        }
+        
+        public void setLimit(int limit) {
+            this.limit = limit;
+        }
+        
+        public Period getPeriod() {
+            return period;
+        }
+        
+        public void setPeriod(Period period) {
+            this.period = period;
+        }
+    }
+    
+    // Top Bike class
+    class TopBike {
+        private String bikeId;
+        private String bikeName;
+        private String bikeBrand;
+        private BikeImage bikeImage;
+        private double bikePrice;
+        private String bikeCategory;
+        private int totalOrders;
+        private int totalQuantity;
+        private double totalRevenue;
+        private double averageQuantity;
+        
+        public TopBike() {}
+        
+        public String getBikeId() {
+            return bikeId;
+        }
+        
+        public void setBikeId(String bikeId) {
+            this.bikeId = bikeId;
+        }
+        
+        public String getBikeName() {
+            return bikeName;
+        }
+        
+        public void setBikeName(String bikeName) {
+            this.bikeName = bikeName;
+        }
+        
+        public String getBikeBrand() {
+            return bikeBrand;
+        }
+        
+        public void setBikeBrand(String bikeBrand) {
+            this.bikeBrand = bikeBrand;
+        }
+        
+        public BikeImage getBikeImage() {
+            return bikeImage;
+        }
+        
+        public void setBikeImage(BikeImage bikeImage) {
+            this.bikeImage = bikeImage;
+        }
+        
+        // Helper method to get image URL
+        public String getBikeImageUrl() {
+            if (bikeImage != null && bikeImage.getUrl() != null) {
+                return bikeImage.getUrl();
+            }
+            return null;
+        }
+        
+        public double getBikePrice() {
+            return bikePrice;
+        }
+        
+        public void setBikePrice(double bikePrice) {
+            this.bikePrice = bikePrice;
+        }
+        
+        public String getBikeCategory() {
+            return bikeCategory;
+        }
+        
+        public void setBikeCategory(String bikeCategory) {
+            this.bikeCategory = bikeCategory;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public int getTotalQuantity() {
+            return totalQuantity;
+        }
+        
+        public void setTotalQuantity(int totalQuantity) {
+            this.totalQuantity = totalQuantity;
+        }
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public double getAverageQuantity() {
+            return averageQuantity;
+        }
+        
+        public void setAverageQuantity(double averageQuantity) {
+            this.averageQuantity = averageQuantity;
+        }
+    }
+    
+    // Bike Image class
+    class BikeImage {
+        private String url;
+        private String alt;
+        private String _id;
+        
+        public BikeImage() {}
+        
+        public String getUrl() {
+            return url;
+        }
+        
+        public void setUrl(String url) {
+            this.url = url;
+        }
+        
+        public String getAlt() {
+            return alt;
+        }
+        
+        public void setAlt(String alt) {
+            this.alt = alt;
+        }
+        
+        public String get_id() {
+            return _id;
+        }
+        
+        public void set_id(String _id) {
+            this._id = _id;
+        }
+    }
+    
+    // Revenue By Store Response class
+    class RevenueByStoreResponse {
+        private boolean success;
+        private String message;
+        private RevenueByStoreData data;
+        
+        public RevenueByStoreResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public RevenueByStoreData getData() {
+            return data;
+        }
+        
+        public void setData(RevenueByStoreData data) {
+            this.data = data;
+        }
+    }
+    
+    // Revenue By Store Data class
+    class RevenueByStoreData {
+        private List<StoreRevenue> revenueByStore;
+        private RevenueSummary summary;
+        private Period period;
+        
+        public RevenueByStoreData() {}
+        
+        public List<StoreRevenue> getRevenueByStore() {
+            return revenueByStore;
+        }
+        
+        public void setRevenueByStore(List<StoreRevenue> revenueByStore) {
+            this.revenueByStore = revenueByStore;
+        }
+        
+        public RevenueSummary getSummary() {
+            return summary;
+        }
+        
+        public void setSummary(RevenueSummary summary) {
+            this.summary = summary;
+        }
+        
+        public Period getPeriod() {
+            return period;
+        }
+        
+        public void setPeriod(Period period) {
+            this.period = period;
+        }
+    }
+    
+    // Store Revenue class
+    class StoreRevenue {
+        private String storeId;
+        private String storeName;
+        private String storeAddress;
+        private String storeCity;
+        private double totalRevenue;
+        private int totalOrders;
+        private double averageOrderValue;
+        
+        public StoreRevenue() {}
+        
+        public String getStoreId() {
+            return storeId;
+        }
+        
+        public void setStoreId(String storeId) {
+            this.storeId = storeId;
+        }
+        
+        public String getStoreName() {
+            return storeName;
+        }
+        
+        public void setStoreName(String storeName) {
+            this.storeName = storeName;
+        }
+        
+        public String getStoreAddress() {
+            return storeAddress;
+        }
+        
+        public void setStoreAddress(String storeAddress) {
+            this.storeAddress = storeAddress;
+        }
+        
+        public String getStoreCity() {
+            return storeCity;
+        }
+        
+        public void setStoreCity(String storeCity) {
+            this.storeCity = storeCity;
+        }
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public double getAverageOrderValue() {
+            return averageOrderValue;
+        }
+        
+        public void setAverageOrderValue(double averageOrderValue) {
+            this.averageOrderValue = averageOrderValue;
+        }
+    }
+    
+    // Revenue Summary class
+    class RevenueSummary {
+        private double totalRevenue;
+        private int totalOrders;
+        private int storeCount;
+        
+        public RevenueSummary() {}
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public int getStoreCount() {
+            return storeCount;
+        }
+        
+        public void setStoreCount(int storeCount) {
+            this.storeCount = storeCount;
+        }
+    }
+    
+    // Inventory Turnover Response
+    class InventoryTurnoverResponse {
+        private boolean success;
+        private String message;
+        private InventoryTurnoverData data;
+        
+        public boolean isSuccess() { return success; }
+        public void setSuccess(boolean success) { this.success = success; }
+        
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+        
+        public InventoryTurnoverData getData() { return data; }
+        public void setData(InventoryTurnoverData data) { this.data = data; }
+    }
+    
+    class InventoryTurnoverData {
+        private List<ProductTurnover> products;
+        private Summary summary;
+        private Period period;
+        
+        public List<ProductTurnover> getProducts() { return products; }
+        public void setProducts(List<ProductTurnover> products) { this.products = products; }
+        
+        public Summary getSummary() { return summary; }
+        public void setSummary(Summary summary) { this.summary = summary; }
+        
+        public Period getPeriod() { return period; }
+        public void setPeriod(Period period) { this.period = period; }
+    }
+    
+    class ProductTurnover {
+        private String productId;
+        private String productName;
+        private String productBrand;
+        private String productCategory;
+        private String imageUrl;
+        private int currentStock;
+        private int totalStockAcrossStores;
+        private int totalQuantitySold;
+        private int totalOrders;
+        private double turnoverRatio;
+        private double daysToSellOut;
+        private double totalRevenue;
+        private double averagePrice;
+        
+        public String getProductId() { return productId; }
+        public void setProductId(String productId) { this.productId = productId; }
+        
+        public String getProductName() { return productName; }
+        public void setProductName(String productName) { this.productName = productName; }
+        
+        public String getProductBrand() { return productBrand; }
+        public void setProductBrand(String productBrand) { this.productBrand = productBrand; }
+        
+        public String getProductCategory() { return productCategory; }
+        public void setProductCategory(String productCategory) { this.productCategory = productCategory; }
+        
+        public String getImageUrl() { return imageUrl; }
+        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+        
+        public int getCurrentStock() { return currentStock; }
+        public void setCurrentStock(int currentStock) { this.currentStock = currentStock; }
+        
+        public int getTotalStockAcrossStores() { return totalStockAcrossStores; }
+        public void setTotalStockAcrossStores(int totalStockAcrossStores) { this.totalStockAcrossStores = totalStockAcrossStores; }
+        
+        public int getTotalQuantitySold() { return totalQuantitySold; }
+        public void setTotalQuantitySold(int totalQuantitySold) { this.totalQuantitySold = totalQuantitySold; }
+        
+        public int getTotalOrders() { return totalOrders; }
+        public void setTotalOrders(int totalOrders) { this.totalOrders = totalOrders; }
+        
+        public double getTurnoverRatio() { return turnoverRatio; }
+        public void setTurnoverRatio(double turnoverRatio) { this.turnoverRatio = turnoverRatio; }
+        
+        public double getDaysToSellOut() { return daysToSellOut; }
+        public void setDaysToSellOut(double daysToSellOut) { this.daysToSellOut = daysToSellOut; }
+        
+        public double getTotalRevenue() { return totalRevenue; }
+        public void setTotalRevenue(double totalRevenue) { this.totalRevenue = totalRevenue; }
+        
+        public double getAveragePrice() { return averagePrice; }
+        public void setAveragePrice(double averagePrice) { this.averagePrice = averagePrice; }
+    }
+    
+    class Summary {
+        private double averageTurnoverRatio;
+        private int totalProducts;
+        private int fastMovingProducts;
+        private int slowMovingProducts;
+        private int outOfStockProducts;
+        
+        public double getAverageTurnoverRatio() { return averageTurnoverRatio; }
+        public void setAverageTurnoverRatio(double averageTurnoverRatio) { this.averageTurnoverRatio = averageTurnoverRatio; }
+        
+        public int getTotalProducts() { return totalProducts; }
+        public void setTotalProducts(int totalProducts) { this.totalProducts = totalProducts; }
+        
+        public int getFastMovingProducts() { return fastMovingProducts; }
+        public void setFastMovingProducts(int fastMovingProducts) { this.fastMovingProducts = fastMovingProducts; }
+        
+        public int getSlowMovingProducts() { return slowMovingProducts; }
+        public void setSlowMovingProducts(int slowMovingProducts) { this.slowMovingProducts = slowMovingProducts; }
+        
+        public int getOutOfStockProducts() { return outOfStockProducts; }
+        public void setOutOfStockProducts(int outOfStockProducts) { this.outOfStockProducts = outOfStockProducts; }
     }
 }

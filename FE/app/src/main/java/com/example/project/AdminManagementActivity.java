@@ -32,12 +32,23 @@ public class AdminManagementActivity extends AppCompatActivity {
     private ImageView iconDashboard, iconUserManagement, iconProductManagement, iconStoreManagement, iconOrderManagement, iconChatManagement;
     private TextView tvDashboard, tvUserManagement, tvProductManagement, tvStoreManagement, tvOrderManagement, tvChatManagement;
     private CardView cardDashboard, cardUserManagement, cardProductManagement, cardStoreManagement, cardOrderManagement, cardChatManagement;
+    private CardView cardInventoryTurnover;
+    private CardView btnViewAllOrders;
     
     // Chart views
     private TextView tvYAxisMax, tvYAxisMid2, tvYAxisMid1;
     private View barViewCN, barViewT2, barViewT3, barViewT4, barViewT5, barViewT6, barViewT7;
     private TextView tvXAxisCN, tvXAxisT2, tvXAxisT3, tvXAxisT4, tvXAxisT5, tvXAxisT6, tvXAxisT7;
     private LinearLayout barCN, barT2, barT3, barT4, barT5, barT6, barT7;
+    
+    // Top bikes views
+    private LinearLayout topBikesContainer;
+    
+    // Revenue by store views
+    private LinearLayout revenueByStoreContainer;
+    
+    // Recent orders views
+    private LinearLayout recentOrdersContainer;
     
     private ApiService apiService;
     private AuthManager authManager;
@@ -114,6 +125,8 @@ public class AdminManagementActivity extends AppCompatActivity {
         cardStoreManagement = findViewById(R.id.cardStoreManagement);
         cardOrderManagement = findViewById(R.id.cardOrderManagement);
         cardChatManagement = findViewById(R.id.cardChatManagement);
+        cardInventoryTurnover = findViewById(R.id.cardInventoryTurnover);
+        btnViewAllOrders = findViewById(R.id.btnViewAllOrders);
         
         // Initialize chart views
         initChartViews();
@@ -150,6 +163,15 @@ public class AdminManagementActivity extends AppCompatActivity {
         barT5 = findViewById(R.id.barT5);
         barT6 = findViewById(R.id.barT6);
         barT7 = findViewById(R.id.barT7);
+        
+        // Initialize top bikes container
+        topBikesContainer = findViewById(R.id.topBikesContainer);
+        
+        // Initialize revenue by store container
+        revenueByStoreContainer = findViewById(R.id.revenueByStoreContainer);
+        
+        // Initialize recent orders container
+        recentOrdersContainer = findViewById(R.id.recentOrdersContainer);
     }
 
     private void setActiveTab(CardView activeCard, ImageView activeIcon, TextView activeText) {
@@ -232,6 +254,15 @@ public class AdminManagementActivity extends AppCompatActivity {
         
         // Call API to get orders by day of week
         loadOrdersByDayOfWeek(authHeader);
+        
+        // Call API to get top bikes
+        loadTopBikes(authHeader);
+        
+        // Call API to get revenue by store
+        loadRevenueByStore(authHeader);
+        
+        // Call API to get recent orders
+        loadRecentOrders(authHeader);
     }
     
     private void loadTotalUsers(String authHeader) {
@@ -536,12 +567,450 @@ public class AdminManagementActivity extends AppCompatActivity {
         barView.setVisibility(View.VISIBLE);
     }
     
+    private void loadTopBikes(String authHeader) {
+        Call<ApiService.TopBikesResponse> call = apiService.getTopBikes(
+            authHeader,
+            5,  // limit
+            null,  // startDate
+            null,  // endDate
+            null,  // storeId
+            null   // status
+        );
+        
+        call.enqueue(new Callback<ApiService.TopBikesResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.TopBikesResponse> call, Response<ApiService.TopBikesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.TopBikesResponse topBikesResponse = response.body();
+                    
+                    if (topBikesResponse.isSuccess() && topBikesResponse.getData() != null) {
+                        List<ApiService.TopBike> topBikes = topBikesResponse.getData().getTopBikes();
+                        if (topBikes != null && topBikes.size() > 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    displayTopBikes(topBikes);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.TopBikesResponse> call, Throwable t) {
+                android.util.Log.e("AdminDashboard", "Failed to load top bikes: " + t.getMessage());
+            }
+        });
+    }
+    
+    private void displayTopBikes(List<ApiService.TopBike> topBikes) {
+        if (topBikesContainer == null || topBikes == null || topBikes.size() == 0) {
+            return;
+        }
+        
+        // Clear existing views
+        topBikesContainer.removeAllViews();
+        
+        // Find max orders for percentage calculation
+        int maxOrders = 0;
+        for (ApiService.TopBike bike : topBikes) {
+            if (bike.getTotalOrders() > maxOrders) {
+                maxOrders = bike.getTotalOrders();
+            }
+        }
+        
+        if (maxOrders == 0) {
+            maxOrders = 1; // Avoid division by zero
+        }
+        
+        // Create items for each bike
+        for (int i = 0; i < topBikes.size(); i++) {
+            ApiService.TopBike bike = topBikes.get(i);
+            View itemView = createTopBikeItem(bike, i + 1, maxOrders);
+            topBikesContainer.addView(itemView);
+            
+            // Add margin between items
+            if (i < topBikes.size() - 1) {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) itemView.getLayoutParams();
+                params.bottomMargin = 16;
+                itemView.setLayoutParams(params);
+            }
+        }
+    }
+    
+    private View createTopBikeItem(ApiService.TopBike bike, int rank, int maxOrders) {
+        // Create main container
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.HORIZONTAL);
+        container.setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16));
+        container.setBackgroundColor(0xFFF8F9FA);
+        
+        // Add rounded corners effect with padding
+        android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+        drawable.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        drawable.setColor(0xFFF8F9FA);
+        drawable.setCornerRadius(dpToPx(12));
+        drawable.setStroke(dpToPx(1), 0xFFE5E7EB);
+        container.setBackground(drawable);
+        
+        LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        container.setLayoutParams(containerParams);
+        
+        // Rank badge - circular
+        TextView rankText = new TextView(this);
+        rankText.setText(String.valueOf(rank));
+        rankText.setTextSize(14);
+        rankText.setTypeface(null, android.graphics.Typeface.BOLD);
+        rankText.setTextColor(0xFFFFFFFF);
+        rankText.setGravity(android.view.Gravity.CENTER);
+        
+        // Set rank badge color
+        int rankColor;
+        switch (rank) {
+            case 1:
+                rankColor = 0xFFFFD700; // Gold
+                break;
+            case 2:
+                rankColor = 0xFFC0C0C0; // Silver
+                break;
+            case 3:
+                rankColor = 0xFFCD7F32; // Bronze
+                break;
+            default:
+                rankColor = 0xFF2196F3; // Blue
+                break;
+        }
+        
+        // Create circular background
+        android.graphics.drawable.GradientDrawable rankDrawable = new android.graphics.drawable.GradientDrawable();
+        rankDrawable.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        rankDrawable.setColor(rankColor);
+        rankText.setBackground(rankDrawable);
+        
+        LinearLayout.LayoutParams rankParams = new LinearLayout.LayoutParams(
+            dpToPx(40),
+            dpToPx(40)
+        );
+        rankParams.rightMargin = dpToPx(12);
+        rankText.setLayoutParams(rankParams);
+        container.addView(rankText);
+        
+        // Bike info container
+        LinearLayout infoContainer = new LinearLayout(this);
+        infoContainer.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams infoParams = new LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            1.0f
+        );
+        infoContainer.setLayoutParams(infoParams);
+        
+        // Bike name
+        TextView bikeName = new TextView(this);
+        bikeName.setText(bike.getBikeName() != null ? bike.getBikeName() : "N/A");
+        bikeName.setTextSize(16);
+        bikeName.setTypeface(null, android.graphics.Typeface.BOLD);
+        bikeName.setTextColor(0xFF1E293B);
+        infoContainer.addView(bikeName);
+        
+        // Bike brand
+        TextView bikeBrand = new TextView(this);
+        bikeBrand.setText(bike.getBikeBrand() != null ? bike.getBikeBrand() : "");
+        bikeBrand.setTextSize(12);
+        bikeBrand.setTextColor(0xFF94A3B8);
+        bikeBrand.setPadding(0, 2, 0, 8);
+        infoContainer.addView(bikeBrand);
+        
+        // Progress bar container - use FrameLayout to overlay
+        android.widget.FrameLayout progressContainer = new android.widget.FrameLayout(this);
+        LinearLayout.LayoutParams progressContainerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            dpToPx(8)
+        );
+        progressContainerParams.topMargin = dpToPx(4);
+        progressContainer.setLayoutParams(progressContainerParams);
+        
+        // Progress bar background
+        View progressBarBg = new View(this);
+        progressBarBg.setBackgroundColor(0xFFE5E7EB);
+        android.widget.FrameLayout.LayoutParams progressBgParams = new android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBarBg.setLayoutParams(progressBgParams);
+        progressContainer.addView(progressBarBg);
+        
+        // Progress bar fill
+        View progressBar = new View(this);
+        float percentage = (float) bike.getTotalOrders() / maxOrders;
+        android.widget.FrameLayout.LayoutParams progressParams = new android.widget.FrameLayout.LayoutParams(
+            (int) (getScreenWidth() * 0.5f * percentage),
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBar.setLayoutParams(progressParams);
+        progressBar.setBackgroundColor(rankColor);
+        progressContainer.addView(progressBar);
+        
+        infoContainer.addView(progressContainer);
+        
+        container.addView(infoContainer);
+        
+        // Stats container
+        LinearLayout statsContainer = new LinearLayout(this);
+        statsContainer.setOrientation(LinearLayout.VERTICAL);
+        statsContainer.setGravity(android.view.Gravity.END | android.view.Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams statsParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        statsContainer.setLayoutParams(statsParams);
+        
+        // Total orders
+        TextView ordersText = new TextView(this);
+        ordersText.setText(String.valueOf(bike.getTotalOrders()));
+        ordersText.setTextSize(18);
+        ordersText.setTypeface(null, android.graphics.Typeface.BOLD);
+        ordersText.setTextColor(0xFF1E293B);
+        statsContainer.addView(ordersText);
+        
+        TextView ordersLabel = new TextView(this);
+        ordersLabel.setText("đơn hàng");
+        ordersLabel.setTextSize(11);
+        ordersLabel.setTextColor(0xFF94A3B8);
+        statsContainer.addView(ordersLabel);
+        
+        container.addView(statsContainer);
+        
+        return container;
+    }
+    
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+    
+    private int getScreenWidth() {
+        return getResources().getDisplayMetrics().widthPixels;
+    }
+    
+    private void loadRevenueByStore(String authHeader) {
+        Call<ApiService.RevenueByStoreResponse> call = apiService.getRevenueByStore(
+            authHeader,
+            null,  // startDate
+            null,  // endDate
+            null   // status
+        );
+        
+        call.enqueue(new Callback<ApiService.RevenueByStoreResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.RevenueByStoreResponse> call, Response<ApiService.RevenueByStoreResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.RevenueByStoreResponse revenueResponse = response.body();
+                    
+                    if (revenueResponse.isSuccess() && revenueResponse.getData() != null) {
+                        List<ApiService.StoreRevenue> stores = revenueResponse.getData().getRevenueByStore();
+                        if (stores != null && stores.size() > 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    displayRevenueByStore(stores);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.RevenueByStoreResponse> call, Throwable t) {
+                android.util.Log.e("AdminDashboard", "Failed to load revenue by store: " + t.getMessage());
+            }
+        });
+    }
+    
+    private void displayRevenueByStore(List<ApiService.StoreRevenue> stores) {
+        if (revenueByStoreContainer == null || stores == null || stores.size() == 0) {
+            return;
+        }
+        
+        // Clear existing views
+        revenueByStoreContainer.removeAllViews();
+        
+        // Find max revenue for percentage calculation
+        double maxRevenue = 0;
+        for (ApiService.StoreRevenue store : stores) {
+            if (store.getTotalRevenue() > maxRevenue) {
+                maxRevenue = store.getTotalRevenue();
+            }
+        }
+        
+        if (maxRevenue == 0) {
+            maxRevenue = 1; // Avoid division by zero
+        }
+        
+        // Create items for each store
+        for (int i = 0; i < stores.size(); i++) {
+            ApiService.StoreRevenue store = stores.get(i);
+            View itemView = createStoreRevenueItem(store, i + 1, maxRevenue);
+            revenueByStoreContainer.addView(itemView);
+            
+            // Add margin between items
+            if (i < stores.size() - 1) {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) itemView.getLayoutParams();
+                params.bottomMargin = dpToPx(16);
+                itemView.setLayoutParams(params);
+            }
+        }
+    }
+    
+    private View createStoreRevenueItem(ApiService.StoreRevenue store, int rank, double maxRevenue) {
+        // Create main container
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16));
+        
+        // Add rounded corners effect
+        android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+        drawable.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        drawable.setColor(0xFFF8F9FA);
+        drawable.setCornerRadius(dpToPx(12));
+        drawable.setStroke(dpToPx(1), 0xFFE5E7EB);
+        container.setBackground(drawable);
+        
+        LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        container.setLayoutParams(containerParams);
+        
+        // Top row: Store name and rank
+        LinearLayout topRow = new LinearLayout(this);
+        topRow.setOrientation(LinearLayout.HORIZONTAL);
+        topRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        
+        // Store name
+        TextView storeName = new TextView(this);
+        storeName.setText(store.getStoreName() != null ? store.getStoreName() : "N/A");
+        storeName.setTextSize(16);
+        storeName.setTypeface(null, android.graphics.Typeface.BOLD);
+        storeName.setTextColor(0xFF1E293B);
+        
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            1.0f
+        );
+        storeName.setLayoutParams(nameParams);
+        topRow.addView(storeName);
+        
+        // Revenue value
+        TextView revenueText = new TextView(this);
+        revenueText.setText(formatRevenue(store.getTotalRevenue()));
+        revenueText.setTextSize(16);
+        revenueText.setTypeface(null, android.graphics.Typeface.BOLD);
+        revenueText.setTextColor(0xFF10B981);
+        revenueText.setGravity(android.view.Gravity.END);
+        topRow.addView(revenueText);
+        
+        container.addView(topRow);
+        
+        // Store location
+        if (store.getStoreCity() != null || store.getStoreAddress() != null) {
+            TextView locationText = new TextView(this);
+            String location = "";
+            if (store.getStoreCity() != null) {
+                location = store.getStoreCity();
+            }
+            if (store.getStoreAddress() != null) {
+                if (!location.isEmpty()) location += " - ";
+                location += store.getStoreAddress();
+            }
+            locationText.setText(location);
+            locationText.setTextSize(12);
+            locationText.setTextColor(0xFF94A3B8);
+            locationText.setPadding(0, dpToPx(4), 0, dpToPx(8));
+            container.addView(locationText);
+        }
+        
+        // Progress bar container
+        android.widget.FrameLayout progressContainer = new android.widget.FrameLayout(this);
+        LinearLayout.LayoutParams progressContainerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            dpToPx(8)
+        );
+        progressContainerParams.topMargin = dpToPx(4);
+        progressContainer.setLayoutParams(progressContainerParams);
+        
+        // Progress bar background
+        View progressBarBg = new View(this);
+        progressBarBg.setBackgroundColor(0xFFE5E7EB);
+        android.widget.FrameLayout.LayoutParams progressBgParams = new android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBarBg.setLayoutParams(progressBgParams);
+        progressContainer.addView(progressBarBg);
+        
+        // Progress bar fill
+        View progressBar = new View(this);
+        float percentage = (float) (store.getTotalRevenue() / maxRevenue);
+        android.widget.FrameLayout.LayoutParams progressParams = new android.widget.FrameLayout.LayoutParams(
+            (int) (getScreenWidth() * 0.5f * percentage),
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBar.setLayoutParams(progressParams);
+        progressBar.setBackgroundColor(0xFF10B981);
+        progressContainer.addView(progressBar);
+        
+        container.addView(progressContainer);
+        
+        // Bottom row: Orders count
+        LinearLayout bottomRow = new LinearLayout(this);
+        bottomRow.setOrientation(LinearLayout.HORIZONTAL);
+        bottomRow.setPadding(0, dpToPx(8), 0, 0);
+        
+        TextView ordersLabel = new TextView(this);
+        ordersLabel.setText("Đơn hàng: ");
+        ordersLabel.setTextSize(12);
+        ordersLabel.setTextColor(0xFF64748B);
+        bottomRow.addView(ordersLabel);
+        
+        TextView ordersValue = new TextView(this);
+        ordersValue.setText(String.valueOf(store.getTotalOrders()));
+        ordersValue.setTextSize(12);
+        ordersValue.setTypeface(null, android.graphics.Typeface.BOLD);
+        ordersValue.setTextColor(0xFF1E293B);
+        bottomRow.addView(ordersValue);
+        
+        container.addView(bottomRow);
+        
+        return container;
+    }
+    
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void setupClickListeners() {
-        // No management buttons in new design - only bottom navigation
+        // Inventory Turnover Card
+        if (cardInventoryTurnover != null) {
+            cardInventoryTurnover.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminManagementActivity.this, InventoryTurnoverActivity.class);
+                startActivity(intent);
+            });
+        }
+        
+        // View All Orders button (arrow button in Recent Orders section)
+        if (btnViewAllOrders != null) {
+            btnViewAllOrders.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminManagementActivity.this, OrderManagementActivity.class);
+                startActivity(intent);
+            });
+        }
 
         // Bottom navigation actions
         if (navDashboard != null) {
@@ -579,6 +1048,298 @@ public class AdminManagementActivity extends AppCompatActivity {
                 Intent intent = new Intent(AdminManagementActivity.this, AdminChatListActivity.class);
                 startActivity(intent);
             });
+        }
+    }
+    
+    private void loadRecentOrders(String authHeader) {
+        if (recentOrdersContainer == null) return;
+        
+        // Clear existing orders
+        recentOrdersContainer.removeAllViews();
+        
+        Call<ApiService.OrderResponse> call = apiService.getAllOrders(
+            authHeader,
+            null,  // status
+            1,     // page
+            5      // limit - show 5 recent orders
+        );
+        
+        call.enqueue(new Callback<ApiService.OrderResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.OrderResponse> call, Response<ApiService.OrderResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.OrderResponse orderResponse = response.body();
+                    
+                    if (orderResponse.isSuccess() && orderResponse.getData() != null) {
+                        List<ApiService.OrderData> orders = orderResponse.getData();
+                        
+                        if (orders.isEmpty()) {
+                            // Show empty state - NO MOCK DATA
+                            TextView emptyText = new TextView(AdminManagementActivity.this);
+                            emptyText.setText("Chưa có đơn hàng nào");
+                            emptyText.setTextSize(14);
+                            emptyText.setTextColor(0xFF94A3B8);
+                            emptyText.setGravity(android.view.Gravity.CENTER);
+                            emptyText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                            recentOrdersContainer.addView(emptyText);
+                        } else {
+                            // Render each order with REAL DATA
+                            for (ApiService.OrderData order : orders) {
+                                renderOrderItem(order);
+                            }
+                        }
+                    } else {
+                        // API returned but success=false or data=null
+                        // Show empty state instead of mock data
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("Không thể tải danh sách đơn hàng");
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    }
+                } else {
+                    // HTTP error (not 200)
+                    int statusCode = response.code();
+                    if (statusCode == 404) {
+                        // API endpoint not found - show message instead of mock data
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("API endpoint chưa được implement");
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    } else if (statusCode == 401 || statusCode == 403) {
+                        // Unauthorized or Forbidden
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("Không có quyền truy cập");
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    } else {
+                        // Other server errors
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("Lỗi server: " + statusCode);
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.OrderResponse> call, Throwable t) {
+                // Network error or connection failure
+                // Show error message instead of mock data
+                TextView errorText = new TextView(AdminManagementActivity.this);
+                errorText.setText("Lỗi kết nối: " + (t.getMessage() != null ? t.getMessage() : "Không thể kết nối server"));
+                errorText.setTextSize(14);
+                errorText.setTextColor(0xFF94A3B8);
+                errorText.setGravity(android.view.Gravity.CENTER);
+                errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                if (recentOrdersContainer != null) {
+                    recentOrdersContainer.addView(errorText);
+                }
+            }
+        });
+    }
+    
+    private void renderOrderItem(ApiService.OrderData order) {
+        if (recentOrdersContainer == null) return;
+        
+        // Create card container
+        CardView orderCard = new CardView(this);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        cardParams.bottomMargin = dpToPx(12);
+        orderCard.setLayoutParams(cardParams);
+        orderCard.setRadius(dpToPx(16));
+        orderCard.setCardElevation(0);
+        orderCard.setCardBackgroundColor(0xFFF8FAFC);
+        
+        // Create inner layout
+        LinearLayout innerLayout = new LinearLayout(this);
+        innerLayout.setOrientation(LinearLayout.HORIZONTAL);
+        innerLayout.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        innerLayout.setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16));
+        
+        // Product icon
+        CardView iconCard = new CardView(this);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dpToPx(52), dpToPx(52));
+        iconCard.setLayoutParams(iconParams);
+        iconCard.setRadius(dpToPx(14));
+        iconCard.setCardElevation(0);
+        iconCard.setCardBackgroundColor(0xFFFFFFFF);
+        
+        ImageView iconImage = new ImageView(this);
+        iconImage.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(28), dpToPx(28)));
+        iconImage.setImageResource(R.drawable.ic_modern_products);
+        
+        // Set icon color based on status
+        String status = order.getStatus() != null ? order.getStatus() : "pending";
+        int iconColor = getStatusIconColor(status);
+        iconImage.setColorFilter(iconColor);
+        
+        iconCard.addView(iconImage);
+        innerLayout.addView(iconCard);
+        
+        // Order info
+        LinearLayout infoLayout = new LinearLayout(this);
+        LinearLayout.LayoutParams infoParams = new LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            1.0f
+        );
+        infoParams.leftMargin = dpToPx(14);
+        infoLayout.setLayoutParams(infoParams);
+        infoLayout.setOrientation(LinearLayout.VERTICAL);
+        
+        // Order name (first product name or order number)
+        TextView orderName = new TextView(this);
+        String productName = getFirstProductName(order);
+        if (productName != null && !productName.isEmpty()) {
+            orderName.setText(productName);
+        } else {
+            orderName.setText("Đơn hàng #" + (order.getOrderNumber() != null ? order.getOrderNumber() : "N/A"));
+        }
+        orderName.setTextSize(16);
+        orderName.setTypeface(null, android.graphics.Typeface.BOLD);
+        orderName.setTextColor(0xFF1E293B);
+        infoLayout.addView(orderName);
+        
+        // Order details
+        TextView orderDetails = new TextView(this);
+        String orderNumber = order.getOrderNumber() != null ? order.getOrderNumber() : "N/A";
+        String itemCount = order.getItems() != null ? String.valueOf(order.getItems().size()) : "0";
+        orderDetails.setText("Đơn #" + orderNumber + " • " + itemCount + " sản phẩm");
+        orderDetails.setTextSize(13);
+        orderDetails.setTextColor(0xFF64748B);
+        LinearLayout.LayoutParams detailsParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        detailsParams.topMargin = dpToPx(4);
+        orderDetails.setLayoutParams(detailsParams);
+        infoLayout.addView(orderDetails);
+        
+        innerLayout.addView(infoLayout);
+        
+        // Status badge
+        CardView statusCard = new CardView(this);
+        LinearLayout.LayoutParams statusParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        statusCard.setLayoutParams(statusParams);
+        statusCard.setRadius(dpToPx(12));
+        statusCard.setCardElevation(0);
+        
+        int[] statusColors = getStatusColors(status);
+        statusCard.setCardBackgroundColor(statusColors[0]);
+        
+        TextView statusText = new TextView(this);
+        statusText.setText(getStatusText(status));
+        statusText.setTextSize(11);
+        statusText.setTextColor(statusColors[1]);
+        statusText.setTypeface(null, android.graphics.Typeface.BOLD);
+        statusText.setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6));
+        statusCard.addView(statusText);
+        
+        innerLayout.addView(statusCard);
+        
+        orderCard.addView(innerLayout);
+        recentOrdersContainer.addView(orderCard);
+    }
+    
+    private String getFirstProductName(ApiService.OrderData order) {
+        if (order.getItems() != null && !order.getItems().isEmpty()) {
+            ApiService.OrderItem firstItem = order.getItems().get(0);
+            if (firstItem.getBikeName() != null && !firstItem.getBikeName().isEmpty()) {
+                return firstItem.getBikeName();
+            }
+        }
+        return null;
+    }
+    
+    private int getStatusIconColor(String status) {
+        switch (status.toLowerCase()) {
+            case "delivered":
+            case "completed":
+                return 0xFF2196F3; // Blue
+            case "pending":
+            case "processing":
+                return 0xFFFF9800; // Orange
+            case "cancelled":
+                return 0xFFDC2626; // Red
+            default:
+                return 0xFF64748B; // Gray
+        }
+    }
+    
+    private int[] getStatusColors(String status) {
+        // Returns [backgroundColor, textColor]
+        switch (status.toLowerCase()) {
+            case "delivered":
+            case "completed":
+                return new int[]{0xFFD1FAE5, 0xFF059669}; // Green
+            case "pending":
+            case "processing":
+                return new int[]{0xFFFEE2E2, 0xFFDC2626}; // Red
+            case "cancelled":
+                return new int[]{0xFFFEE2E2, 0xFFDC2626}; // Red
+            default:
+                return new int[]{0xFFE5E7EB, 0xFF64748B}; // Gray
+        }
+    }
+    
+    private String getStatusText(String status) {
+        switch (status.toLowerCase()) {
+            case "delivered":
+            case "completed":
+                return "Hoàn thành";
+            case "pending":
+                return "Chờ xử lý";
+            case "processing":
+                return "Đang xử lý";
+            case "cancelled":
+                return "Đã hủy";
+            default:
+                return status;
+        }
+    }
+    
+    private void showMockRecentOrders() {
+        if (recentOrdersContainer == null) return;
+        
+        recentOrdersContainer.removeAllViews();
+        
+        // Create mock orders
+        for (int i = 0; i < 3; i++) {
+            ApiService.OrderData mockOrder = new ApiService.OrderData();
+            mockOrder.setOrderNumber("ORD" + String.format("%05d", 12345 + i));
+            mockOrder.setStatus(i == 0 ? "delivered" : (i == 1 ? "pending" : "processing"));
+            mockOrder.setTotalAmount(5000000 + i * 1000000);
+            
+            // Create mock items
+            java.util.List<ApiService.OrderItem> items = new java.util.ArrayList<>();
+            ApiService.OrderItem item = new ApiService.OrderItem();
+            ApiService.ProductInfo product = new ApiService.ProductInfo();
+            product.setName("Xe đạp điện " + (i + 1));
+            item.setProduct(product);
+            item.setQuantity(1);
+            item.setPrice(5000000 + i * 1000000);
+            items.add(item);
+            mockOrder.setItems(items);
+            
+            renderOrderItem(mockOrder);
         }
     }
 }
