@@ -278,6 +278,14 @@ public interface ApiService {
         @retrofit2.http.Query("limit") Integer limit
     );
     
+    @GET("orders/revenue/total")
+    Call<RevenueResponse> getTotalRevenue(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("storeId") String storeId
+    );
+    
     @PUT("orders/{orderId}/status")
     Call<ApiResponse<Object>> updateOrderStatus(
         @Header("Authorization") String token,
@@ -1003,6 +1011,216 @@ public interface ApiService {
         
         public void setEmail(String email) {
             this.email = email;
+        }
+    }
+    
+    // Revenue Response class
+    class RevenueResponse {
+        private boolean success;
+        private String message;
+        private RevenueData data;
+        
+        public RevenueResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public RevenueData getData() {
+            return data;
+        }
+        
+        public void setData(RevenueData data) {
+            this.data = data;
+        }
+    }
+    
+    // Revenue Data class
+    class RevenueData {
+        private double totalRevenue;
+        private int totalOrders;
+        private double averageOrderValue;
+        private List<RevenueByStore> revenueByStore;
+        private List<RevenueByMonth> revenueByMonth;
+        private Period period;
+        
+        public RevenueData() {}
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public double getAverageOrderValue() {
+            return averageOrderValue;
+        }
+        
+        public void setAverageOrderValue(double averageOrderValue) {
+            this.averageOrderValue = averageOrderValue;
+        }
+        
+        public List<RevenueByStore> getRevenueByStore() {
+            return revenueByStore;
+        }
+        
+        public void setRevenueByStore(List<RevenueByStore> revenueByStore) {
+            this.revenueByStore = revenueByStore;
+        }
+        
+        public List<RevenueByMonth> getRevenueByMonth() {
+            return revenueByMonth;
+        }
+        
+        public void setRevenueByMonth(List<RevenueByMonth> revenueByMonth) {
+            this.revenueByMonth = revenueByMonth;
+        }
+        
+        public Period getPeriod() {
+            return period;
+        }
+        
+        public void setPeriod(Period period) {
+            this.period = period;
+        }
+    }
+    
+    // Revenue By Store class
+    class RevenueByStore {
+        private String storeId;
+        private String storeName;
+        private double totalRevenue;
+        private int totalOrders;
+        
+        public RevenueByStore() {}
+        
+        public String getStoreId() {
+            return storeId;
+        }
+        
+        public void setStoreId(String storeId) {
+            this.storeId = storeId;
+        }
+        
+        public String getStoreName() {
+            return storeName;
+        }
+        
+        public void setStoreName(String storeName) {
+            this.storeName = storeName;
+        }
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+    }
+    
+    // Revenue By Month class
+    class RevenueByMonth {
+        private int year;
+        private int month;
+        private double totalRevenue;
+        private int totalOrders;
+        
+        public RevenueByMonth() {}
+        
+        public int getYear() {
+            return year;
+        }
+        
+        public void setYear(int year) {
+            this.year = year;
+        }
+        
+        public int getMonth() {
+            return month;
+        }
+        
+        public void setMonth(int month) {
+            this.month = month;
+        }
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+    }
+    
+    // Period class
+    class Period {
+        private String startDate;
+        private String endDate;
+        private String storeId;
+        
+        public Period() {}
+        
+        public String getStartDate() {
+            return startDate;
+        }
+        
+        public void setStartDate(String startDate) {
+            this.startDate = startDate;
+        }
+        
+        public String getEndDate() {
+            return endDate;
+        }
+        
+        public void setEndDate(String endDate) {
+            this.endDate = endDate;
+        }
+        
+        public String getStoreId() {
+            return storeId;
+        }
+        
+        public void setStoreId(String storeId) {
+            this.storeId = storeId;
         }
     }
 }

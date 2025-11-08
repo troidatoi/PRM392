@@ -100,7 +100,7 @@
                         <!-- Total Sales Card -->
                         <androidx.cardview.widget.CardView
                             android:layout_width="0dp"
-                            android:layout_height="130dp"
+                            android:layout_height="140dp"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
                             app:cardCornerRadius="20dp"
@@ -113,6 +113,7 @@
                         android:orientation="vertical"
                         android:background="@drawable/gradient_card_purple"
                         android:padding="16dp"
+                        android:paddingBottom="20dp"
                         android:gravity="center">
 
                         <androidx.cardview.widget.CardView
@@ -143,11 +144,16 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
+                            android:id="@+id/tvTotalSalesLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Total Sales"
-                            android:textSize="12sp"
-                            android:textColor="#E1BEE7" />
+                            android:text="Tổng doanh thu"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
+                            android:alpha="0.95"
+                            android:layout_marginTop="2dp"
+                            android:visibility="visible" />
 
                     </LinearLayout>
 

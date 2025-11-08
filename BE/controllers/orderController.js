@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const OrderDetail = require('../models/OrderDetail');
 const Payment = require('../models/Payment');
@@ -592,6 +593,142 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+// Get total revenue
+const getTotalRevenue = async (req, res) => {
+  try {
+    const { startDate, endDate, storeId } = req.query;
+    
+    // Build query for completed orders (delivered orders)
+    const query = { orderStatus: 'delivered' };
+    
+    // Filter by store if provided
+    if (storeId) {
+      query.store = mongoose.Types.ObjectId.isValid(storeId) 
+        ? new mongoose.Types.ObjectId(storeId) 
+        : storeId;
+    }
+    
+    // Filter by date range if provided
+    if (startDate || endDate) {
+      query.orderDate = {};
+      if (startDate) {
+        query.orderDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        // Set end date to end of day
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.orderDate.$lte = end;
+      }
+    }
+    
+    // Calculate total revenue from finalAmount of delivered orders
+    const revenueData = await Order.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$finalAmount' },
+          totalOrders: { $sum: 1 },
+          averageOrderValue: { $avg: '$finalAmount' }
+        }
+      }
+    ]);
+    
+    // Get revenue by store if no specific store is requested
+    let revenueByStore = [];
+    if (!storeId) {
+      const storeQuery = { orderStatus: 'delivered' };
+      if (startDate || endDate) {
+        storeQuery.orderDate = query.orderDate;
+      }
+      revenueByStore = await Order.aggregate([
+        { $match: storeQuery },
+        {
+          $group: {
+            _id: '$store',
+            totalRevenue: { $sum: '$finalAmount' },
+            totalOrders: { $sum: 1 }
+          }
+        },
+        {
+          $lookup: {
+            from: 'stores',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'store'
+          }
+        },
+        {
+          $unwind: {
+            path: '$store',
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $project: {
+            storeId: '$_id',
+            storeName: '$store.name',
+            totalRevenue: 1,
+            totalOrders: 1
+          }
+        },
+        { $sort: { totalRevenue: -1 } }
+      ]);
+    }
+    
+    // Get revenue by month for chart data
+    const revenueByMonth = await Order.aggregate([
+      { $match: query },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$orderDate' },
+            month: { $month: '$orderDate' }
+          },
+          totalRevenue: { $sum: '$finalAmount' },
+          totalOrders: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } }
+    ]);
+    
+    const result = revenueData[0] || {
+      totalRevenue: 0,
+      totalOrders: 0,
+      averageOrderValue: 0
+    };
+    
+    res.json({
+      success: true,
+      message: 'Lấy tổng doanh thu thành công',
+      data: {
+        totalRevenue: result.totalRevenue || 0,
+        totalOrders: result.totalOrders || 0,
+        averageOrderValue: result.averageOrderValue || 0,
+        revenueByStore: revenueByStore,
+        revenueByMonth: revenueByMonth.map(item => ({
+          year: item._id.year,
+          month: item._id.month,
+          totalRevenue: item.totalRevenue,
+          totalOrders: item.totalOrders
+        })),
+        period: {
+          startDate: startDate || null,
+          endDate: endDate || null,
+          storeId: storeId || null
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createOrders,
   getUserOrders,
@@ -600,5 +737,6 @@ module.exports = {
   cancelOrder,
   getOrdersByStore,
   getAllOrders,
-  estimateShipping
+  estimateShipping,
+  getTotalRevenue
 };

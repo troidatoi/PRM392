@@ -7,7 +7,8 @@ const {
   updateOrderStatus,
   cancelOrder,
   getOrdersByStore,
-  estimateShipping
+  estimateShipping,
+  getTotalRevenue
 } = require('../controllers/orderController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -34,5 +35,8 @@ router.get('/store/:storeId', protect, getOrdersByStore);
 
 // Get all orders (admin only)
 router.get('/', protect, authorize('admin'), require('../controllers/orderController').getAllOrders);
+
+// Get total revenue (admin only)
+router.get('/revenue/total', protect, authorize('admin'), getTotalRevenue);
 
 module.exports = router;
