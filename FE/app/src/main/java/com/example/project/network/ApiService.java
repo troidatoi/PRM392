@@ -997,6 +997,7 @@ public interface ApiService {
         private String bikeName;
         private int quantity;
         private double price;
+        private ProductInfo product; // Product object from backend
         
         public OrderItem() {}
         
@@ -1009,6 +1010,10 @@ public interface ApiService {
         }
         
         public String getBikeName() {
+            // Return product name if available, otherwise bikeName
+            if (product != null && product.getName() != null) {
+                return product.getName();
+            }
             return bikeName;
         }
         
@@ -1022,6 +1027,56 @@ public interface ApiService {
         
         public void setQuantity(int quantity) {
             this.quantity = quantity;
+        }
+        
+        public double getPrice() {
+            return price;
+        }
+        
+        public void setPrice(double price) {
+            this.price = price;
+        }
+        
+        public ProductInfo getProduct() {
+            return product;
+        }
+        
+        public void setProduct(ProductInfo product) {
+            this.product = product;
+        }
+    }
+    
+    // Product Info class for order items
+    class ProductInfo {
+        private String _id;
+        private String name;
+        private java.util.List<String> images;
+        private double price;
+        
+        public ProductInfo() {}
+        
+        public String getId() {
+            return _id;
+        }
+        
+        public void setId(String _id) {
+            this._id = _id;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public void setName(String name) {
+            this.name = name;
+        }
+        
+        public java.util.List<String> getImages() {
+            return images;
+        }
+        
+        public void setImages(java.util.List<String> images) {
+            this.images = images;
         }
         
         public double getPrice() {

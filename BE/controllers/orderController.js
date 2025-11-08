@@ -576,12 +576,34 @@ const getAllOrders = async (req, res) => {
         paymentMethod: order.paymentMethod,
         createdAt: order.orderDate,
         updatedAt: order.updatedAt,
-        items: orderDetails.map(detail => ({
-          product: detail.product,
-          quantity: detail.quantity,
-          price: detail.price,
-          totalPrice: detail.totalPrice
-        }))
+        items: orderDetails.map(detail => {
+          // Transform images from objects to array of URLs
+          let imageUrls = [];
+          if (detail.product && detail.product.images) {
+            if (Array.isArray(detail.product.images)) {
+              imageUrls = detail.product.images.map(img => {
+                if (typeof img === 'string') {
+                  return img;
+                } else if (img && img.url) {
+                  return img.url;
+                }
+                return null;
+              }).filter(url => url !== null);
+            }
+          }
+          
+          return {
+            product: {
+              _id: detail.product?._id,
+              name: detail.product?.name,
+              images: imageUrls, // Array of strings (URLs)
+              price: detail.product?.price
+            },
+            quantity: detail.quantity,
+            price: detail.price,
+            totalPrice: detail.totalPrice
+          };
+        })
       };
     }));
     

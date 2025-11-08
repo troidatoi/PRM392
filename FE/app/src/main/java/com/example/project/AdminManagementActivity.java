@@ -33,6 +33,7 @@ public class AdminManagementActivity extends AppCompatActivity {
     private TextView tvDashboard, tvUserManagement, tvProductManagement, tvStoreManagement, tvOrderManagement, tvChatManagement;
     private CardView cardDashboard, cardUserManagement, cardProductManagement, cardStoreManagement, cardOrderManagement, cardChatManagement;
     private CardView cardInventoryTurnover;
+    private CardView btnViewAllOrders;
     
     // Chart views
     private TextView tvYAxisMax, tvYAxisMid2, tvYAxisMid1;
@@ -45,6 +46,9 @@ public class AdminManagementActivity extends AppCompatActivity {
     
     // Revenue by store views
     private LinearLayout revenueByStoreContainer;
+    
+    // Recent orders views
+    private LinearLayout recentOrdersContainer;
     
     private ApiService apiService;
     private AuthManager authManager;
@@ -122,6 +126,7 @@ public class AdminManagementActivity extends AppCompatActivity {
         cardOrderManagement = findViewById(R.id.cardOrderManagement);
         cardChatManagement = findViewById(R.id.cardChatManagement);
         cardInventoryTurnover = findViewById(R.id.cardInventoryTurnover);
+        btnViewAllOrders = findViewById(R.id.btnViewAllOrders);
         
         // Initialize chart views
         initChartViews();
@@ -164,6 +169,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         
         // Initialize revenue by store container
         revenueByStoreContainer = findViewById(R.id.revenueByStoreContainer);
+        
+        // Initialize recent orders container
+        recentOrdersContainer = findViewById(R.id.recentOrdersContainer);
     }
 
     private void setActiveTab(CardView activeCard, ImageView activeIcon, TextView activeText) {
@@ -252,6 +260,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         
         // Call API to get revenue by store
         loadRevenueByStore(authHeader);
+        
+        // Call API to get recent orders
+        loadRecentOrders(authHeader);
     }
     
     private void loadTotalUsers(String authHeader) {
@@ -992,6 +1003,14 @@ public class AdminManagementActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+        
+        // View All Orders button (arrow button in Recent Orders section)
+        if (btnViewAllOrders != null) {
+            btnViewAllOrders.setOnClickListener(v -> {
+                Intent intent = new Intent(AdminManagementActivity.this, OrderManagementActivity.class);
+                startActivity(intent);
+            });
+        }
 
         // Bottom navigation actions
         if (navDashboard != null) {
@@ -1029,6 +1048,298 @@ public class AdminManagementActivity extends AppCompatActivity {
                 Intent intent = new Intent(AdminManagementActivity.this, AdminChatListActivity.class);
                 startActivity(intent);
             });
+        }
+    }
+    
+    private void loadRecentOrders(String authHeader) {
+        if (recentOrdersContainer == null) return;
+        
+        // Clear existing orders
+        recentOrdersContainer.removeAllViews();
+        
+        Call<ApiService.OrderResponse> call = apiService.getAllOrders(
+            authHeader,
+            null,  // status
+            1,     // page
+            5      // limit - show 5 recent orders
+        );
+        
+        call.enqueue(new Callback<ApiService.OrderResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.OrderResponse> call, Response<ApiService.OrderResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.OrderResponse orderResponse = response.body();
+                    
+                    if (orderResponse.isSuccess() && orderResponse.getData() != null) {
+                        List<ApiService.OrderData> orders = orderResponse.getData();
+                        
+                        if (orders.isEmpty()) {
+                            // Show empty state - NO MOCK DATA
+                            TextView emptyText = new TextView(AdminManagementActivity.this);
+                            emptyText.setText("Chưa có đơn hàng nào");
+                            emptyText.setTextSize(14);
+                            emptyText.setTextColor(0xFF94A3B8);
+                            emptyText.setGravity(android.view.Gravity.CENTER);
+                            emptyText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                            recentOrdersContainer.addView(emptyText);
+                        } else {
+                            // Render each order with REAL DATA
+                            for (ApiService.OrderData order : orders) {
+                                renderOrderItem(order);
+                            }
+                        }
+                    } else {
+                        // API returned but success=false or data=null
+                        // Show empty state instead of mock data
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("Không thể tải danh sách đơn hàng");
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    }
+                } else {
+                    // HTTP error (not 200)
+                    int statusCode = response.code();
+                    if (statusCode == 404) {
+                        // API endpoint not found - show message instead of mock data
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("API endpoint chưa được implement");
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    } else if (statusCode == 401 || statusCode == 403) {
+                        // Unauthorized or Forbidden
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("Không có quyền truy cập");
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    } else {
+                        // Other server errors
+                        TextView errorText = new TextView(AdminManagementActivity.this);
+                        errorText.setText("Lỗi server: " + statusCode);
+                        errorText.setTextSize(14);
+                        errorText.setTextColor(0xFF94A3B8);
+                        errorText.setGravity(android.view.Gravity.CENTER);
+                        errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                        recentOrdersContainer.addView(errorText);
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.OrderResponse> call, Throwable t) {
+                // Network error or connection failure
+                // Show error message instead of mock data
+                TextView errorText = new TextView(AdminManagementActivity.this);
+                errorText.setText("Lỗi kết nối: " + (t.getMessage() != null ? t.getMessage() : "Không thể kết nối server"));
+                errorText.setTextSize(14);
+                errorText.setTextColor(0xFF94A3B8);
+                errorText.setGravity(android.view.Gravity.CENTER);
+                errorText.setPadding(0, dpToPx(24), 0, dpToPx(24));
+                if (recentOrdersContainer != null) {
+                    recentOrdersContainer.addView(errorText);
+                }
+            }
+        });
+    }
+    
+    private void renderOrderItem(ApiService.OrderData order) {
+        if (recentOrdersContainer == null) return;
+        
+        // Create card container
+        CardView orderCard = new CardView(this);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        cardParams.bottomMargin = dpToPx(12);
+        orderCard.setLayoutParams(cardParams);
+        orderCard.setRadius(dpToPx(16));
+        orderCard.setCardElevation(0);
+        orderCard.setCardBackgroundColor(0xFFF8FAFC);
+        
+        // Create inner layout
+        LinearLayout innerLayout = new LinearLayout(this);
+        innerLayout.setOrientation(LinearLayout.HORIZONTAL);
+        innerLayout.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        innerLayout.setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16));
+        
+        // Product icon
+        CardView iconCard = new CardView(this);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dpToPx(52), dpToPx(52));
+        iconCard.setLayoutParams(iconParams);
+        iconCard.setRadius(dpToPx(14));
+        iconCard.setCardElevation(0);
+        iconCard.setCardBackgroundColor(0xFFFFFFFF);
+        
+        ImageView iconImage = new ImageView(this);
+        iconImage.setLayoutParams(new LinearLayout.LayoutParams(dpToPx(28), dpToPx(28)));
+        iconImage.setImageResource(R.drawable.ic_modern_products);
+        
+        // Set icon color based on status
+        String status = order.getStatus() != null ? order.getStatus() : "pending";
+        int iconColor = getStatusIconColor(status);
+        iconImage.setColorFilter(iconColor);
+        
+        iconCard.addView(iconImage);
+        innerLayout.addView(iconCard);
+        
+        // Order info
+        LinearLayout infoLayout = new LinearLayout(this);
+        LinearLayout.LayoutParams infoParams = new LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            1.0f
+        );
+        infoParams.leftMargin = dpToPx(14);
+        infoLayout.setLayoutParams(infoParams);
+        infoLayout.setOrientation(LinearLayout.VERTICAL);
+        
+        // Order name (first product name or order number)
+        TextView orderName = new TextView(this);
+        String productName = getFirstProductName(order);
+        if (productName != null && !productName.isEmpty()) {
+            orderName.setText(productName);
+        } else {
+            orderName.setText("Đơn hàng #" + (order.getOrderNumber() != null ? order.getOrderNumber() : "N/A"));
+        }
+        orderName.setTextSize(16);
+        orderName.setTypeface(null, android.graphics.Typeface.BOLD);
+        orderName.setTextColor(0xFF1E293B);
+        infoLayout.addView(orderName);
+        
+        // Order details
+        TextView orderDetails = new TextView(this);
+        String orderNumber = order.getOrderNumber() != null ? order.getOrderNumber() : "N/A";
+        String itemCount = order.getItems() != null ? String.valueOf(order.getItems().size()) : "0";
+        orderDetails.setText("Đơn #" + orderNumber + " • " + itemCount + " sản phẩm");
+        orderDetails.setTextSize(13);
+        orderDetails.setTextColor(0xFF64748B);
+        LinearLayout.LayoutParams detailsParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        detailsParams.topMargin = dpToPx(4);
+        orderDetails.setLayoutParams(detailsParams);
+        infoLayout.addView(orderDetails);
+        
+        innerLayout.addView(infoLayout);
+        
+        // Status badge
+        CardView statusCard = new CardView(this);
+        LinearLayout.LayoutParams statusParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        statusCard.setLayoutParams(statusParams);
+        statusCard.setRadius(dpToPx(12));
+        statusCard.setCardElevation(0);
+        
+        int[] statusColors = getStatusColors(status);
+        statusCard.setCardBackgroundColor(statusColors[0]);
+        
+        TextView statusText = new TextView(this);
+        statusText.setText(getStatusText(status));
+        statusText.setTextSize(11);
+        statusText.setTextColor(statusColors[1]);
+        statusText.setTypeface(null, android.graphics.Typeface.BOLD);
+        statusText.setPadding(dpToPx(12), dpToPx(6), dpToPx(12), dpToPx(6));
+        statusCard.addView(statusText);
+        
+        innerLayout.addView(statusCard);
+        
+        orderCard.addView(innerLayout);
+        recentOrdersContainer.addView(orderCard);
+    }
+    
+    private String getFirstProductName(ApiService.OrderData order) {
+        if (order.getItems() != null && !order.getItems().isEmpty()) {
+            ApiService.OrderItem firstItem = order.getItems().get(0);
+            if (firstItem.getBikeName() != null && !firstItem.getBikeName().isEmpty()) {
+                return firstItem.getBikeName();
+            }
+        }
+        return null;
+    }
+    
+    private int getStatusIconColor(String status) {
+        switch (status.toLowerCase()) {
+            case "delivered":
+            case "completed":
+                return 0xFF2196F3; // Blue
+            case "pending":
+            case "processing":
+                return 0xFFFF9800; // Orange
+            case "cancelled":
+                return 0xFFDC2626; // Red
+            default:
+                return 0xFF64748B; // Gray
+        }
+    }
+    
+    private int[] getStatusColors(String status) {
+        // Returns [backgroundColor, textColor]
+        switch (status.toLowerCase()) {
+            case "delivered":
+            case "completed":
+                return new int[]{0xFFD1FAE5, 0xFF059669}; // Green
+            case "pending":
+            case "processing":
+                return new int[]{0xFFFEE2E2, 0xFFDC2626}; // Red
+            case "cancelled":
+                return new int[]{0xFFFEE2E2, 0xFFDC2626}; // Red
+            default:
+                return new int[]{0xFFE5E7EB, 0xFF64748B}; // Gray
+        }
+    }
+    
+    private String getStatusText(String status) {
+        switch (status.toLowerCase()) {
+            case "delivered":
+            case "completed":
+                return "Hoàn thành";
+            case "pending":
+                return "Chờ xử lý";
+            case "processing":
+                return "Đang xử lý";
+            case "cancelled":
+                return "Đã hủy";
+            default:
+                return status;
+        }
+    }
+    
+    private void showMockRecentOrders() {
+        if (recentOrdersContainer == null) return;
+        
+        recentOrdersContainer.removeAllViews();
+        
+        // Create mock orders
+        for (int i = 0; i < 3; i++) {
+            ApiService.OrderData mockOrder = new ApiService.OrderData();
+            mockOrder.setOrderNumber("ORD" + String.format("%05d", 12345 + i));
+            mockOrder.setStatus(i == 0 ? "delivered" : (i == 1 ? "pending" : "processing"));
+            mockOrder.setTotalAmount(5000000 + i * 1000000);
+            
+            // Create mock items
+            java.util.List<ApiService.OrderItem> items = new java.util.ArrayList<>();
+            ApiService.OrderItem item = new ApiService.OrderItem();
+            ApiService.ProductInfo product = new ApiService.ProductInfo();
+            product.setName("Xe đạp điện " + (i + 1));
+            item.setProduct(product);
+            item.setQuantity(1);
+            item.setPrice(5000000 + i * 1000000);
+            items.add(item);
+            mockOrder.setItems(items);
+            
+            renderOrderItem(mockOrder);
         }
     }
 }
