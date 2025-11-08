@@ -300,6 +300,14 @@ public interface ApiService {
         @retrofit2.http.Query("storeId") String storeId
     );
     
+    @GET("orders/revenue/by-store")
+    Call<RevenueByStoreResponse> getRevenueByStore(
+        @Header("Authorization") String token,
+        @retrofit2.http.Query("startDate") String startDate,
+        @retrofit2.http.Query("endDate") String endDate,
+        @retrofit2.http.Query("status") String status
+    );
+    
     @GET("orders/by-day-of-week")
     Call<OrdersByDayOfWeekResponse> getOrdersByDayOfWeek(
         @Header("Authorization") String token,
@@ -1871,6 +1879,174 @@ public interface ApiService {
         
         public void set_id(String _id) {
             this._id = _id;
+        }
+    }
+    
+    // Revenue By Store Response class
+    class RevenueByStoreResponse {
+        private boolean success;
+        private String message;
+        private RevenueByStoreData data;
+        
+        public RevenueByStoreResponse() {}
+        
+        public boolean isSuccess() {
+            return success;
+        }
+        
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
+        
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+        public RevenueByStoreData getData() {
+            return data;
+        }
+        
+        public void setData(RevenueByStoreData data) {
+            this.data = data;
+        }
+    }
+    
+    // Revenue By Store Data class
+    class RevenueByStoreData {
+        private List<StoreRevenue> revenueByStore;
+        private RevenueSummary summary;
+        private Period period;
+        
+        public RevenueByStoreData() {}
+        
+        public List<StoreRevenue> getRevenueByStore() {
+            return revenueByStore;
+        }
+        
+        public void setRevenueByStore(List<StoreRevenue> revenueByStore) {
+            this.revenueByStore = revenueByStore;
+        }
+        
+        public RevenueSummary getSummary() {
+            return summary;
+        }
+        
+        public void setSummary(RevenueSummary summary) {
+            this.summary = summary;
+        }
+        
+        public Period getPeriod() {
+            return period;
+        }
+        
+        public void setPeriod(Period period) {
+            this.period = period;
+        }
+    }
+    
+    // Store Revenue class
+    class StoreRevenue {
+        private String storeId;
+        private String storeName;
+        private String storeAddress;
+        private String storeCity;
+        private double totalRevenue;
+        private int totalOrders;
+        private double averageOrderValue;
+        
+        public StoreRevenue() {}
+        
+        public String getStoreId() {
+            return storeId;
+        }
+        
+        public void setStoreId(String storeId) {
+            this.storeId = storeId;
+        }
+        
+        public String getStoreName() {
+            return storeName;
+        }
+        
+        public void setStoreName(String storeName) {
+            this.storeName = storeName;
+        }
+        
+        public String getStoreAddress() {
+            return storeAddress;
+        }
+        
+        public void setStoreAddress(String storeAddress) {
+            this.storeAddress = storeAddress;
+        }
+        
+        public String getStoreCity() {
+            return storeCity;
+        }
+        
+        public void setStoreCity(String storeCity) {
+            this.storeCity = storeCity;
+        }
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public double getAverageOrderValue() {
+            return averageOrderValue;
+        }
+        
+        public void setAverageOrderValue(double averageOrderValue) {
+            this.averageOrderValue = averageOrderValue;
+        }
+    }
+    
+    // Revenue Summary class
+    class RevenueSummary {
+        private double totalRevenue;
+        private int totalOrders;
+        private int storeCount;
+        
+        public RevenueSummary() {}
+        
+        public double getTotalRevenue() {
+            return totalRevenue;
+        }
+        
+        public void setTotalRevenue(double totalRevenue) {
+            this.totalRevenue = totalRevenue;
+        }
+        
+        public int getTotalOrders() {
+            return totalOrders;
+        }
+        
+        public void setTotalOrders(int totalOrders) {
+            this.totalOrders = totalOrders;
+        }
+        
+        public int getStoreCount() {
+            return storeCount;
+        }
+        
+        public void setStoreCount(int storeCount) {
+            this.storeCount = storeCount;
         }
     }
 }

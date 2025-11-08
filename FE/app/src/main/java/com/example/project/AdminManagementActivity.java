@@ -42,6 +42,9 @@ public class AdminManagementActivity extends AppCompatActivity {
     // Top bikes views
     private LinearLayout topBikesContainer;
     
+    // Revenue by store views
+    private LinearLayout revenueByStoreContainer;
+    
     private ApiService apiService;
     private AuthManager authManager;
 
@@ -156,6 +159,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         
         // Initialize top bikes container
         topBikesContainer = findViewById(R.id.topBikesContainer);
+        
+        // Initialize revenue by store container
+        revenueByStoreContainer = findViewById(R.id.revenueByStoreContainer);
     }
 
     private void setActiveTab(CardView activeCard, ImageView activeIcon, TextView activeText) {
@@ -241,6 +247,9 @@ public class AdminManagementActivity extends AppCompatActivity {
         
         // Call API to get top bikes
         loadTopBikes(authHeader);
+        
+        // Call API to get revenue by store
+        loadRevenueByStore(authHeader);
     }
     
     private void loadTotalUsers(String authHeader) {
@@ -773,6 +782,200 @@ public class AdminManagementActivity extends AppCompatActivity {
     
     private int getScreenWidth() {
         return getResources().getDisplayMetrics().widthPixels;
+    }
+    
+    private void loadRevenueByStore(String authHeader) {
+        Call<ApiService.RevenueByStoreResponse> call = apiService.getRevenueByStore(
+            authHeader,
+            null,  // startDate
+            null,  // endDate
+            null   // status
+        );
+        
+        call.enqueue(new Callback<ApiService.RevenueByStoreResponse>() {
+            @Override
+            public void onResponse(Call<ApiService.RevenueByStoreResponse> call, Response<ApiService.RevenueByStoreResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiService.RevenueByStoreResponse revenueResponse = response.body();
+                    
+                    if (revenueResponse.isSuccess() && revenueResponse.getData() != null) {
+                        List<ApiService.StoreRevenue> stores = revenueResponse.getData().getRevenueByStore();
+                        if (stores != null && stores.size() > 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    displayRevenueByStore(stores);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiService.RevenueByStoreResponse> call, Throwable t) {
+                android.util.Log.e("AdminDashboard", "Failed to load revenue by store: " + t.getMessage());
+            }
+        });
+    }
+    
+    private void displayRevenueByStore(List<ApiService.StoreRevenue> stores) {
+        if (revenueByStoreContainer == null || stores == null || stores.size() == 0) {
+            return;
+        }
+        
+        // Clear existing views
+        revenueByStoreContainer.removeAllViews();
+        
+        // Find max revenue for percentage calculation
+        double maxRevenue = 0;
+        for (ApiService.StoreRevenue store : stores) {
+            if (store.getTotalRevenue() > maxRevenue) {
+                maxRevenue = store.getTotalRevenue();
+            }
+        }
+        
+        if (maxRevenue == 0) {
+            maxRevenue = 1; // Avoid division by zero
+        }
+        
+        // Create items for each store
+        for (int i = 0; i < stores.size(); i++) {
+            ApiService.StoreRevenue store = stores.get(i);
+            View itemView = createStoreRevenueItem(store, i + 1, maxRevenue);
+            revenueByStoreContainer.addView(itemView);
+            
+            // Add margin between items
+            if (i < stores.size() - 1) {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) itemView.getLayoutParams();
+                params.bottomMargin = dpToPx(16);
+                itemView.setLayoutParams(params);
+            }
+        }
+    }
+    
+    private View createStoreRevenueItem(ApiService.StoreRevenue store, int rank, double maxRevenue) {
+        // Create main container
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(dpToPx(16), dpToPx(16), dpToPx(16), dpToPx(16));
+        
+        // Add rounded corners effect
+        android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+        drawable.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        drawable.setColor(0xFFF8F9FA);
+        drawable.setCornerRadius(dpToPx(12));
+        drawable.setStroke(dpToPx(1), 0xFFE5E7EB);
+        container.setBackground(drawable);
+        
+        LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        container.setLayoutParams(containerParams);
+        
+        // Top row: Store name and rank
+        LinearLayout topRow = new LinearLayout(this);
+        topRow.setOrientation(LinearLayout.HORIZONTAL);
+        topRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        
+        // Store name
+        TextView storeName = new TextView(this);
+        storeName.setText(store.getStoreName() != null ? store.getStoreName() : "N/A");
+        storeName.setTextSize(16);
+        storeName.setTypeface(null, android.graphics.Typeface.BOLD);
+        storeName.setTextColor(0xFF1E293B);
+        
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+            0,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            1.0f
+        );
+        storeName.setLayoutParams(nameParams);
+        topRow.addView(storeName);
+        
+        // Revenue value
+        TextView revenueText = new TextView(this);
+        revenueText.setText(formatRevenue(store.getTotalRevenue()));
+        revenueText.setTextSize(16);
+        revenueText.setTypeface(null, android.graphics.Typeface.BOLD);
+        revenueText.setTextColor(0xFF10B981);
+        revenueText.setGravity(android.view.Gravity.END);
+        topRow.addView(revenueText);
+        
+        container.addView(topRow);
+        
+        // Store location
+        if (store.getStoreCity() != null || store.getStoreAddress() != null) {
+            TextView locationText = new TextView(this);
+            String location = "";
+            if (store.getStoreCity() != null) {
+                location = store.getStoreCity();
+            }
+            if (store.getStoreAddress() != null) {
+                if (!location.isEmpty()) location += " - ";
+                location += store.getStoreAddress();
+            }
+            locationText.setText(location);
+            locationText.setTextSize(12);
+            locationText.setTextColor(0xFF94A3B8);
+            locationText.setPadding(0, dpToPx(4), 0, dpToPx(8));
+            container.addView(locationText);
+        }
+        
+        // Progress bar container
+        android.widget.FrameLayout progressContainer = new android.widget.FrameLayout(this);
+        LinearLayout.LayoutParams progressContainerParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            dpToPx(8)
+        );
+        progressContainerParams.topMargin = dpToPx(4);
+        progressContainer.setLayoutParams(progressContainerParams);
+        
+        // Progress bar background
+        View progressBarBg = new View(this);
+        progressBarBg.setBackgroundColor(0xFFE5E7EB);
+        android.widget.FrameLayout.LayoutParams progressBgParams = new android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBarBg.setLayoutParams(progressBgParams);
+        progressContainer.addView(progressBarBg);
+        
+        // Progress bar fill
+        View progressBar = new View(this);
+        float percentage = (float) (store.getTotalRevenue() / maxRevenue);
+        android.widget.FrameLayout.LayoutParams progressParams = new android.widget.FrameLayout.LayoutParams(
+            (int) (getScreenWidth() * 0.5f * percentage),
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        progressBar.setLayoutParams(progressParams);
+        progressBar.setBackgroundColor(0xFF10B981);
+        progressContainer.addView(progressBar);
+        
+        container.addView(progressContainer);
+        
+        // Bottom row: Orders count
+        LinearLayout bottomRow = new LinearLayout(this);
+        bottomRow.setOrientation(LinearLayout.HORIZONTAL);
+        bottomRow.setPadding(0, dpToPx(8), 0, 0);
+        
+        TextView ordersLabel = new TextView(this);
+        ordersLabel.setText("Đơn hàng: ");
+        ordersLabel.setTextSize(12);
+        ordersLabel.setTextColor(0xFF64748B);
+        bottomRow.addView(ordersLabel);
+        
+        TextView ordersValue = new TextView(this);
+        ordersValue.setText(String.valueOf(store.getTotalOrders()));
+        ordersValue.setTextSize(12);
+        ordersValue.setTypeface(null, android.graphics.Typeface.BOLD);
+        ordersValue.setTextColor(0xFF1E293B);
+        bottomRow.addView(ordersValue);
+        
+        container.addView(bottomRow);
+        
+        return container;
     }
     
     private void showError(String message) {
