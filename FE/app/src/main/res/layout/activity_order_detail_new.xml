@@ -798,18 +798,7 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
-            <Button
-                android:id="@+id/btnCancelOrder"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Hủy đơn hàng"
-                android:textColor="#FFF"
-                android:backgroundTint="#F44336"
-                android:layout_marginTop="8dp"
-                android:visibility="gone"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+
 
         </LinearLayout>
 

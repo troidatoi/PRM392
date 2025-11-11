@@ -34,7 +34,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     private TextView tvSubtotal, tvShippingFee, tvTotal;
     private RecyclerView rvOrderItems;
     private View loadingView;
-    private Button btnConfirmOrder, btnShipOrder, btnDelivered, btnCancelOrder, btnContinuePayment;
+    private Button btnConfirmOrder, btnShipOrder, btnDelivered, btnContinuePayment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +167,6 @@ public class OrderDetailActivity extends AppCompatActivity {
         btnConfirmOrder = findViewById(R.id.btnConfirmOrder);
         btnShipOrder = findViewById(R.id.btnShipOrder);
         btnDelivered = findViewById(R.id.btnDelivered);
-        btnCancelOrder = findViewById(R.id.btnCancelOrder);
         btnContinuePayment = findViewById(R.id.btnContinuePayment);
     }
 
@@ -219,13 +218,7 @@ public class OrderDetailActivity extends AppCompatActivity {
             }
         });
 
-        // User: Hủy đơn hàng
-        btnCancelOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showCancelOrderDialog();
-            }
-        });
+
     }
 
     private void loadOrderData() {
@@ -333,8 +326,7 @@ public class OrderDetailActivity extends AppCompatActivity {
                             if ((status.equalsIgnoreCase("shipped") || mapStatusText(status).equals("Đang giao hàng"))) {
                                 btnDelivered.setVisibility(View.VISIBLE);
                             } else { btnDelivered.setVisibility(View.GONE); }
-                            // Admin không có nút hủy
-                            btnCancelOrder.setVisibility(View.GONE);
+
                         } else {
                             // User: Ẩn nút liên hệ hỗ trợ
                             btnContactSupport.setVisibility(View.GONE);
@@ -352,14 +344,7 @@ public class OrderDetailActivity extends AppCompatActivity {
                                 btnContinuePayment.setVisibility(View.GONE);
                             }
                             
-                            // User có thể hủy đơn khi đơn đang ở trạng thái awaiting_payment, Pending hoặc Confirmed
-                            if ((status.equalsIgnoreCase("awaiting_payment") || mapStatusText(status).equals("Chờ thanh toán") ||
-                                status.equalsIgnoreCase("pending") || mapStatusText(status).equals("Chờ xác nhận") ||
-                                status.equalsIgnoreCase("confirmed") || mapStatusText(status).equals("Đã xác nhận"))) {
-                                btnCancelOrder.setVisibility(View.VISIBLE);
-                            } else {
-                                btnCancelOrder.setVisibility(View.GONE);
-                            }
+
                         }
                     } catch(Exception e) {
                         showErr("Lỗi dữ liệu đơn hàng. Thử lại sau.");
