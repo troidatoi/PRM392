@@ -16,7 +16,9 @@ const sendEmail = async (options) => {
     }
 
     // Create transporter
-    const transporter = nodemailer.createTransport({
+    // Nếu sử dụng Gmail, cần dùng App Password hoặc OAuth2
+    // Hướng dẫn tạo App Password: https://support.google.com/accounts/answer/185833
+    const transporterConfig = {
       host: process.env.EMAIL_HOST,
       port: parseInt(process.env.EMAIL_PORT),
       secure: process.env.EMAIL_PORT === '465', // true for 465, false for other ports
@@ -34,7 +36,21 @@ const sendEmail = async (options) => {
       connectionTimeout: 60000, // 60s
       greetingTimeout: 30000, // 30s
       socketTimeout: 60000 // 60s
-    });
+    };
+
+    // Nếu là Gmail, thêm tls config
+    if (process.env.EMAIL_HOST && process.env.EMAIL_HOST.includes('gmail.com')) {
+      transporterConfig.tls = {
+        rejectUnauthorized: false
+      };
+      // Gmail yêu cầu port 587 với secure: false hoặc port 465 với secure: true
+      if (parseInt(process.env.EMAIL_PORT) === 587) {
+        transporterConfig.secure = false;
+        transporterConfig.requireTLS = true;
+      }
+    }
+
+    const transporter = nodemailer.createTransport(transporterConfig);
 
     // Verify transporter configuration
     await transporter.verify();
@@ -85,6 +101,18 @@ const sendEmail = async (options) => {
           to: options.email,
           subject: options.subject
         });
+        
+        // Nếu là lỗi Gmail authentication, hiển thị hướng dẫn
+        if (error.code === 'EAUTH' && process.env.EMAIL_HOST && process.env.EMAIL_HOST.includes('gmail.com')) {
+          console.error('\n⚠️  LỖI XÁC THỰC GMAIL:');
+          console.error('Gmail yêu cầu sử dụng App Password thay vì mật khẩu thông thường.');
+          console.error('Hướng dẫn tạo App Password:');
+          console.error('1. Vào https://myaccount.google.com/security');
+          console.error('2. Bật 2-Step Verification (nếu chưa bật)');
+          console.error('3. Vào "App passwords" và tạo mật khẩu mới');
+          console.error('4. Sử dụng mật khẩu đó trong EMAIL_PASS (16 ký tự, không có khoảng trắng)');
+          console.error('5. Đảm bảo EMAIL_PORT=587 và EMAIL_HOST=smtp.gmail.com\n');
+        }
         
         // Wait before retry (exponential backoff)
         if (attempt < maxRetries) {

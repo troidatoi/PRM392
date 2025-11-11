@@ -82,6 +82,91 @@ exports.register = async (req, res, next) => {
       }
     });
 
+    // Gửi email chào mừng (không block response nếu thất bại)
+    try {
+      const userName = firstName && lastName 
+        ? `${firstName} ${lastName}` 
+        : firstName || lastName || username;
+      
+      const message = `
+Chào mừng ${userName} đến với Electric Bike Shop!
+
+Cảm ơn bạn đã đăng ký tài khoản với chúng tôi. Tài khoản của bạn đã được tạo thành công.
+
+Thông tin tài khoản:
+- Tên đăng nhập: ${username}
+- Email: ${email}
+${phoneNumber ? `- Số điện thoại: ${phoneNumber}` : ''}
+
+Bạn có thể bắt đầu mua sắm ngay bây giờ!
+
+Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.
+
+Trân trọng,
+Đội ngũ Electric Bike Shop
+      `.trim();
+
+      const htmlMessage = `
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+          <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; text-align: center; margin-bottom: 30px;">
+              Chào mừng đến với Electric Bike Shop! 🚴‍♂️
+            </h2>
+            
+            <p style="color: #666; font-size: 16px; line-height: 1.6;">
+              Chào <strong>${userName}</strong>,
+            </p>
+            
+            <p style="color: #666; font-size: 16px; line-height: 1.6;">
+              Cảm ơn bạn đã đăng ký tài khoản với chúng tôi. Tài khoản của bạn đã được tạo thành công!
+            </p>
+            
+            <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+              <h3 style="color: #333; margin-top: 0;">Thông tin tài khoản:</h3>
+              <p style="color: #666; margin: 5px 0;"><strong>Tên đăng nhập:</strong> ${username}</p>
+              <p style="color: #666; margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+              ${phoneNumber ? `<p style="color: #666; margin: 5px 0;"><strong>Số điện thoại:</strong> ${phoneNumber}</p>` : ''}
+            </div>
+            
+            <p style="color: #666; font-size: 16px; line-height: 1.6;">
+              Bạn có thể bắt đầu mua sắm ngay bây giờ! Hãy khám phá các sản phẩm xe đạp điện tuyệt vời của chúng tôi.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || '#'}" 
+                 style="background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                Bắt đầu mua sắm
+              </a>
+            </div>
+            
+            <p style="color: #666; font-size: 14px; line-height: 1.6;">
+              Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi. Chúng tôi luôn sẵn sàng hỗ trợ bạn!
+            </p>
+            
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+            
+            <p style="color: #888; font-size: 12px; text-align: center; margin: 0;">
+              Trân trọng,<br>
+              <strong>Đội ngũ Electric Bike Shop</strong>
+            </p>
+          </div>
+        </div>
+      `;
+
+      await sendEmail({
+        email: user.email,
+        subject: 'Chào mừng đến với Electric Bike Shop!',
+        message,
+        html: htmlMessage
+      });
+
+      console.log(`Welcome email sent successfully to: ${user.email}`);
+    } catch (emailError) {
+      // Không block response nếu gửi email thất bại
+      console.error('Failed to send welcome email:', emailError);
+      // Tiếp tục xử lý đăng ký thành công
+    }
+
     sendTokenResponse(user, 201, res);
   } catch (err) {
     next(err);
@@ -370,6 +455,51 @@ exports.resetPassword = async (req, res, next) => {
     sendTokenResponse(user, 200, res);
   } catch (error) {
     console.error('Reset password error:', error);
+    next(error);
+  }
+};
+
+// @desc    Check if username, email or phone is already registered
+// @route   GET /api/auth/check-duplicate
+// @access  Public
+exports.checkDuplicate = async (req, res, next) => {
+  try {
+    const { username, email, phoneNumber } = req.query;
+
+    if (!username && !email && !phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng cung cấp username, email hoặc số điện thoại'
+      });
+    }
+
+    const result = {
+      usernameExists: false,
+      emailExists: false,
+      phoneExists: false
+    };
+
+    if (username) {
+      const existingUsername = await User.findOne({ username });
+      result.usernameExists = !!existingUsername;
+    }
+
+    if (email) {
+      const existingEmail = await User.findOne({ email: email.toLowerCase() });
+      result.emailExists = !!existingEmail;
+    }
+
+    if (phoneNumber) {
+      const existingPhone = await User.findOne({ phoneNumber });
+      result.phoneExists = !!existingPhone;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Check duplicate error:', error);
     next(error);
   }
 };

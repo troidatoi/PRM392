@@ -10,7 +10,8 @@ const {
   changePassword,
   googleAuthCallback,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  checkDuplicate
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const { handleGoogleAuthError } = require('../middleware/googleAuth');
@@ -38,6 +39,9 @@ router.post(
 );
 
 router.post('/logout', protect, logout);
+
+// Check duplicate email/phone
+router.get('/check-duplicate', checkDuplicate);
 
 // Google OAuth routes
 router.get('/google', (req, res, next) => {

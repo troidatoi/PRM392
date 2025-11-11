@@ -2,7 +2,11 @@ package com.example.project;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +32,12 @@ public class RegisterActivity extends AppCompatActivity {
     private MaterialButton btnRegister;
     private AuthManager authManager;
     private ApiService apiService;
+    
+    // Handler for debouncing validation
+    private Handler validationHandler = new Handler(Looper.getMainLooper());
+    private Runnable usernameValidationRunnable;
+    private Runnable emailValidationRunnable;
+    private Runnable phoneValidationRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +79,191 @@ public class RegisterActivity extends AppCompatActivity {
         // Login link click
         findViewById(R.id.tvLogin).setOnClickListener(v -> {
             finish(); // Go back to login
+        });
+
+        // Setup real-time validation
+        setupRealTimeValidation();
+    }
+    
+    private void setupRealTimeValidation() {
+        // Username validation with debounce
+        etUsername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Remove previous validation call
+                if (usernameValidationRunnable != null) {
+                    validationHandler.removeCallbacks(usernameValidationRunnable);
+                }
+                
+                // Clear error when user starts typing
+                String username = s.toString().trim();
+                if (username.isEmpty()) {
+                    tilUsername.setError(null);
+                    return;
+                }
+                
+                // Validate username length first
+                if (username.length() < 3) {
+                    tilUsername.setError("Tên đăng nhập phải có ít nhất 3 ký tự");
+                    return;
+                }
+                
+                // Debounce: wait 800ms after user stops typing
+                usernameValidationRunnable = () -> checkUsernameDuplicate(username);
+                validationHandler.postDelayed(usernameValidationRunnable, 800);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+        
+        // Email validation with debounce
+        etEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Remove previous validation call
+                if (emailValidationRunnable != null) {
+                    validationHandler.removeCallbacks(emailValidationRunnable);
+                }
+                
+                // Clear error when user starts typing
+                String email = s.toString().trim();
+                if (email.isEmpty()) {
+                    tilEmail.setError(null);
+                    return;
+                }
+                
+                // Validate email format first
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    tilEmail.setError("Email không hợp lệ");
+                    return;
+                }
+                
+                // Debounce: wait 800ms after user stops typing
+                emailValidationRunnable = () -> checkEmailDuplicate(email);
+                validationHandler.postDelayed(emailValidationRunnable, 800);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+        
+        // Phone validation with debounce
+        etPhone.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Remove previous validation call
+                if (phoneValidationRunnable != null) {
+                    validationHandler.removeCallbacks(phoneValidationRunnable);
+                }
+                
+                // Clear error when user starts typing
+                String phone = s.toString().trim();
+                if (phone.isEmpty()) {
+                    tilPhone.setError(null);
+                    return;
+                }
+                
+                // Validate phone format first
+                if (phone.length() < 10 || !android.util.Patterns.PHONE.matcher(phone).matches()) {
+                    tilPhone.setError("Số điện thoại không hợp lệ");
+                    return;
+                }
+                
+                // Debounce: wait 800ms after user stops typing
+                phoneValidationRunnable = () -> checkPhoneDuplicate(phone);
+                validationHandler.postDelayed(phoneValidationRunnable, 800);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+    
+    private void checkUsernameDuplicate(String username) {
+        if (TextUtils.isEmpty(username) || username.length() < 3) {
+            return;
+        }
+        
+        apiService.checkDuplicate(username, null, null).enqueue(new Callback<ApiResponse<ApiService.CheckDuplicateResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ApiService.CheckDuplicateResponse>> call, 
+                                 Response<ApiResponse<ApiService.CheckDuplicateResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    ApiService.CheckDuplicateResponse data = response.body().getData();
+                    if (data != null && data.isUsernameExists()) {
+                        tilUsername.setError("Tên đăng nhập đã được sử dụng");
+                    } else {
+                        tilUsername.setError(null);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ApiService.CheckDuplicateResponse>> call, Throwable t) {
+                // Silently fail - don't show error for network issues during typing
+            }
+        });
+    }
+    
+    private void checkEmailDuplicate(String email) {
+        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            return;
+        }
+        
+        apiService.checkDuplicate(null, email, null).enqueue(new Callback<ApiResponse<ApiService.CheckDuplicateResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ApiService.CheckDuplicateResponse>> call, 
+                                 Response<ApiResponse<ApiService.CheckDuplicateResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    ApiService.CheckDuplicateResponse data = response.body().getData();
+                    if (data != null && data.isEmailExists()) {
+                        tilEmail.setError("Email đã được đăng ký");
+                    } else {
+                        tilEmail.setError(null);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ApiService.CheckDuplicateResponse>> call, Throwable t) {
+                // Silently fail - don't show error for network issues during typing
+            }
+        });
+    }
+    
+    private void checkPhoneDuplicate(String phone) {
+        if (TextUtils.isEmpty(phone) || phone.length() < 10) {
+            return;
+        }
+        
+        apiService.checkDuplicate(null, null, phone).enqueue(new Callback<ApiResponse<ApiService.CheckDuplicateResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ApiService.CheckDuplicateResponse>> call, 
+                                 Response<ApiResponse<ApiService.CheckDuplicateResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    ApiService.CheckDuplicateResponse data = response.body().getData();
+                    if (data != null && data.isPhoneExists()) {
+                        tilPhone.setError("Số điện thoại đã được đăng ký");
+                    } else {
+                        tilPhone.setError(null);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ApiService.CheckDuplicateResponse>> call, Throwable t) {
+                // Silently fail - don't show error for network issues during typing
+            }
         });
     }
 

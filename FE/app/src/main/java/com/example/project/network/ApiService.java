@@ -28,6 +28,13 @@ public interface ApiService {
     @POST("auth/register")
     Call<ApiResponse<User>> register(@Body RegisterRequest request);
     
+    @GET("auth/check-duplicate")
+    Call<ApiResponse<CheckDuplicateResponse>> checkDuplicate(
+        @retrofit2.http.Query("username") String username,
+        @retrofit2.http.Query("email") String email,
+        @retrofit2.http.Query("phoneNumber") String phoneNumber
+    );
+    
     @POST("auth/login")
     Call<ApiResponse<User>> login(@Body LoginRequest request);
     
@@ -357,6 +364,39 @@ public interface ApiService {
         @retrofit2.http.Path("orderId") String orderId,
         @Body java.util.Map<String, Object> body
     );
+    
+    // Check duplicate response model
+    class CheckDuplicateResponse {
+        private boolean usernameExists;
+        private boolean emailExists;
+        private boolean phoneExists;
+        
+        public CheckDuplicateResponse() {}
+        
+        public boolean isUsernameExists() {
+            return usernameExists;
+        }
+        
+        public void setUsernameExists(boolean usernameExists) {
+            this.usernameExists = usernameExists;
+        }
+        
+        public boolean isEmailExists() {
+            return emailExists;
+        }
+        
+        public void setEmailExists(boolean emailExists) {
+            this.emailExists = emailExists;
+        }
+        
+        public boolean isPhoneExists() {
+            return phoneExists;
+        }
+        
+        public void setPhoneExists(boolean phoneExists) {
+            this.phoneExists = phoneExists;
+        }
+    }
     
     // Change password request model
     class ChangePasswordRequest {
