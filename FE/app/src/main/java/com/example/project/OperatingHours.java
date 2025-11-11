@@ -2,7 +2,7 @@ package com.example.project;
 
 import com.google.gson.annotations.SerializedName;
 
-public class OperatingHours {
+public class OperatingHours implements java.io.Serializable {
     private DaySchedule monday;
     private DaySchedule tuesday;
     private DaySchedule wednesday;
@@ -93,7 +93,7 @@ public class OperatingHours {
     }
 
     // Inner class for day schedule
-    public static class DaySchedule {
+    public static class DaySchedule implements java.io.Serializable {
         private String open;
         private String close;
         @SerializedName("isOpen")

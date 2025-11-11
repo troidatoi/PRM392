@@ -403,9 +403,14 @@ const getStoresForMap = async (req, res) => {
         return !!store?.isActive;
       }
 
+      // Lấy thời gian hiện tại theo timezone Việt Nam (GMT+7)
       const now = new Date();
+      const vietnamOffset = 7 * 60; // GMT+7 in minutes
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const vietnamTime = new Date(utc + (vietnamOffset * 60000));
+
       const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-      const dayName = dayNames[now.getDay()];
+      const dayName = dayNames[vietnamTime.getDay()];
 
       const daySchedule = store.operatingHours[dayName];
       if (!daySchedule || !daySchedule.isOpen) {
@@ -418,8 +423,23 @@ const getStoresForMap = async (req, res) => {
         return false;
       }
 
-      const currentTime = now.toTimeString().substring(0, 5);
-      return currentTime >= openTime && currentTime <= closeTime;
+      // Chuyển đổi thời gian sang phút từ 00:00 để so sánh chính xác
+      const timeToMinutes = (timeStr) => {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
+      };
+
+      const currentMinutes = vietnamTime.getHours() * 60 + vietnamTime.getMinutes();
+      const openMinutes = timeToMinutes(openTime);
+      const closeMinutes = timeToMinutes(closeTime);
+
+      // Xử lý trường hợp đóng cửa sau nửa đêm (ví dụ: 22:00 - 02:00)
+      if (closeMinutes < openMinutes) {
+        // Cửa hàng mở qua đêm
+        return currentMinutes >= openMinutes || currentMinutes <= closeMinutes;
+      }
+
+      return currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
     };
 
     let allStores = await Store.find({ isActive: true })

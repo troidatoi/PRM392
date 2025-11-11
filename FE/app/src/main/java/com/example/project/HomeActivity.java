@@ -612,6 +612,12 @@ public class HomeActivity extends AppCompatActivity {
         storeList = new ArrayList<>();
         // Pass null for OnStoreActionListener (no edit/delete in user view)
         storeAdapter = new StoreAdapter(storeList, null);
+        storeAdapter.setOnViewDetailsClickListener(store -> {
+            Intent intent = new Intent(HomeActivity.this, StoreDetailActivity.class);
+            intent.putExtra("STORE_DETAIL", store);
+            startActivity(intent);
+        });
+
         storeAdapter.setOnStoreClickListener(store -> {
             // Zoom to store location on map
             if (mapView != null && mapController != null) {

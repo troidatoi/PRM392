@@ -119,15 +119,37 @@
 
             </LinearLayout>
 
-            <!-- Operating Hours -->
-            <TextView
-                android:id="@+id/tvOperatingHours"
+            <!-- Operating Hours (Today) -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="08:00 - 22:00"
-                android:textSize="13sp"
-                android:textColor="#757575"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:id="@+id/llOperatingHoursToday">
+                
+
+                
+                <TextView
+                    android:id="@+id/tvOperatingHours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="08:00 - 22:00"
+                    android:textSize="13sp"
+                    android:textColor="#757575" />
+            </LinearLayout>
+            
+            <!-- Detailed Operating Hours (All Days) -->
+            <TextView
+                android:id="@+id/tvDetailedOperatingHours"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="#616161"
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="2dp"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -205,6 +227,40 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center">
+
+            <!-- View Details Button -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btnViewDetails"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="44dp"
+                android:layout_marginEnd="6dp"
+                app:cardBackgroundColor="#1E88E5">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="6dp"
+                        android:src="@drawable/ic_info"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chi tiết"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
 
             <!-- Edit Button -->
             <androidx.cardview.widget.CardView

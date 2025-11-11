@@ -18,6 +18,11 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
     private OnStoreActionListener listener;
     private OnStoreClickListener clickListener;
     private OnInventoryClickListener inventoryClickListener;
+    private OnViewDetailsClickListener viewDetailsClickListener;
+
+    public interface OnViewDetailsClickListener {
+        void onViewDetailsClick(Store store);
+    }
 
     public interface OnStoreActionListener {
         void onEditStore(Store store);
@@ -43,6 +48,10 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
 
     public void setOnInventoryClickListener(OnInventoryClickListener listener) {
         this.inventoryClickListener = listener;
+    }
+
+    public void setOnViewDetailsClickListener(OnViewDetailsClickListener listener) {
+        this.viewDetailsClickListener = listener;
     }
 
     @NonNull
@@ -80,14 +89,33 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
         // Show operating hours and status (Đang mở/Đóng cửa) based on current time
         boolean isOpenNow = store.isOpenNow();
         String operatingHoursText = store.getOperatingHoursText();
+        String detailedOperatingHoursText = store.getDetailedOperatingHoursText();
         
-        // Display operating hours
-        if (holder.tvOperatingHours != null) {
+        // Display operating hours for today
+        if (holder.llOperatingHoursToday != null) {
+            if (operatingHoursText != null && !operatingHoursText.isEmpty()) {
+                holder.tvOperatingHours.setText(operatingHoursText);
+                holder.llOperatingHoursToday.setVisibility(View.VISIBLE);
+            } else {
+                holder.llOperatingHoursToday.setVisibility(View.GONE);
+            }
+        } else if (holder.tvOperatingHours != null) {
+            // Fallback for old layout
             if (operatingHoursText != null && !operatingHoursText.isEmpty()) {
                 holder.tvOperatingHours.setText(operatingHoursText);
                 holder.tvOperatingHours.setVisibility(View.VISIBLE);
             } else {
                 holder.tvOperatingHours.setVisibility(View.GONE);
+            }
+        }
+        
+        // Display detailed operating hours for all days
+        if (holder.tvDetailedOperatingHours != null) {
+            if (detailedOperatingHoursText != null && !detailedOperatingHoursText.isEmpty()) {
+                holder.tvDetailedOperatingHours.setText(detailedOperatingHoursText);
+                holder.tvDetailedOperatingHours.setVisibility(View.VISIBLE);
+            } else {
+                holder.tvDetailedOperatingHours.setVisibility(View.GONE);
             }
         }
         
@@ -123,6 +151,15 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             holder.nearestBadge.setVisibility(
                 (showNearestBadge && position == 0) ? View.VISIBLE : View.GONE
             );
+        }
+
+        // View Details button
+        if (holder.btnViewDetails != null) {
+            holder.btnViewDetails.setOnClickListener(v -> {
+                if (viewDetailsClickListener != null) {
+                    viewDetailsClickListener.onViewDetailsClick(store);
+                }
+            });
         }
 
         // Edit button - only show if listener is available
@@ -182,8 +219,9 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
     }
 
     static class StoreViewHolder extends RecyclerView.ViewHolder {
-        TextView tvStoreName, tvStoreAddress, tvStoreStatus, tvStoreDistance, tvOperatingHours;
-        CardView statusBadge, nearestBadge, btnEditStore, btnDeleteStore, btnInventory;
+        TextView tvStoreName, tvStoreAddress, tvStoreStatus, tvStoreDistance, tvOperatingHours, tvDetailedOperatingHours;
+        android.view.ViewGroup llOperatingHoursToday;
+        CardView statusBadge, nearestBadge, btnViewDetails, btnEditStore, btnDeleteStore, btnInventory;
 
         public StoreViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -192,8 +230,11 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.StoreViewHol
             tvStoreStatus = itemView.findViewById(R.id.tvStoreStatus);
             tvStoreDistance = itemView.findViewById(R.id.tvStoreDistance);
             tvOperatingHours = itemView.findViewById(R.id.tvOperatingHours);
+            tvDetailedOperatingHours = itemView.findViewById(R.id.tvDetailedOperatingHours);
+            llOperatingHoursToday = itemView.findViewById(R.id.llOperatingHoursToday);
             statusBadge = itemView.findViewById(R.id.statusBadge);
             nearestBadge = itemView.findViewById(R.id.nearestBadge);
+            btnViewDetails = itemView.findViewById(R.id.btnViewDetails);
             btnEditStore = itemView.findViewById(R.id.btnEditStore);
             btnDeleteStore = itemView.findViewById(R.id.btnDeleteStore);
             btnInventory = itemView.findViewById(R.id.btnInventory);

@@ -76,10 +76,7 @@ public class ShippingRateAdapter extends RecyclerView.Adapter<ShippingRateAdapte
             }
         });
 
-        // Hide delete button - rates are fixed
-        if (holder.btnDelete != null) {
-            holder.btnDelete.setVisibility(View.GONE);
-        }
+
     }
 
     @Override
@@ -99,7 +96,6 @@ public class ShippingRateAdapter extends RecyclerView.Adapter<ShippingRateAdapte
         TextView tvStatus;
         View statusBadge;
         CardView btnEdit;
-        CardView btnDelete;
 
         public ShippingRateViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -109,7 +105,6 @@ public class ShippingRateAdapter extends RecyclerView.Adapter<ShippingRateAdapte
             tvStatus = itemView.findViewById(R.id.tvStatus);
             statusBadge = itemView.findViewById(R.id.statusBadge);
             btnEdit = itemView.findViewById(R.id.btnEdit);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

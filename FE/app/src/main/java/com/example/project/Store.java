@@ -2,7 +2,7 @@ package com.example.project;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Store {
+public class Store implements java.io.Serializable {
     @SerializedName("_id")
     private String id;
     private String name;
@@ -15,6 +15,8 @@ public class Store {
     private String description;
     @SerializedName("isActive")
     private boolean isActive;
+    @SerializedName("isOpenNow")
+    private Boolean isOpenNow; // Giá trị từ API, null nếu chưa được set
     private OperatingHours operatingHours;
     @SerializedName("createdAt")
     private String createdAt;
@@ -224,15 +226,25 @@ public class Store {
     }
     
     /**
-     * Kiểm tra xem cửa hàng có đang mở hay không dựa trên operatingHours và thời gian hiện tại
+     * Kiểm tra xem cửa hàng có đang mở hay không
+     * Ưu tiên dùng giá trị từ API, nếu không có thì tính toán dựa trên operatingHours
      */
     public boolean isOpenNow() {
+        // Nếu API đã trả về giá trị isOpenNow, dùng giá trị đó
+        if (isOpenNow != null) {
+            return isOpenNow;
+        }
+        
+        // Fallback: tính toán dựa trên operatingHours
         if (operatingHours == null) {
-            // Fallback to isActive if no operating hours
             return isActive;
         }
         
+        // Lấy thời gian hiện tại theo timezone Việt Nam (GMT+7)
         java.util.Calendar calendar = java.util.Calendar.getInstance();
+        java.util.TimeZone vietnamTimeZone = java.util.TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
+        calendar.setTimeZone(vietnamTimeZone);
+        
         int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
         
         // Convert Calendar day to our day name (Calendar: Sunday=1, Monday=2, ..., Saturday=7)
@@ -243,12 +255,12 @@ public class Store {
             return false;
         }
         
-        // Get current time in HH:mm format
-        int hour = calendar.get(java.util.Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(java.util.Calendar.MINUTE);
-        String currentTime = String.format("%02d:%02d", hour, minute);
+        // Get current time in minutes from 00:00
+        int currentHour = calendar.get(java.util.Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(java.util.Calendar.MINUTE);
+        int currentMinutes = currentHour * 60 + currentMinute;
         
-        // Compare with open and close times
+        // Parse open and close times to minutes
         String openTime = daySchedule.getOpen();
         String closeTime = daySchedule.getClose();
         
@@ -256,7 +268,37 @@ public class Store {
             return false;
         }
         
-        return currentTime.compareTo(openTime) >= 0 && currentTime.compareTo(closeTime) <= 0;
+        // Convert time string (HH:mm) to minutes
+        int openMinutes = timeToMinutes(openTime);
+        int closeMinutes = timeToMinutes(closeTime);
+        
+        // Xử lý trường hợp đóng cửa sau nửa đêm (ví dụ: 22:00 - 02:00)
+        if (closeMinutes < openMinutes) {
+            // Cửa hàng mở qua đêm
+            return currentMinutes >= openMinutes || currentMinutes <= closeMinutes;
+        }
+        
+        return currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+    }
+    
+    /**
+     * Chuyển đổi thời gian từ format HH:mm sang phút từ 00:00
+     */
+    private int timeToMinutes(String timeStr) {
+        if (timeStr == null || timeStr.isEmpty()) {
+            return 0;
+        }
+        String[] parts = timeStr.split(":");
+        if (parts.length != 2) {
+            return 0;
+        }
+        try {
+            int hours = Integer.parseInt(parts[0]);
+            int minutes = Integer.parseInt(parts[1]);
+            return hours * 60 + minutes;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
     
     /**
@@ -268,6 +310,8 @@ public class Store {
         }
         
         java.util.Calendar calendar = java.util.Calendar.getInstance();
+        java.util.TimeZone vietnamTimeZone = java.util.TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
+        calendar.setTimeZone(vietnamTimeZone);
         int dayOfWeek = calendar.get(java.util.Calendar.DAY_OF_WEEK);
         String dayName = getDayNameFromCalendar(dayOfWeek);
         OperatingHours.DaySchedule daySchedule = operatingHours.getScheduleForDay(dayName);
@@ -277,6 +321,38 @@ public class Store {
         }
         
         return daySchedule.getFormattedHours();
+    }
+    
+    /**
+     * Lấy text hiển thị giờ hoạt động chi tiết cho tất cả các ngày trong tuần
+     */
+    public String getDetailedOperatingHoursText() {
+        if (operatingHours == null) {
+            return null;
+        }
+        
+        java.util.List<String> dayNames = java.util.Arrays.asList(
+            "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"
+        );
+        java.util.List<String> dayKeys = java.util.Arrays.asList(
+            "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+        );
+        
+        java.util.List<String> hoursList = new java.util.ArrayList<>();
+        
+        for (int i = 0; i < dayNames.size(); i++) {
+            String dayKey = dayKeys.get(i);
+            String dayName = dayNames.get(i);
+            OperatingHours.DaySchedule schedule = operatingHours.getScheduleForDay(dayKey);
+            
+            if (schedule != null && schedule.isOpen() && schedule.getOpen() != null && schedule.getClose() != null) {
+                hoursList.add(dayName + ": " + schedule.getOpen() + " - " + schedule.getClose());
+            } else {
+                hoursList.add(dayName + ": Đóng cửa");
+            }
+        }
+        
+        return java.lang.String.join("\n", hoursList);
     }
     
     /**
