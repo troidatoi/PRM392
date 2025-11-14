@@ -35,26 +35,30 @@ public class ProductStockAdapter extends RecyclerView.Adapter<ProductStockAdapte
         holder.tvStoreName.setText(stock.getStoreName());
         holder.tvStoreAddress.setText(stock.getStoreAddress());
         holder.tvStockQuantity.setText(String.valueOf(stock.getQuantity()));
-        holder.tvStockStatus.setText(stock.getStatus());
-
-        // Set colors and background based on stock quantity
+        
+        // Set colors, background and status text based on stock quantity
         int statusColor;
         int backgroundColor;
+        String statusText;
         
-        if (stock.getQuantity() > 10) {
-            // Green - Còn hàng
+        if (stock.getQuantity() > 5) {
+            // Green - Còn hàng (more than 5 items)
             statusColor = Color.parseColor("#4CAF50");
             backgroundColor = Color.parseColor("#E8F5E9");
+            statusText = "Còn hàng";
         } else if (stock.getQuantity() > 0) {
-            // Orange - Sắp hết
+            // Orange - Sắp hết (1-5 items)
             statusColor = Color.parseColor("#FF9800");
             backgroundColor = Color.parseColor("#FFF3E0");
+            statusText = "Sắp hết";
         } else {
-            // Red - Hết hàng
+            // Red - Hết hàng (0 items)
             statusColor = Color.parseColor("#F44336");
             backgroundColor = Color.parseColor("#FFEBEE");
+            statusText = "Hết hàng";
         }
 
+        holder.tvStockStatus.setText(statusText);
         holder.tvStockQuantity.setTextColor(statusColor);
         holder.tvStockStatus.setTextColor(statusColor);
         

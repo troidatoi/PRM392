@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
     // Cập nhật cổng theo server hiện tại
-    private static final String BASE_URL = "http://10.0.2.2:5000/api/";
+    private static final String BASE_URL = "http://10.0.2.2:5001/api/";
     private static RetrofitClient instance;
     private ApiService apiService;
     private Retrofit retrofit;
