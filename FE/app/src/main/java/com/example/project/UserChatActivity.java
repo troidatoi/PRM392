@@ -9,6 +9,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 
+import com.example.project.utils.ChatNotificationHelper;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -90,6 +92,12 @@ public class UserChatActivity extends AppCompatActivity implements SocketManager
         loadMessagesFromAPI(); // Load messages from API
         setupClickListeners();
         setupTypingDetection();
+        
+        // Create notification channel
+        ChatNotificationHelper.createChatNotificationChannel(this);
+        
+        // Cancel notification for this chat when opened
+        ChatNotificationHelper.cancelChatNotification(this, "admin");
     }
 
     private void initViews() {
