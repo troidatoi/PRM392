@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.project.utils.ChatNotificationHelper;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -96,6 +98,12 @@ public class AdminChatActivity extends AppCompatActivity implements SocketManage
         loadMessagesFromAPI(); // Load from API first
         setupClickListeners();
         setupTypingDetection();
+        
+        // Create notification channel
+        ChatNotificationHelper.createChatNotificationChannel(this);
+        
+        // Cancel notification for this user when opened
+        ChatNotificationHelper.cancelChatNotification(this, userId);
     }
 
     private void initViews() {

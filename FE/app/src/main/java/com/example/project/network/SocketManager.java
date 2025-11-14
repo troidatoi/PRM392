@@ -1,14 +1,18 @@
 package com.example.project.network;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.project.ChatMessage;
 import com.example.project.utils.AuthManager;
+import com.example.project.utils.ChatNotificationHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -26,6 +30,9 @@ public class SocketManager {
     private Context context;
     private List<SocketListener> listeners = new ArrayList<>();
     private boolean isConnected = false;
+    
+    // Debug mode: Hiện notification ngay cả khi app foreground (để test)
+    private static boolean FORCE_NOTIFICATION_FOR_TESTING = true;
     
     // Socket events
     public static final String EVENT_CONNECT = "connect";
@@ -128,6 +135,17 @@ public class SocketManager {
             @Override
             public void call(Object... args) {
                 Log.d(TAG, "Message received");
+                
+                // Show notification if app is in background
+                if (args.length > 0 && args[0] instanceof JSONObject) {
+                    try {
+                        JSONObject data = (JSONObject) args[0];
+                        showNotificationIfBackground(data);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error processing notification", e);
+                    }
+                }
+                
                 notifyListeners(EVENT_MESSAGE_RECEIVED, args[0]);
             }
         });
@@ -359,6 +377,111 @@ public class SocketManager {
         }
     }
     
+    /**
+     * Hiển thị notification nếu app đang ở background
+     */
+    private void showNotificationIfBackground(JSONObject messageData) {
+        try {
+            Log.d(TAG, "=== NOTIFICATION DEBUG START ===");
+            Log.d(TAG, "Received message data: " + messageData.toString());
+            
+            // Kiểm tra xem app có đang ở foreground không
+            boolean isInForeground = isAppInForeground();
+            Log.d(TAG, "App in foreground: " + isInForeground);
+            Log.d(TAG, "Force notification mode: " + FORCE_NOTIFICATION_FOR_TESTING);
+            
+            if (isInForeground && !FORCE_NOTIFICATION_FOR_TESTING) {
+                Log.d(TAG, "App is in foreground and force mode OFF, skipping notification");
+                return;
+            }
+            
+            if (FORCE_NOTIFICATION_FOR_TESTING) {
+                Log.d(TAG, "⚠️ FORCE MODE ENABLED - Showing notification even in foreground");
+            }
+            
+            // Parse message data
+            String senderId = messageData.getJSONObject("user").getString("_id");
+            String senderName = messageData.getJSONObject("user").getString("username");
+            String message = messageData.getString("message");
+            
+            Log.d(TAG, "Parsed - senderId: " + senderId + ", senderName: " + senderName);
+            
+            // Lấy user ID hiện tại từ AuthManager
+            AuthManager authManager = AuthManager.getInstance(context);
+            com.example.project.models.User currentUser = authManager.getCurrentUser();
+            String currentUserId = (currentUser != null) ? currentUser.getId() : null;
+            
+            Log.d(TAG, "Current user ID: " + currentUserId);
+            Log.d(TAG, "Sender ID: " + senderId);
+            
+            // Chỉ hiện notification nếu không phải tin nhắn của mình
+            if (currentUserId != null && !currentUserId.equals(senderId)) {
+                // Kiểm tra xem người gửi có phải admin không
+                String userRole = messageData.getJSONObject("user").optString("role", "customer");
+                boolean isFromAdmin = "admin".equals(userRole) || "staff".equals(userRole);
+                boolean isAdminChat = !isFromAdmin; // Nếu nhận từ admin thì đây là user chat
+                
+                Log.d(TAG, "User role: " + userRole + ", isFromAdmin: " + isFromAdmin);
+                Log.d(TAG, "🔔 Showing notification - From: " + senderName + ", Message: " + message);
+                
+                // Hiển thị notification
+                ChatNotificationHelper.showChatNotification(
+                    context,
+                    senderId,
+                    senderName,
+                    message,
+                    isAdminChat
+                );
+                
+                Log.d(TAG, "✅ Notification shown successfully");
+            } else {
+                Log.d(TAG, "❌ Skipping notification - Message from self or no current user");
+            }
+            
+            Log.d(TAG, "=== NOTIFICATION DEBUG END ===");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error showing notification", e);
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Kiểm tra xem app có đang ở foreground không
+     */
+    private boolean isAppInForeground() {
+        try {
+            ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            if (activityManager == null) {
+                Log.w(TAG, "ActivityManager is null");
+                return false;
+            }
+            
+            List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+            if (appProcesses == null) {
+                Log.w(TAG, "Running app processes is null");
+                return false;
+            }
+            
+            final String packageName = context.getPackageName();
+            Log.d(TAG, "Checking foreground for package: " + packageName);
+            
+            for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+                Log.d(TAG, "Process: " + appProcess.processName + ", Importance: " + appProcess.importance);
+                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND 
+                    && appProcess.processName.equals(packageName)) {
+                    Log.d(TAG, "✅ App is in FOREGROUND");
+                    return true;
+                }
+            }
+            
+            Log.d(TAG, "❌ App is in BACKGROUND");
+            return false;
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking foreground status", e);
+            return false;
+        }
+    }
+
     // Listener interface
     public interface SocketListener {
         void onSocketEvent(String event, Object data);

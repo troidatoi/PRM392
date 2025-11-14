@@ -11,6 +11,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.project.utils.ChatNotificationHelper;
+import com.example.project.utils.NotificationHelper;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -18,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        
+        // Request notification permissions and create channels
+        NotificationHelper.requestNotificationPermission(this, 1001);
+        ChatNotificationHelper.createChatNotificationChannel(this);
 
         // Get Start Button - Navigate to LoginActivity or Home
         RelativeLayout startButton = findViewById(R.id.startButton);
