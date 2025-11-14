@@ -49,6 +49,7 @@ public class SocketManager {
     public static final String EVENT_MESSAGE_DELETED = "message:deleted";
     public static final String EVENT_MESSAGE_REACTION = "message:reaction";
     public static final String EVENT_SYSTEM_MESSAGE = "message:system";
+    public static final String EVENT_CHAT_LIST_UPDATE = "chat-list:update";
     
     private SocketManager(Context context) {
         this.context = context.getApplicationContext();
@@ -217,6 +218,14 @@ public class SocketManager {
             @Override
             public void call(Object... args) {
                 notifyListeners(EVENT_SYSTEM_MESSAGE, args[0]);
+            }
+        });
+        
+        socket.on(EVENT_CHAT_LIST_UPDATE, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d(TAG, "Chat list update event received");
+                notifyListeners(EVENT_CHAT_LIST_UPDATE, args[0]);
             }
         });
     }

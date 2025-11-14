@@ -96,6 +96,24 @@ const setupChatSocket = (io) => {
           isFromAdmin: isFromAdmin // Thêm field isFromAdmin
         });
 
+        // Emit event để cập nhật danh sách chat của admin
+        // Chỉ emit cho admins, không phải cho user gửi tin nhắn
+        const admins = Array.from(activeUsers.entries())
+          .filter(([userId, data]) => data.user.role === 'admin' || data.user.role === 'staff')
+          .filter(([userId]) => userId !== socket.userId); // Không gửi cho chính mình
+        
+        admins.forEach(([adminId, data]) => {
+          io.to(data.socketId).emit('chat-list:update', {
+            userId: socket.userId,
+            user: newMessage.user,
+            lastMessage: {
+              message: newMessage.message,
+              sentAt: newMessage.sentAt.getTime(),
+              isFromAdmin: isFromAdmin
+            }
+          });
+        });
+
         console.log(`Message sent to room ${roomId}`);
       } catch (error) {
         console.error('Error sending message:', error);
