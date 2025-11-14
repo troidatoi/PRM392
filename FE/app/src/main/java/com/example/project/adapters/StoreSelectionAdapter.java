@@ -66,7 +66,6 @@ public class StoreSelectionAdapter extends RecyclerView.Adapter<StoreSelectionAd
         
         holder.tvStoreName.setText(store.getName());
         holder.tvStoreAddress.setText(store.getAddress());
-        holder.tvStoreStock.setText("Còn " + store.getStock());
 
         // Update selection state
         boolean isSelected = position == selectedPosition;
@@ -81,17 +80,22 @@ public class StoreSelectionAdapter extends RecyclerView.Adapter<StoreSelectionAd
             holder.cardStore.setCardBackgroundColor(holder.itemView.getContext().getColor(R.color.light_gray));
         }
 
-        // Stock badge color
+        // Stock badge color and text based on quantity
         if (store.getStock() == 0) {
+            // Red - Hết hàng (0 items)
             holder.cardStockBadge.setCardBackgroundColor(holder.itemView.getContext().getColor(R.color.light_red));
             holder.tvStoreStock.setTextColor(holder.itemView.getContext().getColor(R.color.red));
             holder.tvStoreStock.setText("Hết hàng");
-        } else if (store.getStock() < 5) {
+        } else if (store.getStock() <= 5) {
+            // Orange - Sắp hết (1-5 items)
             holder.cardStockBadge.setCardBackgroundColor(holder.itemView.getContext().getColor(R.color.light_orange));
             holder.tvStoreStock.setTextColor(holder.itemView.getContext().getColor(R.color.orange));
+            holder.tvStoreStock.setText("Còn " + store.getStock() + " - Sắp hết");
         } else {
+            // Green - Còn hàng (more than 5 items)
             holder.cardStockBadge.setCardBackgroundColor(holder.itemView.getContext().getColor(R.color.light_green));
             holder.tvStoreStock.setTextColor(holder.itemView.getContext().getColor(R.color.green));
+            holder.tvStoreStock.setText("Còn " + store.getStock() + " - Còn hàng");
         }
 
         // Click listener
