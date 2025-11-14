@@ -19,7 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.project.models.ApiResponse;
 import com.example.project.network.ApiService;
 import com.example.project.network.RetrofitClient;
+import com.example.project.network.SocketManager;
 import com.example.project.utils.AuthManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +45,8 @@ public class AdminChatListActivity extends AppCompatActivity implements ChatUser
     private List<ChatUser> chatUsers;
     private ApiService apiService;
     private String token;
+    private SocketManager socketManager;
+    private SocketManager.SocketListener socketListener;
     
     // Bottom navigation
     private LinearLayout navDashboard, navUserManagement, navProductManagement, navStoreManagement, navOrderManagement, navChatManagement;
@@ -70,6 +76,7 @@ public class AdminChatListActivity extends AppCompatActivity implements ChatUser
 
         initViews();
         setupRecyclerView();
+        setupSocketConnection();
         loadChatUsers();
         setupClickListeners();
         setupBottomNavigation();
@@ -104,6 +111,113 @@ public class AdminChatListActivity extends AppCompatActivity implements ChatUser
         Log.d(TAG, "RecyclerView: " + (rvChatUsers != null ? "not null" : "null"));
         Log.d(TAG, "Adapter: " + (chatUserAdapter != null ? "not null" : "null"));
         Log.d(TAG, "ChatUsers list: " + (chatUsers != null ? chatUsers.size() : "null"));
+    }
+
+    private void setupSocketConnection() {
+        Log.d(TAG, "Setting up socket connection");
+        
+        // Initialize socket manager
+        socketManager = SocketManager.getInstance(this);
+        
+        // Create socket listener
+        socketListener = new SocketManager.SocketListener() {
+            @Override
+            public void onSocketEvent(String event, Object data) {
+                if (SocketManager.EVENT_CHAT_LIST_UPDATE.equals(event) && data instanceof JSONObject) {
+                    handleChatListUpdate((JSONObject) data);
+                }
+            }
+        };
+        
+        // Add listener
+        socketManager.addListener(socketListener);
+        
+        // Connect to socket
+        socketManager.connect();
+        
+        Log.d(TAG, "Socket connection setup complete");
+    }
+    
+    private void handleChatListUpdate(JSONObject data) {
+        runOnUiThread(() -> {
+            try {
+                Log.d(TAG, "=== Chat List Update ===");
+                Log.d(TAG, "Data: " + data.toString());
+                
+                // Parse data
+                String userId = data.getString("userId");
+                JSONObject userObj = data.getJSONObject("user");
+                JSONObject lastMessageObj = data.getJSONObject("lastMessage");
+                
+                // Extract user info
+                String userName = userObj.getString("username");
+                String avatar = userObj.optString("avatar", null);
+                
+                // Extract last message info
+                String lastMessage = lastMessageObj.getString("message");
+                long sentAt = lastMessageObj.getLong("sentAt");
+                int unreadCount = lastMessageObj.optInt("unreadCount", 0);
+                
+                // Check if user already exists in list
+                boolean userExists = false;
+                for (int i = 0; i < chatUsers.size(); i++) {
+                    ChatUser chatUser = chatUsers.get(i);
+                    if (chatUser.getUserId().equals(userId)) {
+                        // Update existing user
+                        chatUser.setLastMessage(lastMessage);
+                        chatUser.setLastMessageTime(sentAt);
+                        chatUser.setUnreadCount(unreadCount);
+                        
+                        // Move to top of list
+                        chatUsers.remove(i);
+                        chatUsers.add(0, chatUser);
+                        
+                        userExists = true;
+                        Log.d(TAG, "Updated existing user: " + userName);
+                        break;
+                    }
+                }
+                
+                if (!userExists) {
+                    // Add new user to the top of list
+                    ChatUser newChatUser = new ChatUser(
+                        userId,
+                        userName,
+                        avatar,
+                        lastMessage,
+                        sentAt,
+                        unreadCount
+                    );
+                    chatUsers.add(0, newChatUser);
+                    Log.d(TAG, "Added new user: " + userName);
+                }
+                
+                // Notify adapter
+                chatUserAdapter.notifyDataSetChanged();
+                
+                // Show empty state if needed
+                if (tvEmptyState != null) {
+                    tvEmptyState.setVisibility(chatUsers.isEmpty() ? View.VISIBLE : View.GONE);
+                }
+                
+                Log.d(TAG, "Chat list updated. Total users: " + chatUsers.size());
+                
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing chat list update", e);
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        
+        // Remove socket listener and disconnect
+        if (socketManager != null && socketListener != null) {
+            socketManager.removeListener(socketListener);
+        }
+        
+        Log.d(TAG, "Activity destroyed, socket listener removed");
     }
 
     private void loadChatUsers() {
